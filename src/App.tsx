@@ -1,38 +1,22 @@
-import { useState } from "react";
-import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
 
-import { Input } from "@chakra-ui/react";
-import { Button } from "@/components/ui/button";
+import { FileList } from "@/components/global/FileList";
+import { FolderList } from "@/components/global/FolderList";
+import { Editor } from "@/components/global/Editor";
+
+import { Header } from "@/components/global/Header";
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
-
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
-
   return (
     <main className="container">
-      <h1>Hello, World!</h1>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <Input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <Button type="submit">Greet</Button>
-      </form>
-      <p>{greetMsg}</p>
+      {/* メニューエリア */}
+      <Header />
+      {/* エディターエリア */}
+      <section className="editor-container">
+        <FolderList />
+        <FileList />
+        <Editor />
+      </section>
     </main>
   );
 }
