@@ -17,7 +17,7 @@ export const Header = () => {
           <Input placeholder="search text" w={300} />
         </InputGroup>
       </Flex>
-      <SegmentedControl items={["Edit", "Split", "View"]} />
+      <SegmentedControl defaultValue="Edit" items={["Edit", "Split", "View"]} />
     </Flex>
   );
 };
