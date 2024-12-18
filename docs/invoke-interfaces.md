@@ -122,12 +122,7 @@
 | -------- | ------------- | -------------- |
 | memos    | Vec<MemoInfo> | メモ情報の配列 |
 
-※ MemoInfo 構造体
-| フィールド | データ型 | 説明 |
-| ---------- | -------- | ------- |
-| id | u64 | メモ ID |
-| title | String | メモのタイトル |
-| updated_at | String | 最終更新日時 |
+[MemoInfo 構造体](#MemoInfo)
 
 </details>
 
@@ -149,20 +144,16 @@
 
 #### 戻り値
 
-| データ名   | データ型 | 説明                       |
-| ---------- | -------- | -------------------------- |
-| id         | u64      | メモ ID                    |
-| title      | String   | メモのタイトル             |
-| content    | String   | メモの Markdown コンテンツ |
-| created_at | String   | 作成日時                   |
-| updated_at | String   | 最終更新日時               |
-| tags       | Vec<Tag> | タグ情報の配列             |
+| データ名   | データ型     | 説明                       |
+| ---------- | ------------ | -------------------------- |
+| id         | u64          | メモ ID                    |
+| title      | String       | メモのタイトル             |
+| content    | String       | メモの Markdown コンテンツ |
+| created_at | String       | 作成日時                   |
+| updated_at | String       | 最終更新日時               |
+| tags       | Vec<TagInfo> | タグ情報の配列             |
 
-※ Tag 構造体
-| フィールド | データ型 | 説明 |
-| ---------- | -------- | ------- |
-| id | u64 | タグ ID |
-| name | String | タグ名 |
+[TagInfo 構造体](#TagInfo)
 
 ### createMemo
 
@@ -237,9 +228,11 @@
 
 #### 戻り値
 
-| データ名 | データ型 | 説明           |
-| -------- | -------- | -------------- |
-| tags     | Vec<Tag> | タグ情報の配列 |
+| データ名 | データ型     | 説明           |
+| -------- | ------------ | -------------- |
+| tags     | Vec<TagInfo> | タグ情報の配列 |
+
+[TagInfo 構造体](#TagInfo)
 
 ### createTag
 
@@ -325,7 +318,23 @@
 | ---------- | -------- | ------------ |
 | id         | u64      | ファイル ID  |
 | title      | String   | ファイル名   |
+| folder_id  | u64      | フォルダ ID  |
 | updated_at | String   | 最終更新日時 |
+
+### TagInfo
+
+| フィールド | データ型 | 説明    |
+| ---------- | -------- | ------- |
+| id         | u64      | タグ ID |
+| name       | String   | タグ名  |
+
+### MemoInfo
+
+| フィールド | データ型 | 説明           |
+| ---------- | -------- | -------------- |
+| id         | u64      | メモ ID        |
+| title      | String   | メモのタイトル |
+| updated_at | String   | 最終更新日時   |
 
 ## その他
 
