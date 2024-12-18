@@ -1,7 +1,8 @@
-import { Input, Flex } from "@chakra-ui/react";
+import { Flex, HStack, Button } from "@chakra-ui/react";
 
-import { InputGroup } from "@/components/ui/input-group";
 import { SegmentedControl } from "@/components/ui/segmented-control";
+import { ConfigMenu } from "@/components/parts/ConfigMenu";
+import { SearchInput } from "@/components/parts/SearchInput";
 
 export const Header = () => {
   return (
@@ -12,12 +13,17 @@ export const Header = () => {
       borderBottomWidth={1}
       borderBottomColor="border"
     >
-      <Flex>
-        <InputGroup>
-          <Input placeholder="search text" w={300} />
-        </InputGroup>
-      </Flex>
-      <SegmentedControl defaultValue="Edit" items={["Edit", "Split", "View"]} />
+      <SearchInput />
+
+      <HStack>
+        <SegmentedControl
+          defaultValue="Edit"
+          items={["Edit", "Split", "View"]}
+        />
+        <ConfigMenu>
+          <Button>Config</Button>
+        </ConfigMenu>
+      </HStack>
     </Flex>
   );
 };
