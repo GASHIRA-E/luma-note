@@ -20,12 +20,13 @@ export const FolderList = () => {
         + 新規フォルダー
       </Button>
       <Flex direction="column" gap={2}>
-        <FolderItem name="Folder 1" selected={true} />
+        <FolderItem name="未分類" memoCounts={2} />
+        <FolderItem name="Folder 1" selected memoCounts={3} />
         <FolderItem
           name="長い名前のフォルダー長い名前のフォルダー2"
-          selected={false}
+          memoCounts={0}
         />
-        <FolderItem name="Folder 3" selected={false} />
+        <FolderItem name="Folder 3" memoCounts={12} />
       </Flex>
     </Box>
   );

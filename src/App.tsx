@@ -1,6 +1,6 @@
 import "./App.css";
 
-import { FileList } from "@/components/global/FileList";
+import { MemoList } from "@/components/global/MemoList";
 import { FolderList } from "@/components/global/FolderList";
 import { Editor } from "@/components/global/Editor";
 
@@ -14,7 +14,7 @@ function App() {
       {/* エディターエリア */}
       <section className="editor-container">
         <FolderList />
-        <FileList />
+        <MemoList />
         <Editor />
       </section>
     </main>

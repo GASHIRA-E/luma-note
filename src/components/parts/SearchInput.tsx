@@ -14,7 +14,9 @@ import { HiCheck } from "react-icons/hi";
 export const SearchInput = () => {
   // 開閉状態を管理するためのstate
   const [isOpen, setIsOpen] = useState(false);
-  const handleFocusInput = () => setIsOpen(true);
+  const handleFocusInput = () => {
+    setIsOpen(true);
+  };
 
   const tags = [...Array(20)].map((_, i) => ({ id: i, name: `Tag${i}` }));
   // タグの選択状態を管理するためのstate
@@ -31,7 +33,7 @@ export const SearchInput = () => {
   return (
     <PopoverRoot open={isOpen}>
       <PopoverTrigger>
-        <Input placeholder="search text" w={300} onFocus={handleFocusInput} />
+        <Input placeholder="メモタイトル" w={300} onFocus={handleFocusInput} />
       </PopoverTrigger>
       <PopoverContent>
         <PopoverArrow />
