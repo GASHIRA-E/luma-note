@@ -4,9 +4,15 @@ export type FolderProps = {
   name: string;
   selected?: boolean;
   memoCounts?: number;
+  onClick: () => void;
 };
 
-export const FolderItem = ({ name, selected, memoCounts }: FolderProps) => {
+export const FolderItem = ({
+  name,
+  selected,
+  memoCounts,
+  onClick,
+}: FolderProps) => {
   return (
     <Box
       position="relative"
@@ -20,6 +26,7 @@ export const FolderItem = ({ name, selected, memoCounts }: FolderProps) => {
       _hover={{
         bg: "bg.emphasized",
       }}
+      onClick={selected ? undefined : onClick}
     >
       {memoCounts !== undefined ? (
         <Float placement="top-end">

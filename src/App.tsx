@@ -1,7 +1,7 @@
 import "./App.css";
 
+import { FolderList } from "@/components/container/FolderList";
 import { MemoList } from "@/components/global/MemoList";
-import { FolderList } from "@/components/global/FolderList";
 import { Editor } from "@/components/global/Editor";
 
 import { Header } from "@/components/global/Header";
