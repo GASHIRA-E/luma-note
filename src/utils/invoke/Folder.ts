@@ -6,7 +6,11 @@ export type FolderKeys =
   | "updateFolder"
   | "getMemoList";
 
-export type FolderInvokes = CreateFolder | DeleteFolder | UpdateFolder | GetMemoList;
+export type FolderInvokes =
+  | CreateFolder
+  | DeleteFolder
+  | UpdateFolder
+  | GetMemoList;
 
 type CreateFolder = InvokeBase<
   FolderKeys,
@@ -14,7 +18,7 @@ type CreateFolder = InvokeBase<
   {
     name: string;
   },
-  {}
+  null
 >;
 
 type DeleteFolder = InvokeBase<
@@ -23,7 +27,7 @@ type DeleteFolder = InvokeBase<
   {
     folderId: string;
   },
-  {}
+  null
 >;
 
 type UpdateFolder = InvokeBase<
@@ -33,7 +37,7 @@ type UpdateFolder = InvokeBase<
     folderId: number;
     name?: string;
   },
-  {}
+  null
 >;
 
 type GetMemoList = InvokeBase<
