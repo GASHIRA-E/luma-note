@@ -10,14 +10,12 @@ export const getMemoList = (
     {
       id: 1,
       title: "メモ1",
-      content: "メモ1の内容",
-      folderId: "1",
+      updated_at: "2021-01-01 00:00:00",
     },
     {
       id: 2,
       title: "メモ2",
-      content: "メモ2の内容",
-      folderId: "1",
+      updated_at: "2021-01-02 00:00:00",
     },
   ];
 };

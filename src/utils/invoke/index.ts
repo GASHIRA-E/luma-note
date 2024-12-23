@@ -4,7 +4,12 @@ import { FolderKeys, FolderInvokes } from "./Folder";
 
 type InvokeKeys = FolderKeys;
 
-export type InvokeBase<K extends string, Key extends K, T extends object, R> = {
+export type InvokeBase<
+  K extends string,
+  Key extends K,
+  T extends object | undefined,
+  R
+> = {
   key: Key;
   props: T;
   return: R;

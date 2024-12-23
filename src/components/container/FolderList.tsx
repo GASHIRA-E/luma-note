@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 import { FolderList as FolderListPresentational } from "@/components/global/FolderList";
 
-import { customInvoke } from "@/utils/invoke";
+import { getFoldersQuery } from "@/utils/invoke/Folder";
 
 export const FolderList = () => {
   type StateFolderList = React.ComponentProps<
@@ -10,30 +10,28 @@ export const FolderList = () => {
   >["folderList"];
   const [folderList, setFolderList] = useState<StateFolderList>([]);
 
+  const { data } = getFoldersQuery();
+
   useEffect(() => {
-    customInvoke(
-      "getMemoList",
-      { folderId: "1" },
-      {
-        isMock: true,
-      }
-    ).then((response) => {
-      const _folderList = response.map<StateFolderList[number]>((memo) => ({
-        folderId: memo.id,
-        name: memo.title,
-        selected: false,
-      }));
-      setFolderList([
-        // 未分類フォルダー
-        {
-          folderId: -1,
-          name: "未分類",
+    console.log(data);
+    const folders =
+      data?.map((folder) => {
+        return {
+          folderId: folder.id,
+          name: folder.name,
           selected: false,
-        },
-        ..._folderList,
-      ]);
-    });
-  }, []);
+        };
+      }) ?? [];
+    setFolderList([
+      // 未分類フォルダー
+      {
+        folderId: -1,
+        name: "未分類",
+        selected: false,
+      },
+      ...folders,
+    ]);
+  }, [data]);
 
   const handleClickNewFolder = () => {
     console.log("onClickNewFolder");
