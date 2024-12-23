@@ -1,5 +1,5 @@
 import { useQuery, useMutation, QueryClient } from "@tanstack/react-query";
-import { InvokeBase, customInvoke } from "./index";
+import { InvokeBase, customInvoke } from "./_base";
 
 export type FolderKeys =
   | "get_folders"
