@@ -16,7 +16,6 @@ export type FolderInvokes =
   | GetMemoList;
 
 export const getFoldersQuery = () => {
-  console.log("getFoldersQuery");
   return useQuery({
     queryKey: ["get_folders"],
     queryFn: () => customInvoke("get_folders", undefined),

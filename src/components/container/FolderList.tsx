@@ -13,7 +13,6 @@ export const FolderList = () => {
   const { data } = getFoldersQuery();
 
   useEffect(() => {
-    console.log(data);
     const folders =
       data?.map((folder) => {
         return {
