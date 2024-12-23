@@ -47,7 +47,7 @@ export const MemoItem = ({
       <HStack justifyContent="space-between" alignItems="flex-start">
         <Text textStyle="md">{name}</Text>
         <MenuRoot onSelect={handleSelectMenu}>
-          <MenuTrigger>
+          <MenuTrigger asChild>
             <IconButton size="xs" aria-label="More options" variant="outline">
               <HiDotsHorizontal />
             </IconButton>

@@ -24,7 +24,7 @@ export const ConfigMenu = ({ children }: ConfigMenuProps) => {
 
   return (
     <DrawerRoot>
-      <DrawerTrigger>{children}</DrawerTrigger>
+      <DrawerTrigger asChild>{children}</DrawerTrigger>
       <DrawerContent>
         <DrawerHeader>
           <DrawerTitle>Config Menu</DrawerTitle>
@@ -56,9 +56,7 @@ export const ConfigMenu = ({ children }: ConfigMenuProps) => {
             ))}
           </VStack>
         </DrawerBody>
-        <DrawerCloseTrigger asChild>
-          <Button>Close</Button>
-        </DrawerCloseTrigger>
+        <DrawerCloseTrigger />
         <DrawerFooter>
           <Button>Save</Button>
         </DrawerFooter>
