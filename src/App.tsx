@@ -3,10 +3,10 @@ import "./App.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { FolderList } from "@/components/container/FolderList";
-import { MemoList } from "@/components/global/MemoList";
-import { Editor } from "@/components/global/Editor";
+import { MemoList } from "@/components/presentation/MemoList";
+import { Editor } from "@/components/presentation/Editor";
 
-import { Header } from "@/components/global/Header";
+import { Header } from "@/components/presentation/Header";
 
 const queryClient = new QueryClient();
 
