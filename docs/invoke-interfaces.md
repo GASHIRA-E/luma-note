@@ -1,33 +1,36 @@
 # invoke の定義書
 
 - [[domain] Search](#Search)
-  - findMemo ... メモを検索する
+  - find_memo ... メモを検索する
 - [[domain] Folder](#Folder)
-  - getFolderList ... フォルダ一覧取得
-  - createFolder ... フォルダを作成する
-  - deleteFolder ... フォルダを削除する
-  - updateFolder ... フォルダを更新する
-  - getMemoList ... フォルダ内のメモ一覧取得
+  - get_folder_list ... フォルダ一覧取得
+  - create_folder ... フォルダを作成する
+  - delete_folder ... フォルダを削除する
+  - update_folder ... フォルダを更新する
+  - get_memo_list ... フォルダ内のメモ一覧取得
 - [[domain] Memo](#Memo)
-  - getMemo ... メモを取得する
-  - createMemo ... メモを作成する
-  - deleteMemo ... メモを削除する
-  - updateMemo ... メモを更新する
+  - get_memo ... メモを取得する
+  - create_memo ... メモを作成する
+  - delete_memo ... メモを削除する
+  - update_memo ... メモを更新する
 - [[domain] tags](#tags)
-  - getTags ... タグ一覧取得
-  - createTag ... タグを作成する
-  - deleteTag ... タグを削除する
+  - get_tags ... タグ一覧取得
+  - create_tag ... タグを作成する
+  - delete_tag ... タグを削除する
 - [[domain] config](#config)
-  - getConfig ... 設定を取得する
-  - updateConfig ... 設定を更新する
+  - get_config ... 設定を取得する
+  - update_config ... 設定を更新する
 - [[domain] Schema](#Schema)
   - FileInfo ... ファイル情報
+  - FolderInfo ... フォルダ情報
+  - TagInfo ... タグ情報
+  - MemoInfo ... メモ情報
 
 ## Search
 
 <details>
 
-### findMemo
+### find_memo
 
 #### 説明
 
@@ -54,7 +57,7 @@
 
 <details>
 
-### getFolderList
+### get_folder_list
 
 #### 説明
 
@@ -72,7 +75,7 @@
 
 [FolderInfo 構造体](#FolderInfo)
 
-### createFolder
+### create_folder
 
 #### 説明
 
@@ -90,7 +93,7 @@
 | -------- | -------- | ----------------------- |
 | id       | u64      | 作成されたフォルダの ID |
 
-### deleteFolder
+### delete_folder
 
 #### 説明
 
@@ -106,7 +109,7 @@
 
 なし
 
-### updateFolder
+### update_folder
 
 #### 説明
 
@@ -123,7 +126,7 @@
 
 なし
 
-### getMemoList
+### get_memo_list
 
 #### 説明
 
@@ -149,7 +152,7 @@
 
 <details>
 
-### getMemo
+### get_memo
 
 #### 説明
 
@@ -174,7 +177,7 @@
 
 [TagInfo 構造体](#TagInfo)
 
-### createMemo
+### create_memo
 
 #### 説明
 
@@ -194,7 +197,7 @@
 | -------- | -------- | ------------------- |
 | id       | u64      | 作成されたメモの ID |
 
-### deleteMemo
+### delete_memo
 
 #### 説明
 
@@ -210,7 +213,7 @@
 
 なし
 
-### updateMemo
+### update_memo
 
 #### 説明
 
@@ -235,7 +238,7 @@
 
 <details>
 
-### getTags
+### get_tags
 
 #### 説明
 
@@ -253,7 +256,7 @@
 
 [TagInfo 構造体](#TagInfo)
 
-### createTag
+### create_tag
 
 #### 説明
 
@@ -271,7 +274,7 @@
 | -------- | -------- | ------------------- |
 | id       | u64      | 作成されたタグの ID |
 
-### deleteTag
+### delete_tag
 
 #### 説明
 
@@ -293,7 +296,7 @@
 
 <details>
 
-### getConfig
+### get_config
 
 #### 説明
 
@@ -310,7 +313,7 @@
 | theme     | String   | テーマ設定（"light"/"dark"/"system"） |
 | font_size | u32      | フォントサイズ                        |
 
-### updateConfig
+### update_config
 
 #### 説明
 
