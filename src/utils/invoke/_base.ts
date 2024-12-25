@@ -1,7 +1,7 @@
 import { invoke } from "@tauri-apps/api/core";
 // Folderドメインの定義
 import { FolderKeys, FolderInvokes } from "./Folder";
-import { IS_MOCK } from "@/config";
+import { IS_MOCK } from "@/config/app";
 
 type InvokeKeys = FolderKeys;
 
@@ -20,7 +20,7 @@ type InvokeTypes = FolderInvokes;
 
 export const customInvoke = async <K extends InvokeKeys>(
   key: K,
-  props: Extract<InvokeTypes, { key: K }>["props"],
+  props: Extract<InvokeTypes, { key: K }>["props"]
 ) => {
   if (IS_MOCK) {
     const mock = await import(`./_mock/${key}.ts`);
