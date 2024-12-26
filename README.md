@@ -38,10 +38,15 @@ For iOS development, run:
   npm run tauri ios dev
 ```
 
-## Chakra ui の theme型を作成
+## Chakra ui の theme 型を作成
 
-アプリケーションroot dir にて実行
+アプリケーション root dir にて実行
 
 ```bash
 npx @chakra-ui/cli typegen ./src/config/theme.ts
 ```
+
+## DB
+
+1.  npm run tauri dev
+2.  sqlite3 ~/Library/Application\ Support/gashira-e.com/memos.db
