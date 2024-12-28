@@ -1,7 +1,11 @@
 import { EditArea as EditorPresentation } from "@/components/presentation/EditArea";
 import { useState, useMemo } from "react";
 
+import { useEditorStore } from "@/utils/stores/editor";
+
 export const EditArea = () => {
+  const editorDisplayMode = useEditorStore((state) => state.displayMode);
+
   const [tags, setTags] = useState(["test", "sample", "memo"]);
   const [mdText, setMdText] = useState(`
 # サンプルメモ1
@@ -72,7 +76,7 @@ console.log(sample);
       editorDisplay={{
         mdText: mdText,
         updateMdText: setMdText,
-        // displayMode: "Edit",
+        displayMode: editorDisplayMode,
       }}
     />
   );

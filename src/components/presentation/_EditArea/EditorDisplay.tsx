@@ -4,6 +4,7 @@ import { Box, Flex, Textarea } from "@chakra-ui/react";
 import { markedHighlight } from "marked-highlight";
 import hljs from "highlight.js";
 
+import { DisplayModes, type DisplayMode } from "@/utils/constants";
 import { useScrollSync } from "@/utils/hooks/useScrollSync";
 
 import "highlight.js/styles/github-dark.min.css";
@@ -22,10 +23,15 @@ const marked = new Marked(
 
 export type EditorDisplayProps = {
   mdText: string;
+  displayMode: DisplayMode;
   updateMdText: (mdText: string) => void;
 };
 
-export const EditorDisplay = ({ mdText, updateMdText }: EditorDisplayProps) => {
+export const EditorDisplay = ({
+  mdText,
+  displayMode,
+  updateMdText,
+}: EditorDisplayProps) => {
   const { ref1, ref2 } = useScrollSync<HTMLTextAreaElement>();
 
   const markdownHtml = useMemo(() => {
@@ -36,8 +42,9 @@ export const EditorDisplay = ({ mdText, updateMdText }: EditorDisplayProps) => {
     <Flex flexGrow={1} overflow="hidden">
       <Textarea
         ref={ref1}
+        display={displayMode === DisplayModes.VIEW ? "none" : "block"}
+        width={displayMode === DisplayModes.EDIT ? "100%" : "50%"}
         style={{
-          width: "50%",
           height: "100%",
           padding: "16px",
           fontSize: "16px",
@@ -54,8 +61,9 @@ export const EditorDisplay = ({ mdText, updateMdText }: EditorDisplayProps) => {
         borderTop="1px solid"
         borderColor="border.emphasized"
         className="markdown-body"
+        display={displayMode === DisplayModes.EDIT ? "none" : "block"}
+        width={displayMode === DisplayModes.VIEW ? "100%" : "50%"}
         style={{
-          width: "50%",
           height: "100%",
           padding: "16px",
           overflowY: "auto",
