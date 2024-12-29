@@ -1,8 +1,6 @@
 use serde::{Deserialize, Serialize};
 mod database;
-use sqlx::FromRow;
-use sqlx::Pool;
-use sqlx::Sqlite;
+use sqlx::{FromRow, Pool, Sqlite};
 use tauri::Manager;
 
 #[derive(Debug, Serialize, Deserialize)]
