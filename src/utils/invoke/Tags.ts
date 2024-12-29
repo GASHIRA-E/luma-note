@@ -65,8 +65,14 @@ type DeleteTag = InvokeBase<
   null
 >;
 
-export const deleteTagMutation = (props: DeleteTag["props"]) => {
+export const deleteTagMutation = (
+  props: DeleteTag["props"],
+  queryClient: QueryClient
+) => {
   return useMutation({
     mutationFn: () => customInvoke(TAGS_KEYS.DELETE_TAG, props),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [TAGS_KEYS.GET_TAGS] });
+    },
   });
 };
