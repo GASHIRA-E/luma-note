@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-import { FolderList as FolderListPresentational } from "@/components/global/FolderList";
+import { FolderList as FolderListPresentational } from "@/components/presentation/FolderList";
 
 import { getFoldersQuery } from "@/utils/invoke/Folder";
 
