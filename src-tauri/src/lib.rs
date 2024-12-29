@@ -1,8 +1,9 @@
+mod commands;
 mod database;
 mod types;
+use commands::folder::get_folders;
 use sqlx::{Pool, Sqlite};
 use tauri::Manager;
-use types::FolderInfo;
 
 pub fn db_init() -> Result<Pool<Sqlite>, Box<dyn std::error::Error>> {
     use tauri::async_runtime::block_on;
@@ -38,21 +39,6 @@ pub fn db_init() -> Result<Pool<Sqlite>, Box<dyn std::error::Error>> {
     }
 
     Ok(sqlite_pool)
-}
-
-#[tauri::command]
-async fn get_folders(state: tauri::State<'_, Pool<Sqlite>>) -> Result<Vec<FolderInfo>, ()> {
-    let folders = get_folders_from_db(state.inner().clone()).await?;
-    Ok(folders)
-}
-
-async fn get_folders_from_db(sqlite_pool: Pool<Sqlite>) -> Result<Vec<FolderInfo>, ()> {
-    const SQL: &str = "SELECT * FROM Folders";
-    let folders = sqlx::query_as::<_, FolderInfo>(SQL)
-        .fetch_all(&sqlite_pool)
-        .await
-        .map_err(|_| ())?;
-    Ok(folders)
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
