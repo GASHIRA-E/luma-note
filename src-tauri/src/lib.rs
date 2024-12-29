@@ -1,50 +1,8 @@
-use serde::{Deserialize, Serialize};
 mod database;
-use sqlx::{FromRow, Pool, Sqlite};
+mod types;
+use sqlx::{Pool, Sqlite};
 use tauri::Manager;
-
-#[derive(Debug, Serialize, Deserialize)]
-struct FolderInfo {
-    id: i64,
-    name: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct DetailMemoInfo {
-    id: i64,
-    title: String,
-    folder_id: i64,
-    content: String,
-    updated_at: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct MemoInfo {
-    id: i64,
-    name: String,
-    updated_at: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct MemoListInfo {
-    id: i64,
-    name: String,
-    updated_at: String,
-    tags: Vec<TagInfo>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct TagInfo {
-    id: i64,
-    name: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, FromRow)]
-struct Folder {
-    id: i64,
-    name: String,
-    updated_at: String,
-}
+use types::FolderInfo;
 
 pub fn db_init() -> Result<Pool<Sqlite>, Box<dyn std::error::Error>> {
     use tauri::async_runtime::block_on;
@@ -83,14 +41,14 @@ pub fn db_init() -> Result<Pool<Sqlite>, Box<dyn std::error::Error>> {
 }
 
 #[tauri::command]
-async fn get_folders(state: tauri::State<'_, Pool<Sqlite>>) -> Result<Vec<Folder>, ()> {
+async fn get_folders(state: tauri::State<'_, Pool<Sqlite>>) -> Result<Vec<FolderInfo>, ()> {
     let folders = get_folders_from_db(state.inner().clone()).await?;
     Ok(folders)
 }
 
-async fn get_folders_from_db(sqlite_pool: Pool<Sqlite>) -> Result<Vec<Folder>, ()> {
+async fn get_folders_from_db(sqlite_pool: Pool<Sqlite>) -> Result<Vec<FolderInfo>, ()> {
     const SQL: &str = "SELECT * FROM Folders";
-    let folders = sqlx::query_as::<_, Folder>(SQL)
+    let folders = sqlx::query_as::<_, FolderInfo>(SQL)
         .fetch_all(&sqlite_pool)
         .await
         .map_err(|_| ())?;
