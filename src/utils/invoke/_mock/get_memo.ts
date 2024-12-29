@@ -42,7 +42,11 @@ console.log(sample);
       tags: [
         {
           id: 1,
-          name: "タグ1",
+          name: "仕事",
+        },
+        {
+          id: 2,
+          name: "プライベート",
         },
       ],
     };
@@ -63,6 +67,11 @@ console.log(sample);
     content: "fuga",
     created_at: "2021-01-01 00:00:00",
     updated_at: "2021-01-01 00:00:00",
-    tags: [],
+    tags: [
+      {
+        id: 3,
+        name: "買い物リスト",
+      },
+    ],
   };
 };

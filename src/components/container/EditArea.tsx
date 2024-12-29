@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 
 import { EditArea as EditorPresentation } from "@/components/presentation/EditArea";
 import { getMemoQuery } from "@/utils/invoke/Memo";
+import { getTagsQuery } from "@/utils/invoke/Tags";
 import { useEditorStore } from "@/utils/stores/editor";
 
 export const EditArea = () => {
@@ -23,19 +24,7 @@ export const EditArea = () => {
     }
   }, [data]);
 
-  // サンプルのタグ一覧 (10件ほど)
-  const allTags = [
-    "test",
-    "sample",
-    "memo",
-    "tag",
-    "note",
-    "idea",
-    "study",
-    "work",
-    "private",
-    "public",
-  ];
+  const { data: tagsData } = getTagsQuery();
 
   // タグを追加する(仮実装)
   const handleAddTag = (tag: string) => {
@@ -47,11 +36,16 @@ export const EditArea = () => {
     setTags(tags.filter((t) => t !== tag));
   };
 
+  // タグ候補一覧
   // 設定済みのタグを除外
-  const availableTags = useMemo<string[]>(
-    () => allTags.filter((tag) => !tags.includes(tag)),
-    [tags, allTags]
-  );
+  const availableTags = useMemo<string[]>(() => {
+    if (!tagsData) {
+      return [];
+    }
+    return tagsData.tags
+      .flatMap((tag) => tag.name)
+      .filter((tag) => !tags.includes(tag));
+  }, [tags, tagsData]);
 
   if (!data) {
     return <p>メモが選択されていません</p>;
