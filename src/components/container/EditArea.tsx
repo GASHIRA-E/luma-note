@@ -1,38 +1,27 @@
-import { EditArea as EditorPresentation } from "@/components/presentation/EditArea";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 
+import { EditArea as EditorPresentation } from "@/components/presentation/EditArea";
+import { getMemoQuery } from "@/utils/invoke/Memo";
 import { useEditorStore } from "@/utils/stores/editor";
 
 export const EditArea = () => {
   const editorDisplayMode = useEditorStore((state) => state.displayMode);
+  const selectedMemoId = useEditorStore((state) => state.selectedMemoId);
+
+  const { data } = getMemoQuery({ memo_id: selectedMemoId });
 
   const [tags, setTags] = useState(["test", "sample", "memo"]);
-  const [mdText, setMdText] = useState(`
-# サンプルメモ1
+  const [mdText, setMdText] = useState("");
 
-これはサンプルのメモです。
-
-## タグ
-
-- test
-- sample
-- memo
-
-## リンク
-
-- [Google](https://www.google.com/)
-
-## 画像
-
-![sample](https://via.placeholder.com/150)
-
-## コード
-
-\`\`\`js
-const sample = "Hello, World!";
-console.log(sample);
-\`\`\`
-`);
+  useEffect(() => {
+    if (data) {
+      setMdText(data.content);
+      setTags(data.tags.map((tag) => tag.name));
+    } else {
+      setMdText("");
+      setTags([]);
+    }
+  }, [data]);
 
   // サンプルのタグ一覧 (10件ほど)
   const allTags = [
@@ -64,10 +53,14 @@ console.log(sample);
     [tags, allTags]
   );
 
+  if (!data) {
+    return <p>メモが選択されていません</p>;
+  }
+
   return (
     <EditorPresentation
       editorInfo={{
-        memoTitle: "サンプルメモ1",
+        memoTitle: data.title,
         tags: tags,
         availableTags: availableTags,
         addTag: handleAddTag,

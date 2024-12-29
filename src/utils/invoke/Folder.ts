@@ -93,7 +93,7 @@ type UpdateFolder = InvokeBase<
 
 export const getMemoListQuery = (props: GetMemoList["props"]) => {
   return useQuery({
-    queryKey: ["get_memo_list", props.folderId],
+    queryKey: ["get_memo_list", props.folder_id],
     queryFn: () => customInvoke("get_memo_list", props),
   });
 };
@@ -102,7 +102,7 @@ type GetMemoList = InvokeBase<
   FolderKeys,
   "get_memo_list",
   {
-    folderId: string;
+    folder_id: number | null;
   },
   {
     id: number;

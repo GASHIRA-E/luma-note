@@ -2,11 +2,25 @@ import { Box, Heading, Flex } from "@chakra-ui/react";
 import { Button } from "@/components/ui/button";
 import { MemoItem } from "@/components/parts/MemoItem";
 
-export const MemoList = () => {
-  const onClickMoveFolder = (memoId: number) => {
-    alert(memoId);
-  };
+interface MemoListProps {
+  memos: Array<{
+    id: number;
+    name: string;
+    updatedAt: string;
+  }>;
+  selectedMemoId: number | null;
+  onClickMoveFolder: (memoId: number) => void;
+  onClickNewMemo: () => void;
+  onClickMemo: (memoId: number) => void;
+}
 
+export const MemoList: React.FC<MemoListProps> = ({
+  memos,
+  selectedMemoId,
+  onClickMoveFolder,
+  onClickNewMemo,
+  onClickMemo,
+}) => {
   return (
     <Box
       w={240}
@@ -20,33 +34,21 @@ export const MemoList = () => {
       <Heading size="lg" mb={2}>
         Memo List
       </Heading>
-      <Button w="full" mb={2}>
+      <Button w="full" mb={2} onClick={onClickNewMemo}>
         + 新規メモ
       </Button>
       <Flex direction="column" gap={2}>
-        {/* テストデータ */}
-        <MemoItem
-          id={1}
-          name="テストファイル1"
-          tags={["タグ1"]}
-          updatedAt="2024-09-20 20:15"
-          selected
-          onClickMoveFolder={onClickMoveFolder}
-        />
-        <MemoItem
-          id={2}
-          name="テストファイル2-長い名前のファイル名-長い名前のファイル名"
-          tags={["タグ2"]}
-          updatedAt="2024-09-21 15:30"
-          onClickMoveFolder={onClickMoveFolder}
-        />
-        <MemoItem
-          id={3}
-          name="テストファイル3"
-          tags={["タグ1", "タグ2"]}
-          updatedAt="2024-09-23 22:15"
-          onClickMoveFolder={onClickMoveFolder}
-        />
+        {memos.map((memo) => (
+          <MemoItem
+            key={memo.id}
+            id={memo.id}
+            name={memo.name}
+            updatedAt={memo.updatedAt}
+            selected={memo.id === selectedMemoId}
+            onClickMoveFolder={onClickMoveFolder}
+            onClickMemo={onClickMemo}
+          />
+        ))}
       </Flex>
     </Box>
   );

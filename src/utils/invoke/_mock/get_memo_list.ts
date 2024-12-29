@@ -2,10 +2,13 @@ import type { FolderInvokes } from "../Folder";
 
 type GetMemoList = Extract<FolderInvokes, { key: "get_memo_list" }>;
 
-export const getMemoList = (
+export const get_memo_list = (
   props: GetMemoList["props"]
 ): GetMemoList["return"] => {
-  console.log("call mock invoke: getMemoList", props);
+  console.log("call mock invoke: get_memo_list", props);
+  if (props.folder_id === null) {
+    return [];
+  }
   return [
     {
       id: 1,

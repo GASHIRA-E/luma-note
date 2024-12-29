@@ -3,7 +3,7 @@ import "./App.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { FolderList } from "@/components/container/FolderList";
-import { MemoList } from "@/components/presentation/MemoList";
+import { MemoListContainer } from "@/components/container/MemoList";
 import { EditArea } from "@/components/container/EditArea";
 import { HeaderContainer } from "@/components/container/Header";
 
@@ -18,7 +18,7 @@ function App() {
         {/* エディターエリア */}
         <section className="editor-container">
           <FolderList />
-          <MemoList />
+          <MemoListContainer />
           <EditArea />
         </section>
       </main>
