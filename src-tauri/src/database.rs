@@ -2,7 +2,7 @@ use sqlx::{
     sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions, SqliteSynchronous},
     SqlitePool,
 };
-use std::str::FromStr; // これを追加
+use std::str::FromStr;
 
 /// このモジュール内の関数の戻り値型
 type DbResult<T> = Result<T, Box<dyn std::error::Error>>;
