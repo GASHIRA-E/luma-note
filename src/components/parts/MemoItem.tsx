@@ -10,19 +10,19 @@ import {
 export type MemoItemProps = {
   id: number;
   name: string;
-  tags: string[];
   updatedAt: string;
   selected?: boolean;
   onClickMoveFolder: (memoId: number) => void;
+  onClickMemo: (memoId: number) => void; // Add this line
 };
 
 export const MemoItem = ({
   id,
   name,
-  tags,
   updatedAt,
   selected,
   onClickMoveFolder,
+  onClickMemo,
 }: MemoItemProps) => {
   const handleSelectMenu: React.ComponentProps<typeof MenuRoot>["onSelect"] = (
     select
@@ -43,6 +43,7 @@ export const MemoItem = ({
       _hover={{
         bg: "bg.emphasized",
       }}
+      onClick={() => onClickMemo(id)}
     >
       <HStack justifyContent="space-between" alignItems="flex-start">
         <Text textStyle="md">{name}</Text>
@@ -58,7 +59,6 @@ export const MemoItem = ({
         </MenuRoot>
       </HStack>
 
-      <Text textStyle="sm">{tags.map((v) => `#${v}`).join(" ")}</Text>
       <Text color="fg.subtle" textStyle="sm">
         {updatedAt}
       </Text>

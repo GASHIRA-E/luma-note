@@ -12,6 +12,13 @@
 - [tanstack query](https://tanstack.com/query/latest)
 - [scaffdog](https://scaff.dog/)
 
+#### エディタ周りのライブラリ
+
+- [marked](https://marked.js.org/)
+  - markdownテキストからhtmlテキストへ変換を行うため
+- [highlight.js](https://highlightjs.org/)
+  - コード関連のハイライトを行うため
+
 ## Recommended IDE Setup
 
 - [VS Code](https://code.visualstudio.com/)

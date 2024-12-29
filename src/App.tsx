@@ -3,10 +3,9 @@ import "./App.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { FolderList } from "@/components/container/FolderList";
-import { MemoList } from "@/components/presentation/MemoList";
-import { Editor } from "@/components/presentation/Editor";
-
-import { Header } from "@/components/presentation/Header";
+import { MemoListContainer } from "@/components/container/MemoList";
+import { EditArea } from "@/components/container/EditArea";
+import { HeaderContainer } from "@/components/container/Header";
 
 const queryClient = new QueryClient();
 
@@ -15,12 +14,12 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <main className="container">
         {/* メニューエリア */}
-        <Header />
+        <HeaderContainer />
         {/* エディターエリア */}
         <section className="editor-container">
           <FolderList />
-          <MemoList />
-          <Editor />
+          <MemoListContainer />
+          <EditArea />
         </section>
       </main>
     </QueryClientProvider>
