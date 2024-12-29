@@ -6,6 +6,7 @@ import { FolderList } from "@/components/container/FolderList";
 import { MemoListContainer } from "@/components/container/MemoList";
 import { EditArea } from "@/components/container/EditArea";
 import { HeaderContainer } from "@/components/container/Header";
+import { ConfigMenuContainer } from "@/components/container/ConfigMenu";
 
 const queryClient = new QueryClient();
 
@@ -14,7 +15,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <main className="container">
         {/* メニューエリア */}
-        <HeaderContainer />
+        <HeaderContainer ConfigMenuButton={ConfigMenuContainer} />
         {/* エディターエリア */}
         <section className="editor-container">
           <FolderList />

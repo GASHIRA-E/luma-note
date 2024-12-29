@@ -5,3 +5,12 @@ export const DisplayModes = {
 } as const;
 
 export type DisplayMode = (typeof DisplayModes)[keyof typeof DisplayModes];
+
+// アプリのテーマ一覧
+export const AppThemes = {
+  LIGHT: "light",
+  DARK: "dark",
+  SYSTEM: "system",
+} as const;
+
+export type AppTheme = (typeof AppThemes)[keyof typeof AppThemes];

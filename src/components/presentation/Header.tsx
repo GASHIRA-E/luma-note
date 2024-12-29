@@ -1,8 +1,7 @@
 import type React from "react";
-import { Flex, HStack, Button } from "@chakra-ui/react";
+import { Flex, HStack } from "@chakra-ui/react";
 
 import { SegmentedControl } from "@/components/ui/segmented-control";
-import { ConfigMenu } from "@/components/parts/ConfigMenu";
 import { SearchInput } from "@/components/parts/SearchInput";
 
 import { getObjectKeys } from "@/utils/helpers/getObjectKeys";
@@ -11,6 +10,7 @@ import { DisplayModes, type DisplayMode } from "@/utils/constants";
 type HeaderProps = {
   editorDisplayModeValue: DisplayMode;
   setEditorDisplayMode: (mode: DisplayMode) => void;
+  ConfigMenuButton: () => React.ReactElement;
 };
 
 const SegmentItems = getObjectKeys(DisplayModes).map((k) => DisplayModes[k]);
@@ -22,6 +22,7 @@ const isDisplayMode = (value: any): value is DisplayMode => {
 export const Header = ({
   editorDisplayModeValue,
   setEditorDisplayMode,
+  ConfigMenuButton,
 }: HeaderProps) => {
   const handleValueChange: React.ComponentProps<
     typeof SegmentedControl
@@ -48,9 +49,7 @@ export const Header = ({
           onValueChange={handleValueChange}
           items={SegmentItems}
         />
-        <ConfigMenu>
-          <Button>Config</Button>
-        </ConfigMenu>
+        <ConfigMenuButton />
       </HStack>
     </Flex>
   );
