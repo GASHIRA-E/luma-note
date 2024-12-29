@@ -1,39 +1,29 @@
-import { useState } from "react";
-import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
 
-import { Input } from "@chakra-ui/react";
-import { Button } from "@/components/ui/button";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+import { FolderList } from "@/components/container/FolderList";
+import { MemoList } from "@/components/presentation/MemoList";
+import { Editor } from "@/components/presentation/Editor";
+
+import { Header } from "@/components/presentation/Header";
+
+const queryClient = new QueryClient();
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
-
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
-
   return (
-    <main className="container">
-      <h1>Hello, World!</h1>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <Input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <Button type="submit">Greet</Button>
-      </form>
-      <p>{greetMsg}</p>
-    </main>
+    <QueryClientProvider client={queryClient}>
+      <main className="container">
+        {/* メニューエリア */}
+        <Header />
+        {/* エディターエリア */}
+        <section className="editor-container">
+          <FolderList />
+          <MemoList />
+          <Editor />
+        </section>
+      </main>
+    </QueryClientProvider>
   );
 }
 
