@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
+import { useColorMode } from "@/components/ui/color-mode";
 
 import { ConfigMenu } from "@/components/presentation/ConfigMenu";
 
@@ -17,6 +18,12 @@ const isAppTheme = (value: any): value is AppTheme => {
 export const ConfigMenuContainer = () => {
   const currentTheme = useConfigStore((state) => state.theme);
   const setTheme = useConfigStore((state) => state.setTheme);
+
+  // アプリテーマの変更
+  const { setColorMode } = useColorMode();
+  useEffect(() => {
+    setColorMode(currentTheme);
+  }, [currentTheme, setColorMode]);
 
   const { data } = getTagsQuery();
   const allTags = useMemo<string[]>(() => {

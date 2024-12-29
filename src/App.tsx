@@ -1,6 +1,8 @@
 import "./App.css";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
+import { ColorModeProvider } from "@/components/ui/color-mode";
 
 import { FolderList } from "@/components/container/FolderList";
 import { MemoListContainer } from "@/components/container/MemoList";
@@ -13,16 +15,20 @@ const queryClient = new QueryClient();
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <main className="container">
-        {/* メニューエリア */}
-        <HeaderContainer ConfigMenuButton={ConfigMenuContainer} />
-        {/* エディターエリア */}
-        <section className="editor-container">
-          <FolderList />
-          <MemoListContainer />
-          <EditArea />
-        </section>
-      </main>
+      <ChakraProvider value={defaultSystem}>
+        <ColorModeProvider>
+          <main className="container">
+            {/* メニューエリア */}
+            <HeaderContainer ConfigMenuButton={ConfigMenuContainer} />
+            {/* エディターエリア */}
+            <section className="editor-container">
+              <FolderList />
+              <MemoListContainer />
+              <EditArea />
+            </section>
+          </main>
+        </ColorModeProvider>
+      </ChakraProvider>
     </QueryClientProvider>
   );
 }
