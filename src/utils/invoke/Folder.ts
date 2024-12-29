@@ -64,7 +64,7 @@ type DeleteFolder = InvokeBase<
   FolderKeys,
   "delete_folder",
   {
-    folderId: string;
+    folder_id: string;
   },
   null
 >;
@@ -85,7 +85,7 @@ type UpdateFolder = InvokeBase<
   FolderKeys,
   "update_folder",
   {
-    folderId: number;
+    folder_id: number;
     name?: string;
   },
   null
