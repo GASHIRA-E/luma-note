@@ -1,6 +1,6 @@
-import type { MemoInvokes } from "../Memo";
+import { MEMO_KEYS, type MemoInvokes } from "../Memo";
 
-type GetMemo = Extract<MemoInvokes, { key: "get_memo" }>;
+type GetMemo = Extract<MemoInvokes, { key: typeof MEMO_KEYS.GET_MEMO }>;
 
 export const get_memo = (props: GetMemo["props"]): GetMemo["return"] => {
   console.log("call mock invoke: get_memo", props);
