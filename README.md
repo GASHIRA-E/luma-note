@@ -98,13 +98,13 @@ sqlite3 ~/Library/Application\ Support/gashira-e.com/memos.db
 sqlite> .tables
 Folders           Memos             _sqlx_migrations
 MemoTagRelations  Tags
+
 sqlite> select * FROM Memos;
 1|1|会議メモ|# 2024年第1回プロジェクトミーティング\n\n- 進捗確認\n- 次回の目標設定\n- 課題の共有|2024-12-29 04:53:30|2024-12-29 04:53:30
 2|1|タスクリスト|- [ ] レポート作成\n- [ ] 資料準備\n- [x] メール返信|2024-12-29 04:53:30|2024-12-29 04:53:30
 3|2|買い物リスト|- 牛乳\n- パン\n- 卵\n- 野菜|2024-12-29 04:53:30|2024-12-29 04:53:30
 4|3|アプリアイデア|# メモアプリの新機能案\n\n1. タグ付け機能\n2. 検索機能の強化\n3. カレンダー連携|2024-12-29 04:53:30|2024-12-29 04:53:30
-sqlite> select * FROM Folder;
-Parse error: no such table: Folder
+
 sqlite> select * FROM Folders;
 1|仕事|2024-12-29 04:53:30|2024-12-29 04:53:30
 2|プライベート|2024-12-29 04:53:30|2024-12-29 04:53:30
