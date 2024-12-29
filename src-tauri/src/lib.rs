@@ -21,19 +21,18 @@ pub fn run() {
 }
 
 pub fn migration_up() -> Vec<Migration> {
-    vec![Migration {
-        version: 1,
-        description: "Create Memos Table",
-        sql: include_str!("migrations/create_memo.sql"),
-        kind: MigrationKind::Up,
-    }]
-}
-
-pub fn migration_down() -> Vec<Migration> {
-    vec![Migration {
-        version: 1,
-        description: "Drop Memos Table",
-        sql: "DROP TABLE Memos;",
-        kind: MigrationKind::Down,
-    }]
+    vec![
+        Migration {
+            version: 1,
+            description: "Create Memo Table",
+            sql: include_str!("migrations/20241226_init_database.sql"),
+            kind: MigrationKind::Up,
+        },
+        Migration {
+            version: 2,
+            description: "Insert Test Data",
+            sql: include_str!("migrations/20241229_insert_test_data.sql"),
+            kind: MigrationKind::Up,
+        },
+    ]
 }
