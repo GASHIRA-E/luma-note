@@ -10,7 +10,7 @@ export const EditArea = () => {
 
   const { data } = getMemoQuery({ memo_id: selectedMemoId });
 
-  const [tags, setTags] = useState(["test", "sample", "memo"]);
+  const [tags, setTags] = useState<string[]>([]);
   const [mdText, setMdText] = useState("");
 
   useEffect(() => {
