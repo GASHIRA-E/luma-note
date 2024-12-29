@@ -1,10 +1,12 @@
 import { invoke } from "@tauri-apps/api/core";
 // Folderドメインの定義
 import { FolderKeys, FolderInvokes } from "./Folder";
-import { MemoKeys, MemoInvokes } from './Memo';
+import { MemoKeys, MemoInvokes } from "./Memo";
+import { TagsKeys, TagsInvokes } from "./Tags";
+
 import { IS_MOCK } from "@/config/app";
 
-type InvokeKeys = FolderKeys | MemoKeys;
+type InvokeKeys = FolderKeys | MemoKeys | TagsKeys;
 
 export type InvokeBase<
   K extends string,
@@ -17,7 +19,7 @@ export type InvokeBase<
   return: R;
 };
 
-type InvokeTypes = FolderInvokes | MemoInvokes;
+type InvokeTypes = FolderInvokes | MemoInvokes | TagsInvokes;
 
 export const customInvoke = async <K extends InvokeKeys>(
   key: K,
