@@ -86,11 +86,15 @@ npx scaffdog generate
 
 ### データベースの確認
 
+データベースのテーブルを確認する
+
 ```bash
 sqlite3 ~/Library/Application\ Support/gashira-e.com/memos.db
 ```
 
-```
+テーブルの確認
+
+```sh
 sqlite> .tables
 Folders           Memos             _sqlx_migrations
 MemoTagRelations  Tags
