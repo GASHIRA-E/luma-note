@@ -5,7 +5,6 @@ import {
   DrawerBody,
   DrawerCloseTrigger,
   DrawerContent,
-  DrawerFooter,
   DrawerHeader,
   DrawerRoot,
   DrawerTitle,
@@ -63,9 +62,6 @@ export const ConfigMenu = ({
           </VStack>
         </DrawerBody>
         <DrawerCloseTrigger />
-        <DrawerFooter>
-          <Button>Save</Button>
-        </DrawerFooter>
       </DrawerContent>
       <DrawerBackdrop />
     </DrawerRoot>
