@@ -162,10 +162,10 @@ sqlite> .quit
 
 ```bash
 # マイグレーションファイルを作成
-sqlx migrate add <マイグレーション名>
+sqlx migrate add -r <マイグレーション名>
 
 # 例: テーブル作成のマイグレーション
-sqlx migrate add create_users_table
+sqlx migrate add -r create_users_table
 
 # 作成されるファイル:
 # - migrations/{timestamp}_create_users_table.up.sql
