@@ -23,7 +23,7 @@ type FindMemoCommand = InvokeBase<
   }
 >;
 
-export const findMemoCommandQuery = (props: FindMemoCommand["props"]) => {
+export const findMemoQuery = (props: FindMemoCommand["props"]) => {
   return useQuery({
     queryKey: [SEARCH_KEYS.FIND_MEMO, props],
     queryFn: () => customInvoke(SEARCH_KEYS.FIND_MEMO, props),
