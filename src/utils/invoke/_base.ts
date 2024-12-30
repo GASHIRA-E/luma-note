@@ -3,8 +3,9 @@ import { invoke } from "@tauri-apps/api/core";
 import { FolderKeys, FolderInvokes } from "./Folder";
 import { MemoKeys, MemoInvokes } from "./Memo";
 import { TagsKeys, TagsInvokes } from "./Tags";
+import { SearchKeys, SearchInvokes } from "./Search";
 
-type InvokeKeys = FolderKeys | MemoKeys | TagsKeys;
+type InvokeKeys = FolderKeys | MemoKeys | TagsKeys | SearchKeys;
 
 export type InvokeBase<
   K extends string,
@@ -17,7 +18,7 @@ export type InvokeBase<
   return: R;
 };
 
-type InvokeTypes = FolderInvokes | MemoInvokes | TagsInvokes;
+type InvokeTypes = FolderInvokes | MemoInvokes | TagsInvokes | SearchInvokes;
 
 export const customInvoke = async <K extends InvokeKeys>(
   key: K,
