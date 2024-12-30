@@ -24,5 +24,4 @@ dist-ssr
 *.sw?
 
 md-memo-light-db/*
-
 !md-memo-light-db/.gitkeep
