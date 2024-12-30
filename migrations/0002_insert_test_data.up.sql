@@ -1,39 +1,9 @@
-CREATE TABLE IF NOT EXISTS Memos (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    folder_id INTEGER DEFAULT 0, -- folderID=0:フォルダ未選択
-    title TEXT NOT NULL,
-    content TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS Tags (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS Folders(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS MemoTagRelations (
-    memo_id INTEGER,
-    tag_id INTEGER,
-    PRIMARY KEY (memo_id, tag_id),
-    FOREIGN KEY (memo_id) REFERENCES Memos(id) ON DELETE CASCADE,
-    FOREIGN KEY (tag_id) REFERENCES Tags(id) ON DELETE CASCADE
-);
-
 -- テストデータの挿入
 INSERT INTO Folders (name) VALUES 
     ('仕事'),
     ('プライベート'),
-    ('アイデア');
+    ('アイデア'),
+    ('その他');
 
 INSERT INTO Memos (folder_id, title, content) VALUES
     (1, '会議メモ', '# 2024年第1回プロジェクトミーティング\n\n- 進捗確認\n- 次回の目標設定\n- 課題の共有'),

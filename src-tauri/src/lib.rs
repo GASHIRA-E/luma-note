@@ -7,36 +7,23 @@ use tauri::Manager;
 
 pub fn db_init() -> Result<Pool<Sqlite>, Box<dyn std::error::Error>> {
     use tauri::async_runtime::block_on;
-    // データベースのファイルパス等を設定する
-    const DATABASE_DIR: &str = "md-memo-light-db";
-    const DATABASE_FILE: &str = "db.sqlite";
-    let home_dir = directories::UserDirs::new()
-        .map(|dirs| dirs.home_dir().to_path_buf())
-        // ホームディレクトリが取得できないときはカレントディレクトリを使う
-        .unwrap_or_else(|| std::env::current_dir().expect("Cannot access the current directory"));
-    let database_dir = home_dir.join(DATABASE_DIR);
-    let database_file = database_dir.join(DATABASE_FILE);
 
-    // データベースファイルが存在するかチェックする
-    let db_exists = std::fs::metadata(&database_file).is_ok();
-    // 存在しないなら、ファイルを格納するためのディレクトリを作成する
-    if !db_exists {
-        std::fs::create_dir(&database_dir)?;
-    }
+    // プロジェクトのルートディレクトリを取得（src-tauriの親ディレクトリ）
+    let current_dir = std::env::current_dir()?
+        .parent()
+        .ok_or("Cannot get parent directory")?
+        .to_path_buf();
 
-    let database_dir_str = dunce::canonicalize(&database_dir)
-        .unwrap()
-        .to_string_lossy()
-        .replace('\\', "/");
-    let database_url = format!("sqlite://{}/{}", database_dir_str, DATABASE_FILE);
+    let database_path = current_dir.join("md-memo-light-db").join("db.sqlite");
+
+    // パスを文字列に変換（Windows対応）
+    let database_url = format!("sqlite:{}", database_path.to_str().ok_or("Invalid path")?);
+
+    println!("データベースパス: {}", database_url);
 
     // SQLiteのコネクションプールを作成する
     let sqlite_pool = block_on(database::create_sqlite_pool(&database_url))?;
-
-    //  データベースファイルが存在しなかったなら、マイグレーションSQLを実行する
-    if !db_exists {
-        block_on(database::migrate_database(&sqlite_pool))?;
-    }
+    println!("データベース接続成功");
 
     Ok(sqlite_pool)
 }

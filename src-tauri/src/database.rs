@@ -24,9 +24,3 @@ pub(crate) async fn create_sqlite_pool(database_url: &str) -> DbResult<SqlitePoo
 
     Ok(sqlite_pool)
 }
-
-/// マイグレーションを行う
-pub(crate) async fn migrate_database(pool: &SqlitePool) -> DbResult<()> {
-    sqlx::migrate!("./src/migrations").run(pool).await?;
-    Ok(())
-}
