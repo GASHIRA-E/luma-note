@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+md-memo-light-db/*
+!md-memo-light-db/.gitkeep
