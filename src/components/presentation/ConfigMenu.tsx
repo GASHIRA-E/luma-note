@@ -5,42 +5,48 @@ import {
   DrawerBody,
   DrawerCloseTrigger,
   DrawerContent,
-  DrawerFooter,
   DrawerHeader,
   DrawerRoot,
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { SegmentedControl } from "@/components/ui/segmented-control";
+import { AppThemes } from "@/utils/constants";
 
 export type ConfigMenuProps = {
-  children?: React.ReactElement;
+  currentTheme: string;
+  allTags: string[];
+  onChangeTheme: (theme: string) => void;
+  onClickRemoveTag: (tag: string) => void;
 };
 
-export const ConfigMenu = ({ children }: ConfigMenuProps) => {
-  const handleValueThemeChange = (themeValue: string) => {
-    alert(themeValue);
-  };
-
+export const ConfigMenu = ({
+  currentTheme,
+  allTags,
+  onChangeTheme,
+  onClickRemoveTag,
+}: ConfigMenuProps) => {
   return (
     <DrawerRoot>
-      <DrawerTrigger asChild>{children}</DrawerTrigger>
+      <DrawerTrigger asChild>
+        <Button onClick={(event) => event.currentTarget.blur()}>Config</Button>
+      </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader>
-          <DrawerTitle>Config Menu</DrawerTitle>
+          <DrawerTitle>設定</DrawerTitle>
         </DrawerHeader>
         <DrawerBody>
           <Box mb={4}>
             {/* テーマ切り替え */}
-            <Text mb={2}>Theme</Text>
+            <Text mb={2}>アプリテーマ切り替え</Text>
             <SegmentedControl
-              onValueChange={(e) => handleValueThemeChange(e.value)}
-              defaultValue="System"
-              items={["Light", "Dark", "System"]}
+              onValueChange={(e) => onChangeTheme(e.value)}
+              defaultValue={currentTheme}
+              items={Object.values(AppThemes)}
             />
           </Box>
           {/* タグの修正 */}
-          <Text mb={2}>Tags</Text>
+          <Text mb={2}>タグ一覧</Text>
           <VStack
             alignItems="start"
             maxH="40"
@@ -48,18 +54,14 @@ export const ConfigMenu = ({ children }: ConfigMenuProps) => {
             bg="bg.subtle"
             p={2}
           >
-            {/* テストデータ */}
-            {[...Array(20)].map((_, i) => (
-              <Tag key={i} closable>
-                Tag{i}
+            {allTags.map((tag, i) => (
+              <Tag key={i} closable onClose={() => onClickRemoveTag(tag)}>
+                {tag}
               </Tag>
             ))}
           </VStack>
         </DrawerBody>
         <DrawerCloseTrigger />
-        <DrawerFooter>
-          <Button>Save</Button>
-        </DrawerFooter>
       </DrawerContent>
       <DrawerBackdrop />
     </DrawerRoot>

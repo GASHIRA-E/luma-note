@@ -1,6 +1,6 @@
-import type { MemoInvokes } from "../Memo";
+import { MEMO_KEYS, type MemoInvokes } from "../Memo";
 
-type GetMemo = Extract<MemoInvokes, { key: "get_memo" }>;
+type GetMemo = Extract<MemoInvokes, { key: typeof MEMO_KEYS.GET_MEMO }>;
 
 export const get_memo = (props: GetMemo["props"]): GetMemo["return"] => {
   console.log("call mock invoke: get_memo", props);
@@ -42,7 +42,11 @@ console.log(sample);
       tags: [
         {
           id: 1,
-          name: "タグ1",
+          name: "仕事",
+        },
+        {
+          id: 2,
+          name: "プライベート",
         },
       ],
     };
@@ -63,6 +67,11 @@ console.log(sample);
     content: "fuga",
     created_at: "2021-01-01 00:00:00",
     updated_at: "2021-01-01 00:00:00",
-    tags: [],
+    tags: [
+      {
+        id: 3,
+        name: "買い物リスト",
+      },
+    ],
   };
 };

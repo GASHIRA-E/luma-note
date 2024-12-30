@@ -1,6 +1,6 @@
-import type { FolderInvokes } from "../Folder";
+import  { FOLDER_KEYS, type FolderInvokes } from "../Folder";
 
-type GetFolders = Extract<FolderInvokes, { key: "get_folders" }>;
+type GetFolders = Extract<FolderInvokes, { key: typeof FOLDER_KEYS.GET_FOLDERS }>;
 
 export const get_folders = (): GetFolders["return"] => {
   console.log("call mock invoke: get_folders");

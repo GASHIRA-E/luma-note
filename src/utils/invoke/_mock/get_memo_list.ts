@@ -1,6 +1,9 @@
-import type { FolderInvokes } from "../Folder";
+import { FOLDER_KEYS, type FolderInvokes } from "../Folder";
 
-type GetMemoList = Extract<FolderInvokes, { key: "get_memo_list" }>;
+type GetMemoList = Extract<
+  FolderInvokes,
+  { key: typeof FOLDER_KEYS.GET_MEMO_LIST }
+>;
 
 export const get_memo_list = (
   props: GetMemoList["props"]

@@ -1,11 +1,11 @@
 import { create } from "zustand";
+import { AppThemes, type AppTheme } from "@/utils/constants";
 
-type Theme = "light" | "dark";
 type fontSize = 16 | 18 | 20 | 22 | 24 | 26 | 28 | 30 | 32 | 34 | 36 | 38 | 40;
 
 type State = {
   /** テーマ */
-  theme: Theme;
+  theme: AppTheme;
   /** フォントサイズ */
   fontSize: fontSize;
   /** 自動保存 */
@@ -13,13 +13,13 @@ type State = {
 };
 
 type Actions = {
-  setTheme: (theme: Theme) => void;
+  setTheme: (theme: AppTheme) => void;
   setFontSize: (fontSize: fontSize) => void;
   setAutoSave: (autoSave: boolean) => void;
 };
 
 export const useConfigStore = create<State & Actions>()((set) => ({
-  theme: "light",
+  theme: AppThemes.SYSTEM,
   fontSize: 16,
   autoSave: false,
   setTheme: (theme) => set(() => ({ theme })),

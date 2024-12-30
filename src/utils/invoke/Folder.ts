@@ -1,12 +1,15 @@
 import { useQuery, useMutation, QueryClient } from "@tanstack/react-query";
 import { InvokeBase, customInvoke } from "./_base";
 
-export type FolderKeys =
-  | "get_folders"
-  | "create_folder"
-  | "delete_folder"
-  | "update_folder"
-  | "get_memo_list";
+export const FOLDER_KEYS = {
+  GET_FOLDERS: "get_folders",
+  CREATE_FOLDER: "create_folder",
+  DELETE_FOLDER: "delete_folder",
+  UPDATE_FOLDER: "update_folder",
+  GET_MEMO_LIST: "get_memo_list",
+} as const;
+
+export type FolderKeys = (typeof FOLDER_KEYS)[keyof typeof FOLDER_KEYS];
 
 export type FolderInvokes =
   | GetFolders
@@ -17,14 +20,14 @@ export type FolderInvokes =
 
 export const getFoldersQuery = () => {
   return useQuery({
-    queryKey: ["get_folders"],
-    queryFn: () => customInvoke("get_folders", undefined),
+    queryKey: [FOLDER_KEYS.GET_FOLDERS],
+    queryFn: () => customInvoke(FOLDER_KEYS.GET_FOLDERS, undefined),
   });
 };
 
 type GetFolders = InvokeBase<
   FolderKeys,
-  "get_folders",
+  typeof FOLDER_KEYS.GET_FOLDERS,
   undefined,
   {
     id: number;
@@ -34,14 +37,14 @@ type GetFolders = InvokeBase<
 
 export const createFolderQuery = (props: CreateFolder["props"]) => {
   return useQuery({
-    queryKey: ["createFolder"],
-    queryFn: () => customInvoke("create_folder", props),
+    queryKey: [FOLDER_KEYS.CREATE_FOLDER],
+    queryFn: () => customInvoke(FOLDER_KEYS.CREATE_FOLDER, props),
   });
 };
 
 type CreateFolder = InvokeBase<
   FolderKeys,
-  "create_folder",
+  typeof FOLDER_KEYS.CREATE_FOLDER,
   {
     name: string;
   },
@@ -53,16 +56,16 @@ export const deleteFolderQuery = (
   queryClient: QueryClient
 ) => {
   return useMutation({
-    mutationFn: () => customInvoke("delete_folder", props),
+    mutationFn: () => customInvoke(FOLDER_KEYS.DELETE_FOLDER, props),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["getMemoList"] });
+      queryClient.invalidateQueries({ queryKey: [FOLDER_KEYS.GET_MEMO_LIST] });
     },
   });
 };
 
 type DeleteFolder = InvokeBase<
   FolderKeys,
-  "delete_folder",
+  typeof FOLDER_KEYS.DELETE_FOLDER,
   {
     folder_id: string;
   },
@@ -74,16 +77,16 @@ export const updateFolderQuery = (
   queryClient: QueryClient
 ) => {
   return useMutation({
-    mutationFn: () => customInvoke("update_folder", props),
+    mutationFn: () => customInvoke(FOLDER_KEYS.UPDATE_FOLDER, props),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["get_memo_list"] });
+      queryClient.invalidateQueries({ queryKey: [FOLDER_KEYS.GET_MEMO_LIST] });
     },
   });
 };
 
 type UpdateFolder = InvokeBase<
   FolderKeys,
-  "update_folder",
+  typeof FOLDER_KEYS.UPDATE_FOLDER,
   {
     folder_id: number;
     name?: string;
@@ -93,14 +96,14 @@ type UpdateFolder = InvokeBase<
 
 export const getMemoListQuery = (props: GetMemoList["props"]) => {
   return useQuery({
-    queryKey: ["get_memo_list", props.folder_id],
-    queryFn: () => customInvoke("get_memo_list", props),
+    queryKey: [FOLDER_KEYS.GET_MEMO_LIST, props.folder_id],
+    queryFn: () => customInvoke(FOLDER_KEYS.GET_MEMO_LIST, props),
   });
 };
 
 type GetMemoList = InvokeBase<
   FolderKeys,
-  "get_memo_list",
+  typeof FOLDER_KEYS.GET_MEMO_LIST,
   {
     folder_id: number | null;
   },
