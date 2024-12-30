@@ -23,7 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
-.env
 md-memo-light-db/*
 
 !md-memo-light-db/.gitkeep

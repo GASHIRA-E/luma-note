@@ -92,45 +92,23 @@ npx scaffdog generate
 cargo install sqlx-cli
 ```
 
-2. プロジェクトルートに`.env`ファイルを作成:
-
-```bash
-# .envファイルを作成
-touch .env
-
-# .envファイルに以下の内容を追加
-echo "DATABASE_URL=sqlite:md-memo-light-db/db.sqlite" > .env
-
-# .gitignoreに.envを追加（既に追加されている場合は不要）
-echo ".env" >> .gitignore
-```
-
-3. データベースディレクトリの作成:
+2. データベースディレクトリの作成:
 
 ```bash
 mkdir -p md-memo-light-db
 ```
 
-4. データベースの作成:
+3. データベースの作成:
 
 ```bash
 sqlx database create
 ```
 
-5. マイグレーションの実行:
+4. マイグレーションの実行:
 
 ```bash
 sqlx migrate run
 ```
-
-#### 注意事項
-
-- `.env`ファイルはバージョン管理対象外です
-- 開発環境とプロダクション環境で異なるデータベース URL を使用する場合は、環境変数で上書きできます
-- Windows 環境では、パスの区切り文字に注意してください：
-  ```env
-  DATABASE_URL=sqlite:md-memo-light-db\db.sqlite
-  ```
 
 ### データベースの確認
 
