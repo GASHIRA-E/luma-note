@@ -92,22 +92,16 @@ npx scaffdog generate
 cargo install sqlx-cli
 ```
 
-2. データベースディレクトリの作成:
+2. データベースの作成:
 
 ```bash
-mkdir -p md-memo-light-db
+sqlx database create --database-url "sqlite:md-memo-light-db/db.sqlite"
 ```
 
-3. データベースの作成:
+3. マイグレーションの実行:
 
 ```bash
-sqlx database create
-```
-
-4. マイグレーションの実行:
-
-```bash
-sqlx migrate run
+sqlx migrate run --database-url "sqlite:md-memo-light-db/db.sqlite"
 ```
 
 ### データベースの確認
@@ -154,20 +148,20 @@ sqlx migrate add -r create_users_table
 
 ```bash
 # 全てのマイグレーションを実行
-sqlx migrate run
+sqlx migrate run --database-url "sqlite:md-memo-light-db/db.sqlite"
 
 # 特定のバージョンまでマイグレーション
-sqlx migrate run --target-version <version>
+sqlx migrate run --target-version <version> --database-url "sqlite:md-memo-light-db/db.sqlite"
 ```
 
 3. マイグレーションの巻き戻し（ダウングレード）:
 
 ```bash
 # 直前のマイグレーションを巻き戻し
-sqlx migrate revert
+sqlx migrate revert --database-url "sqlite:md-memo-light-db/db.sqlite"
 
 # 全てのマイグレーションを巻き戻し
-sqlx migrate revert --target-version 0
+sqlx migrate revert --target-version 0 --database-url "sqlite:md-memo-light-db/db.sqlite"
 ```
 
 4. マイグレーション状態の確認:
@@ -210,6 +204,6 @@ DROP TABLE IF EXISTS example;
 ### マイグレーションのやり直し
 
 ```sh
-sqlx database reset  # データベースを再作成
-sqlx migrate run     # マイグレーションを実行
+sqlx database reset --database-url "sqlite:md-memo-light-db/db.sqlite"  # データベースを再作成
+sqlx migrate run --database-url "sqlite:md-memo-light-db/db.sqlite"     # マイグレーションを実行
 ```
