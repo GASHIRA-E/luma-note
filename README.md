@@ -57,6 +57,13 @@ For iOS development, run:
 
 ## フロントエンド Tips
 
+### npm scripts
+
+| command             | 目的                             |
+| ------------------- | -------------------------------- |
+| `npm run web`       | Mockを使用してフロントを起動する |
+| `npm run tauri dev` | tauriアプリを起動する            |
+
 ### ディレクトリ構成
 
 root: src

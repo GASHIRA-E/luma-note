@@ -4,8 +4,6 @@ import { FolderKeys, FolderInvokes } from "./Folder";
 import { MemoKeys, MemoInvokes } from "./Memo";
 import { TagsKeys, TagsInvokes } from "./Tags";
 
-import { IS_MOCK } from "@/config/app";
-
 type InvokeKeys = FolderKeys | MemoKeys | TagsKeys;
 
 export type InvokeBase<
@@ -25,7 +23,7 @@ export const customInvoke = async <K extends InvokeKeys>(
   key: K,
   props: Extract<InvokeTypes, { key: K }>["props"]
 ) => {
-  if (IS_MOCK) {
+  if (import.meta.env.MODE === "mock") {
     const mock = await import(`./_mock/${key}.ts`);
     return mock[key](props) as Extract<InvokeTypes, { key: K }>["return"];
   }
