@@ -5,6 +5,9 @@ import { MemoList } from "@/components/presentation/MemoList";
 import { getMemoListQuery } from "@/utils/invoke/Folder";
 import { useFolderStore } from "@/utils/stores/folder";
 import { useEditorStore } from "@/utils/stores/editor";
+import { useSearchStore } from "@/utils/stores/search";
+
+type MemoItem = React.ComponentProps<typeof MemoList>["memos"][number];
 
 export const MemoListContainer = () => {
   const selectedFolderId = useFolderStore((state) => state.selectedFolderId);
@@ -12,6 +15,9 @@ export const MemoListContainer = () => {
 
   const selectedMemoIdInStore = useEditorStore((state) => state.selectedMemoId);
   const setSelectedMemoId = useEditorStore((state) => state.setSelectedMemoId);
+
+  const hasSearched = useSearchStore((state) => state.hasSearched);
+  const result = useSearchStore((state) => state.result);
 
   const onClickMoveFolder = (memoId: number) => {
     alert(`フォルダ移動をクリック: ${memoId}`);
@@ -26,12 +32,14 @@ export const MemoListContainer = () => {
       return [];
     }
 
-    return data.map((memo) => ({
+    return data.map<MemoItem>((memo) => ({
       id: memo.id,
       name: memo.title,
       updatedAt: memo.updated_at,
+      resultIcon:
+        (hasSearched && result?.some((r) => r.id === memo.id)) ?? false,
     }));
-  }, [data]);
+  }, [data, hasSearched, result]);
 
   const onClickMemo = (memoId: number) => {
     setSelectedMemoId(memoId);

@@ -1,8 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
 import { InvokeBase, customInvoke } from "./_base";
 
 export const SEARCH_KEYS = {
-  FIND_MEMO: "find_memo"
+  FIND_MEMO: "find_memo",
 } as const;
 
 // コマンド名の一覧
@@ -23,11 +22,8 @@ type FindMemoCommand = InvokeBase<
   }
 >;
 
-export const findMemoQuery = (props: FindMemoCommand["props"]) => {
-  return useQuery({
-    queryKey: [SEARCH_KEYS.FIND_MEMO, props],
-    queryFn: () => customInvoke(SEARCH_KEYS.FIND_MEMO, props),
-  });
+export const findMemo = (props: FindMemoCommand["props"]) => {
+  return customInvoke(SEARCH_KEYS.FIND_MEMO, props);
 };
 
 type DetailMemoInfo = {

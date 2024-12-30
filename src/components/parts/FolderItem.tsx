@@ -22,9 +22,8 @@ export const FolderItem = ({
       p={2}
       borderRadius={2}
       cursor="pointer"
-      transition="background-color 0.3s"
       _hover={{
-        bg: "bg.emphasized",
+        borderColor: "border.inverted",
       }}
       onClick={selected ? undefined : onClick}
     >
