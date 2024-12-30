@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Input, HStack, Button } from "@chakra-ui/react";
 
 import {
@@ -11,48 +10,86 @@ import {
 import { Tag } from "@/components/ui/tag";
 import { HiCheck } from "react-icons/hi";
 
-export const SearchInput = () => {
-  // 開閉状態を管理するためのstate
-  const [isOpen, setIsOpen] = useState(false);
-  const handleFocusInput = () => {
-    setIsOpen(true);
-  };
+type SearchInputProps = {
+  /** ポップオーバーの表示状態を制御するステート */
+  isOpen: boolean;
+  /** 入力フォーカスイベントを処理する関数 */
+  onFocusTriggerInput: React.FocusEventHandler<HTMLInputElement>;
+  /** ポップオーバーを閉じる関数 */
+  onClose: () => void;
+  /** 入力フィールドの現在の値 */
+  inputValue: string;
+  /** 入力値を更新する関数 */
+  setInputValue: (value: string) => void;
+  /** 利用可能なすべてのタグのリスト */
+  allTags: { id: number; name: string }[];
+  /** 選択されたタグIDのリスト */
+  selectedTagIds: number[];
+  /** タグクリックイベントを処理する関数 */
+  onClickTag: (id: number) => void;
+  /** フィルターボタンクリックイベントを処理する関数 */
+  onClickFilterButton: () => void;
+  /** 選択をクリアする関数 */
+  onClickClear: React.MouseEventHandler<HTMLButtonElement>;
+};
 
-  const tags = [...Array(20)].map((_, i) => ({ id: i, name: `Tag${i}` }));
-  // タグの選択状態を管理するためのstate
-  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
-
-  const handleClickTag = (id: number) => {
-    if (selectedTagIds.includes(id)) {
-      setSelectedTagIds(selectedTagIds.filter((v) => v !== id));
-    } else {
-      setSelectedTagIds([...selectedTagIds, id]);
+export const SearchInput = ({
+  allTags,
+  isOpen,
+  onClose,
+  inputValue,
+  setInputValue,
+  onClickClear,
+  selectedTagIds,
+  onClickTag,
+  onFocusTriggerInput,
+  onClickFilterButton,
+}: SearchInputProps) => {
+  const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
+    if (e.key === "Enter") {
+      onClickFilterButton();
     }
   };
 
   return (
-    <PopoverRoot open={isOpen}>
+    <PopoverRoot
+      open={isOpen}
+      autoFocus={false}
+      onFocusOutside={onClose}
+      onPointerDownOutside={onClose}
+    >
       <PopoverTrigger>
-        <Input placeholder="メモタイトル" w={300} onFocus={handleFocusInput} />
+        <Input
+          placeholder="メモタイトル"
+          w={300}
+          value={inputValue}
+          onFocus={onFocusTriggerInput}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
       </PopoverTrigger>
       <PopoverContent>
         <PopoverArrow />
         <PopoverBody>
           <HStack flexWrap="wrap" mb={4}>
-            {tags.map((tag) => (
+            {allTags.map((tag) => (
               <Tag
                 key={tag.id}
+                cursor="pointer"
                 variant={selectedTagIds.includes(tag.id) ? "solid" : "surface"}
                 endElement={
                   selectedTagIds.includes(tag.id) ? <HiCheck /> : undefined
                 }
-                onClick={() => handleClickTag(tag.id)}
+                onClick={() => onClickTag(tag.id)}
               >
                 {tag.name}
               </Tag>
             ))}
           </HStack>
-          <Button onClick={() => setIsOpen(false)}>絞り込む</Button>
+          <HStack>
+            <Button onClick={onClickFilterButton}>絞り込む</Button>
+            <Button onClick={onClickClear}>絞り込みクリア</Button>
+          </HStack>
         </PopoverBody>
       </PopoverContent>
     </PopoverRoot>
