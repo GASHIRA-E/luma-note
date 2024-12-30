@@ -22,6 +22,7 @@ export const HeaderContainer = ({
   const handleClickClear = () => {
     setInputValue("");
     setSelectedTagIds([]);
+    setIsSearchPopoverOpen(false);
   };
 
   const handleClose = () => {
