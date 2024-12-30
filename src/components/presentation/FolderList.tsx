@@ -3,15 +3,20 @@ import { Button } from "@/components/ui/button";
 import { FolderItem } from "@/components/parts/FolderItem";
 
 export type FolderListProps = {
-  folderList: (Omit<React.ComponentProps<typeof FolderItem>, "onClick"> & {
+  folderList: (Omit<
+    React.ComponentProps<typeof FolderItem>,
+    "onClick" | "selected"
+  > & {
     folderId: number;
   })[];
+  selectedFolderId: number | null;
   onClickNewFolder: () => void;
-  onClickFolder: (folderId: string) => void;
+  onClickFolder: (folderId: number) => void;
 };
 
 export const FolderList = ({
   folderList,
+  selectedFolderId,
   onClickNewFolder,
   onClickFolder,
 }: FolderListProps) => {
@@ -36,9 +41,9 @@ export const FolderList = ({
           <FolderItem
             key={folder.folderId}
             name={folder.name}
-            selected={folder.selected}
+            selected={folder.folderId === selectedFolderId}
             memoCounts={folder.memoCounts}
-            onClick={() => onClickFolder(folder.folderId.toString())}
+            onClick={() => onClickFolder(folder.folderId)}
           />
         ))}
       </Flex>

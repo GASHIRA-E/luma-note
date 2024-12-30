@@ -3,12 +3,17 @@ import { useState, useEffect } from "react";
 import { FolderList as FolderListPresentational } from "@/components/presentation/FolderList";
 
 import { getFoldersQuery } from "@/utils/invoke/Folder";
+import { useFolderStore } from "@/utils/stores/folder";
 
 export const FolderList = () => {
   type StateFolderList = React.ComponentProps<
     typeof FolderListPresentational
   >["folderList"];
   const [folderList, setFolderList] = useState<StateFolderList>([]);
+  const selectedFolderId = useFolderStore((state) => state.selectedFolderId);
+  const setSelectedFolderId = useFolderStore(
+    (state) => state.setSelectedFolderId
+  );
 
   const { data } = getFoldersQuery();
 
@@ -18,7 +23,6 @@ export const FolderList = () => {
         return {
           folderId: folder.id,
           name: folder.name,
-          selected: false,
         };
       }) ?? [];
     setFolderList([
@@ -26,23 +30,23 @@ export const FolderList = () => {
       {
         folderId: -1,
         name: "未分類",
-        selected: false,
       },
       ...folders,
     ]);
   }, [data]);
 
   const handleClickNewFolder = () => {
-    console.log("onClickNewFolder");
+    alert("新規フォルダー作成をクリック");
   };
 
-  const handleClickFolder = (folderId: string) => {
-    console.log("onClickFolder", folderId);
+  const handleClickFolder = (folderId: number) => {
+    setSelectedFolderId(folderId);
   };
 
   return (
     <FolderListPresentational
       folderList={folderList}
+      selectedFolderId={selectedFolderId}
       onClickNewFolder={handleClickNewFolder}
       onClickFolder={handleClickFolder}
     />

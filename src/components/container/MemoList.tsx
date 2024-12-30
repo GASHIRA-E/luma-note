@@ -3,12 +3,11 @@ import { useMemo } from "react";
 import { MemoList } from "@/components/presentation/MemoList";
 
 import { getMemoListQuery } from "@/utils/invoke/Folder";
-// import { useFolderStore } from "@/utils/stores/folder";
+import { useFolderStore } from "@/utils/stores/folder";
 import { useEditorStore } from "@/utils/stores/editor";
 
 export const MemoListContainer = () => {
-  const selectedFolderId = 1;
-  // const selectedFolderId = useFolderStore((state) => state.selectedFolderId);
+  const selectedFolderId = useFolderStore((state) => state.selectedFolderId);
   const { data } = getMemoListQuery({ folder_id: selectedFolderId });
 
   const selectedMemoIdInStore = useEditorStore((state) => state.selectedMemoId);
