@@ -18,12 +18,12 @@ async fn get_folders_from_db(sqlite_pool: Pool<Sqlite>) -> Result<Vec<FolderInfo
 }
 
 #[tauri::command]
-pub async fn create_folder(state: tauri::State<'_, Pool<Sqlite>>, name: String) -> Result<u64, ()> {
+pub async fn create_folder(state: tauri::State<'_, Pool<Sqlite>>, name: String) -> Result<i64, ()> {
     let folder_id = create_folder_in_db(state.inner().clone(), name).await?;
     Ok(folder_id)
 }
 
-async fn create_folder_in_db(sqlite_pool: Pool<Sqlite>, name: String) -> Result<u64, ()> {
+pub async fn create_folder_in_db(sqlite_pool: Pool<Sqlite>, name: String) -> Result<i64, ()> {
     //　フォルダ作成内部関数
     const SQL: &str = "INSERT INTO Folders (name) VALUES (?)";
     let result = sqlx::query(SQL)
@@ -32,19 +32,22 @@ async fn create_folder_in_db(sqlite_pool: Pool<Sqlite>, name: String) -> Result<
         .await
         .map_err(|_| ())?;
     // 作成されたフォルダのIDを返す
-    Ok(result.rows_affected())
+    Ok(result.rows_affected() as i64)
 }
 
 #[tauri::command]
-pub async fn delete_folder(state: tauri::State<'_, Pool<Sqlite>>, id: i64) -> Result<(), ()> {
-    delete_folder_in_db(state.inner().clone(), id).await?;
+pub async fn delete_folder(
+    state: tauri::State<'_, Pool<Sqlite>>,
+    folder_id: i64,
+) -> Result<(), ()> {
+    delete_folder_in_db(state.inner().clone(), folder_id).await?;
     Ok(())
 }
 
-async fn delete_folder_in_db(sqlite_pool: Pool<Sqlite>, id: i64) -> Result<(), ()> {
+async fn delete_folder_in_db(sqlite_pool: Pool<Sqlite>, folder_id: i64) -> Result<(), ()> {
     const SQL: &str = "DELETE FROM Folders WHERE id = ?";
     let result = sqlx::query(SQL)
-        .bind(id)
+        .bind(folder_id)
         .execute(&sqlite_pool)
         .await
         .map_err(|_| ())?;
@@ -59,18 +62,22 @@ async fn delete_folder_in_db(sqlite_pool: Pool<Sqlite>, id: i64) -> Result<(), (
 #[tauri::command]
 pub async fn update_folder(
     state: tauri::State<'_, Pool<Sqlite>>,
-    id: i64,
+    folder_id: i64,
     name: String,
 ) -> Result<(), ()> {
-    update_folder_in_db(state.inner().clone(), id, name).await?;
+    update_folder_in_db(state.inner().clone(), folder_id, name).await?;
     Ok(())
 }
 
-async fn update_folder_in_db(sqlite_pool: Pool<Sqlite>, id: i64, name: String) -> Result<(), ()> {
+async fn update_folder_in_db(
+    sqlite_pool: Pool<Sqlite>,
+    folder_id: i64,
+    name: String,
+) -> Result<(), ()> {
     const SQL: &str = "UPDATE Folders SET name = ? WHERE id = ?";
     sqlx::query(SQL)
         .bind(name)
-        .bind(id)
+        .bind(folder_id)
         .execute(&sqlite_pool)
         .await
         .map_err(|_| ())?;
