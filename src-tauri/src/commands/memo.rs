@@ -61,7 +61,7 @@ pub async fn get_detail_memo(
     Ok(memo)
 }
 
-async fn get_detail_memo_in_db(
+pub async fn get_detail_memo_in_db(
     sqlite_pool: Pool<Sqlite>,
     memo_id: i64,
 ) -> Result<DetailMemoInfo, ()> {
@@ -119,7 +119,7 @@ pub async fn create_memo(
     Ok(memo_id)
 }
 
-async fn create_memo_in_db(sqlite_pool: Pool<Sqlite>, memo: CreateMemoIn) -> Result<i64, ()> {
+pub async fn create_memo_in_db(sqlite_pool: Pool<Sqlite>, memo: CreateMemoIn) -> Result<i64, ()> {
     // トランザクション開始
     let mut tx = sqlite_pool.begin().await.map_err(|_| ())?;
 
@@ -259,16 +259,23 @@ mod tests {
 
     async fn create_tables(pool: &Pool<Sqlite>) {
         sqlx::query(
-            "DROP TABLE IF EXISTS MemoTagRelations;
-             DROP TABLE IF EXISTS Memos;
-             DROP TABLE IF EXISTS Folders;
-             DROP TABLE IF EXISTS Tags;
+            r#"
+            CREATE TABLE IF NOT EXISTS Folders(
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            );
 
-             CREATE TABLE IF NOT EXISTS Folders (
+            CREATE TABLE IF NOT EXISTS Memos (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
+                folder_id INTEGER DEFAULT 0, -- folderID=0:フォルダ未選択
+                title TEXT NOT NULL,
+                content TEXT NOT NULL,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (folder_id) REFERENCES Folders(id) ON DELETE SET DEFAULT
+                DEFERRABLE INITIALLY DEFERRED
             );
 
             CREATE TABLE IF NOT EXISTS Tags (
@@ -278,23 +285,14 @@ mod tests {
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
             );
 
-            CREATE TABLE IF NOT EXISTS Memos (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                title TEXT NOT NULL,
-                folder_id INTEGER NOT NULL,
-                content TEXT NOT NULL,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (folder_id) REFERENCES Folders(id) ON DELETE CASCADE
-            );
-    
             CREATE TABLE IF NOT EXISTS MemoTagRelations (
                 memo_id INTEGER,
                 tag_id INTEGER,
                 PRIMARY KEY (memo_id, tag_id),
                 FOREIGN KEY (memo_id) REFERENCES Memos(id) ON DELETE CASCADE,
                 FOREIGN KEY (tag_id) REFERENCES Tags(id) ON DELETE CASCADE
-            );",
+            );
+            "#,
         )
         .execute(pool)
         .await
