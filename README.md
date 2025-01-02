@@ -221,3 +221,18 @@ DROP TABLE IF EXISTS example;
 sqlx database reset --database-url "sqlite:md-memo-light-db/db.sqlite"  # データベースを再作成
 sqlx migrate run --database-url "sqlite:md-memo-light-db/db.sqlite"     # マイグレーションを実行
 ```
+
+### サンプルデータの挿入
+
+※事前にデータを削除してから実行した方が良いです。
+
+```bash
+cd src-tauri
+cargo run --example [example対象]
+```
+
+作成しているexampleフォルダ
+
+- `sample_simple`
+  - `cargo run --example sample_simple`
+  - シンプルなデータを追加する
