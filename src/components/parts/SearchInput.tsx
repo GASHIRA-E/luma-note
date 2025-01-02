@@ -75,6 +75,7 @@ export const SearchInput = ({
               onClick={onClickClear}
               disabled={!hasSearched}
               size="sm"
+              as="span"
             >
               <HiXCircle />
             </IconButton>
