@@ -20,7 +20,6 @@ export const Tag = React.forwardRef<HTMLSpanElement, TagProps>(
     } = props
 
     return (
-      // @ts-ignore
       <ChakraTag.Root ref={ref} {...rest}>
         {startElement && (
           <ChakraTag.StartElement>{startElement}</ChakraTag.StartElement>
