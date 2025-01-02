@@ -48,13 +48,10 @@ export const FolderList = () => {
   };
 
   const handleRenameFolder = (folderId: number) => {
-    // Hack: フォーカスが移動してからダイアログを開き、Menuからフォーカスを外すため
-    setTimeout(() => {
-      const folder = folderList.find((f) => f.folderId === folderId);
-      if (folder) {
-        setFolderBeingRenamed({ id: folder.folderId, name: folder.name });
-      }
-    }, 10);
+    const folder = folderList.find((f) => f.folderId === folderId);
+    if (folder) {
+      setFolderBeingRenamed({ id: folder.folderId, name: folder.name });
+    }
   };
 
   // 名称変更の保存処理

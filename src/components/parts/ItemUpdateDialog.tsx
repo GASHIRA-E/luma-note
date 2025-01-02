@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Input, Portal } from "@chakra-ui/react";
 import { Button } from "@/components/ui/button";
 
@@ -24,8 +24,17 @@ export const ItemUpdateDialog = ({
   setInputValue,
   onSave,
 }: ItemUpdateDialogProps) => {
+  const [currentOpen, setCurrentOpen] = useState(false);
   useEffect(() => {
+    if (!isOpen) {
+      setCurrentOpen(false);
+      return;
+    }
     (document.activeElement as HTMLElement)?.blur();
+    // Hack: フォーカスが移動してからダイアログを開き、Menuからフォーカスを外すため
+    setTimeout(() => {
+      setCurrentOpen(isOpen);
+    }, 10);
   }, [isOpen]);
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,7 +43,7 @@ export const ItemUpdateDialog = ({
 
   return (
     <DialogRoot
-      open={isOpen}
+      open={currentOpen}
       onEscapeKeyDown={onClose}
       onPointerDownOutside={onClose}
     >
