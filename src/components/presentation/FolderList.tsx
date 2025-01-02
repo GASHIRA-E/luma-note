@@ -1,6 +1,14 @@
 import { Box, Flex, Heading } from "@chakra-ui/react";
 import { Button } from "@/components/ui/button";
+import {
+  PopoverBody,
+  PopoverContent,
+  PopoverRoot,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
 import { FolderItem } from "@/components/parts/FolderItem";
+import { NewItemContent } from "@/components/parts/NewItemContent";
 
 export type FolderListProps = {
   folderList: (Omit<
@@ -10,15 +18,23 @@ export type FolderListProps = {
     folderId: number;
   })[];
   selectedFolderId: number | null;
-  onClickNewFolder: () => void;
   onClickFolder: (folderId: number) => void;
+  isPopoverOpen: boolean;
+  setIsPopoverOpen: (value: boolean) => void;
+  newFolderName: string;
+  setNewFolderName: (value: string) => void;
+  onClickCreateFolder: React.MouseEventHandler<HTMLButtonElement>;
 };
 
 export const FolderList = ({
   folderList,
   selectedFolderId,
-  onClickNewFolder,
   onClickFolder,
+  isPopoverOpen,
+  setIsPopoverOpen,
+  newFolderName,
+  setNewFolderName,
+  onClickCreateFolder,
 }: FolderListProps) => {
   return (
     <Box
@@ -33,9 +49,25 @@ export const FolderList = ({
       <Heading size="lg" mb={2}>
         Folder List
       </Heading>
-      <Button w="full" mb={2} onClick={onClickNewFolder}>
-        + 新規フォルダー
-      </Button>
+      <PopoverRoot
+        open={isPopoverOpen}
+        onOpenChange={(e) => setIsPopoverOpen(e.open)}
+      >
+        <PopoverTrigger asChild>
+          <Button w="full" mb={2}>
+            + 新規フォルダー
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent>
+          <PopoverBody>
+            <NewItemContent
+              inputValue={newFolderName}
+              setInputValue={setNewFolderName}
+              onClickCreate={onClickCreateFolder}
+            />
+          </PopoverBody>
+        </PopoverContent>
+      </PopoverRoot>
       <Flex direction="column" gap={2}>
         {folderList.map((folder) => (
           <FolderItem

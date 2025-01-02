@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { FolderList as FolderListPresentational } from "@/components/presentation/FolderList";
 
@@ -19,6 +19,9 @@ export const FolderList = () => {
   const { data: foldersData } = getFoldersQuery();
   const hasSearched = useSearchStore((state) => state.hasSearched);
   const result = useSearchStore((state) => state.result);
+
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [newFolderName, setNewFolderName] = useState("");
 
   const folderList = useMemo(() => {
     const folders =
@@ -49,8 +52,10 @@ export const FolderList = () => {
     ];
   }, [foldersData, hasSearched, result]);
 
-  const handleClickNewFolder = () => {
-    alert("新規フォルダー作成をクリック");
+  const handleCreateFolder = () => {
+    alert(`Creating folder: ${newFolderName}`);
+    setIsPopoverOpen(false);
+    setNewFolderName("");
   };
 
   const handleClickFolder = (folderId: number) => {
@@ -61,8 +66,12 @@ export const FolderList = () => {
     <FolderListPresentational
       folderList={folderList}
       selectedFolderId={selectedFolderId}
-      onClickNewFolder={handleClickNewFolder}
       onClickFolder={handleClickFolder}
+      isPopoverOpen={isPopoverOpen}
+      setIsPopoverOpen={setIsPopoverOpen}
+      newFolderName={newFolderName}
+      setNewFolderName={setNewFolderName}
+      onClickCreateFolder={handleCreateFolder}
     />
   );
 };
