@@ -37,8 +37,8 @@ async fn create_folder_in_db(sqlite_pool: Pool<Sqlite>, name: String) -> Result<
 
 #[tauri::command]
 pub async fn delete_folder(state: tauri::State<'_, Pool<Sqlite>>, id: i64) -> Result<(), ()> {
-    let folder = delete_folder_in_db(state.inner().clone(), id).await?;
-    Ok(folder)
+    delete_folder_in_db(state.inner().clone(), id).await?;
+    Ok(())
 }
 
 async fn delete_folder_in_db(sqlite_pool: Pool<Sqlite>, id: i64) -> Result<(), ()> {
@@ -62,8 +62,8 @@ pub async fn update_folder(
     id: i64,
     name: String,
 ) -> Result<(), ()> {
-    let folder = update_folder_in_db(state.inner().clone(), id, name).await?;
-    Ok(folder)
+    update_folder_in_db(state.inner().clone(), id, name).await?;
+    Ok(())
 }
 
 async fn update_folder_in_db(sqlite_pool: Pool<Sqlite>, id: i64, name: String) -> Result<(), ()> {
