@@ -34,6 +34,27 @@ async fn create_folder_in_db(sqlite_pool: Pool<Sqlite>, name: String) -> Result<
     Ok(())
 }
 
+#[tauri::command]
+pub async fn delete_folder(state: tauri::State<'_, Pool<Sqlite>>, id: i64) -> Result<(), ()> {
+    let folder = delete_folder_in_db(state.inner().clone(), id).await?;
+    Ok(folder)
+}
+
+async fn delete_folder_in_db(sqlite_pool: Pool<Sqlite>, id: i64) -> Result<(), ()> {
+    const SQL: &str = "DELETE FROM Folders WHERE id = ?";
+    let result = sqlx::query(SQL)
+        .bind(id)
+        .execute(&sqlite_pool)
+        .await
+        .map_err(|_| ())?;
+
+    // 削除された行が0の場合（該当するIDが存在しない場合）はエラーを返す
+    if result.rows_affected() == 0 {
+        return Err(());
+    }
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -95,5 +116,27 @@ mod tests {
         let result = get_folders_from_db(sqlite_pool).await;
 
         assert_eq!(result.unwrap().len(), 2);
+    }
+
+    #[tokio::test]
+    async fn test_フォルダ削除できること() {
+        let sqlite_pool = setup_test_db().await;
+
+        create_folder_in_db(sqlite_pool.clone(), "test".to_string())
+            .await
+            .unwrap();
+
+        delete_folder_in_db(sqlite_pool.clone(), 1).await.unwrap();
+
+        let result = get_folders_from_db(sqlite_pool).await;
+        assert_eq!(result.unwrap().len(), 0);
+    }
+
+    #[tokio::test]
+    async fn test_存在しないフォルダは削除できないこと() {
+        let sqlite_pool = setup_test_db().await;
+
+        let result = delete_folder_in_db(sqlite_pool.clone(), 1).await;
+        assert!(result.is_err());
     }
 }
