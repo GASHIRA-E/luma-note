@@ -35,10 +35,13 @@ type GetFolders = InvokeBase<
   }[]
 >;
 
-export const createFolderQuery = (props: CreateFolder["props"]) => {
-  return useQuery({
-    queryKey: [FOLDER_KEYS.CREATE_FOLDER],
-    queryFn: () => customInvoke(FOLDER_KEYS.CREATE_FOLDER, props),
+export const createFolderMutation = (queryClient: QueryClient) => {
+  return useMutation({
+    mutationFn: (props: CreateFolder["props"]) =>
+      customInvoke(FOLDER_KEYS.CREATE_FOLDER, props),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [FOLDER_KEYS.GET_FOLDERS] });
+    },
   });
 };
 
@@ -51,14 +54,12 @@ type CreateFolder = InvokeBase<
   null
 >;
 
-export const deleteFolderQuery = (
-  props: DeleteFolder["props"],
-  queryClient: QueryClient
-) => {
+export const deleteFolderMutation = (queryClient: QueryClient) => {
   return useMutation({
-    mutationFn: () => customInvoke(FOLDER_KEYS.DELETE_FOLDER, props),
+    mutationFn: (props: DeleteFolder["props"]) =>
+      customInvoke(FOLDER_KEYS.DELETE_FOLDER, props),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [FOLDER_KEYS.GET_MEMO_LIST] });
+      queryClient.invalidateQueries({ queryKey: [FOLDER_KEYS.GET_FOLDERS] });
     },
   });
 };
@@ -72,14 +73,12 @@ type DeleteFolder = InvokeBase<
   null
 >;
 
-export const updateFolderQuery = (
-  props: UpdateFolder["props"],
-  queryClient: QueryClient
-) => {
+export const updateFolderMutation = (queryClient: QueryClient) => {
   return useMutation({
-    mutationFn: () => customInvoke(FOLDER_KEYS.UPDATE_FOLDER, props),
+    mutationFn: (props: UpdateFolder["props"]) =>
+      customInvoke(FOLDER_KEYS.UPDATE_FOLDER, props),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [FOLDER_KEYS.GET_MEMO_LIST] });
+      queryClient.invalidateQueries({ queryKey: [FOLDER_KEYS.GET_FOLDERS] });
     },
   });
 };
