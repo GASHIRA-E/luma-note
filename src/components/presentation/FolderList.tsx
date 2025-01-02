@@ -11,14 +11,7 @@ import { FolderItem } from "@/components/parts/FolderItem";
 import { NewItemContent } from "@/components/parts/NewItemContent";
 
 export type FolderListProps = {
-  folderList: (Omit<
-    React.ComponentProps<typeof FolderItem>,
-    "onClick" | "selected"
-  > & {
-    folderId: number;
-  })[];
-  selectedFolderId: number | null;
-  onClickFolder: (folderId: number) => void;
+  folderList: React.ComponentProps<typeof FolderItem>[];
   isPopoverOpen: boolean;
   setIsPopoverOpen: (value: boolean) => void;
   newFolderName: string;
@@ -28,8 +21,6 @@ export type FolderListProps = {
 
 export const FolderList = ({
   folderList,
-  selectedFolderId,
-  onClickFolder,
   isPopoverOpen,
   setIsPopoverOpen,
   newFolderName,
@@ -70,13 +61,7 @@ export const FolderList = ({
       </PopoverRoot>
       <Flex direction="column" gap={2}>
         {folderList.map((folder) => (
-          <FolderItem
-            key={folder.folderId}
-            name={folder.name}
-            selected={folder.folderId === selectedFolderId}
-            memoCounts={folder.memoCounts}
-            onClick={() => onClickFolder(folder.folderId)}
-          />
+          <FolderItem key={folder.folderId} {...folder} />
         ))}
       </Flex>
     </Box>

@@ -27,6 +27,20 @@ export const FolderList = () => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
 
+  const handleClickFolder = (folderId: number) => {
+    setSelectedFolderId(folderId);
+  };
+
+  const handleDeleteFolder = (folderId: number) => {
+    // Implement the logic to delete the folder
+    alert(`Delete folder ${folderId}`);
+  };
+
+  const handleRenameFolder = (folderId: number) => {
+    // Implement the logic to rename the folder
+    alert(`Rename folder ${folderId}`);
+  };
+
   const folderList = useMemo(() => {
     const folders =
       foldersData?.map<FolderListItem>((folder) => {
@@ -38,6 +52,10 @@ export const FolderList = () => {
           folderId: folder.id,
           name: folder.name,
           memoCounts,
+          selected: folder.id === selectedFolderId,
+          onClick: handleClickFolder,
+          onClickDelete: handleDeleteFolder,
+          onClickRename: handleRenameFolder,
         };
       }) ?? [];
 
@@ -51,10 +69,14 @@ export const FolderList = () => {
         folderId: -1,
         name: "未分類",
         memoCounts,
+        selected: selectedFolderId === -1,
+        onClick: handleClickFolder,
+        onClickDelete: handleDeleteFolder,
+        onClickRename: handleRenameFolder,
       },
       ...folders,
     ];
-  }, [foldersData, hasSearched, result]);
+  }, [foldersData, hasSearched, result, selectedFolderId]);
 
   const handleCreateFolder = () => {
     if (!newFolderName) return;
@@ -67,15 +89,9 @@ export const FolderList = () => {
       });
   };
 
-  const handleClickFolder = (folderId: number) => {
-    setSelectedFolderId(folderId);
-  };
-
   return (
     <FolderListPresentational
       folderList={folderList}
-      selectedFolderId={selectedFolderId}
-      onClickFolder={handleClickFolder}
       isPopoverOpen={isPopoverOpen}
       setIsPopoverOpen={setIsPopoverOpen}
       newFolderName={newFolderName}
