@@ -58,7 +58,7 @@ type DeleteTag = InvokeBase<
   TagsKeys,
   typeof TAGS_KEYS.DELETE_TAG,
   {
-    tag_id: number;
+    tagId: number;
   },
   null
 >;

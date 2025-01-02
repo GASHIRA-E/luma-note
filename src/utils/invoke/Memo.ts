@@ -13,20 +13,25 @@ export const MEMO_KEYS = {
 export type MemoKeys = (typeof MEMO_KEYS)[keyof typeof MEMO_KEYS];
 
 // コマンドの型定義をまとめる
-export type MemoInvokes = GetMemo | CreateMemo | DeleteMemo | UpdateMemo | GetMemoList;
+export type MemoInvokes =
+  | GetMemo
+  | CreateMemo
+  | DeleteMemo
+  | UpdateMemo
+  | GetMemoList;
 
 type GetMemo = InvokeBase<
   MemoKeys,
   typeof MEMO_KEYS.GET_MEMO,
   {
-    memo_id: number | null;
+    memoId: number | null;
   },
   {
     id: number;
     title: string;
     content: string;
-    created_at: string;
-    updated_at: string;
+    createdAt: string;
+    updatedAt: string;
     tags: {
       id: number;
       name: string;
@@ -36,9 +41,9 @@ type GetMemo = InvokeBase<
 
 export const getMemoQuery = (props: GetMemo["props"]) => {
   return useQuery({
-    queryKey: [MEMO_KEYS.GET_MEMO, props.memo_id],
+    queryKey: [MEMO_KEYS.GET_MEMO, props.memoId],
     queryFn: () => {
-      if (props.memo_id === null) {
+      if (props.memoId === null) {
         return Promise.resolve(null);
       }
       return customInvoke(MEMO_KEYS.GET_MEMO, props);
@@ -71,7 +76,7 @@ type UpdateMemo = InvokeBase<
   MemoKeys,
   typeof MEMO_KEYS.UPDATE_MEMO,
   {
-    memo_id: number;
+    memoId: number;
     title?: string;
     content?: string;
     tags?: number[];
@@ -85,7 +90,7 @@ export const updateMemoMutation = (queryClient: QueryClient) => {
       customInvoke(MEMO_KEYS.UPDATE_MEMO, props),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: [MEMO_KEYS.GET_MEMO, variables.memo_id],
+        queryKey: [MEMO_KEYS.GET_MEMO, variables.memoId],
       });
     },
   });
@@ -114,18 +119,18 @@ type GetMemoList = InvokeBase<
   MemoKeys,
   typeof MEMO_KEYS.GET_MEMO_LIST,
   {
-    folder_id: number | null;
+    folderId: number | null;
   },
   {
     id: number;
     title: string;
-    updated_at: string;
+    updatedAt: string;
   }[]
 >;
 
 export const getMemoListQuery = (props: GetMemoList["props"]) => {
   return useQuery({
-    queryKey: [MEMO_KEYS.GET_MEMO_LIST, props.folder_id],
+    queryKey: [MEMO_KEYS.GET_MEMO_LIST, props.folderId],
     queryFn: () => customInvoke(MEMO_KEYS.GET_MEMO_LIST, props),
   });
 };
