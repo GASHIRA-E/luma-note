@@ -53,9 +53,7 @@ type CreateMemo = InvokeBase<
     content: string;
     tags?: number[];
   },
-  {
-    id: number;
-  }
+  null
 >;
 
 export const createMemoMutation = (queryClient: QueryClient) => {
