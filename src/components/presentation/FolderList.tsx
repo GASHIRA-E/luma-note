@@ -10,6 +10,7 @@ import {
 import { FolderItem } from "@/components/parts/FolderItem";
 import { NewItemContent } from "@/components/parts/NewItemContent";
 import { ItemUpdateDialog } from "@/components/parts/ItemUpdateDialog";
+import { DeleteItemConfirmDialog } from "@/components/parts/DeleteItemConfirmDialog";
 
 export type FolderListProps = {
   folderList: React.ComponentProps<typeof FolderItem>[];
@@ -19,6 +20,7 @@ export type FolderListProps = {
   setNewFolderName: (value: string) => void;
   onClickCreateFolder: React.MouseEventHandler<HTMLButtonElement>;
   itemUpdateDialogProps: React.ComponentProps<typeof ItemUpdateDialog>;
+  deleteItemConfirmDialogProps: React.ComponentProps<typeof DeleteItemConfirmDialog>;
 };
 
 export const FolderList = ({
@@ -29,6 +31,7 @@ export const FolderList = ({
   setNewFolderName,
   onClickCreateFolder,
   itemUpdateDialogProps,
+  deleteItemConfirmDialogProps,
 }: FolderListProps) => {
   return (
     <Box
@@ -68,6 +71,7 @@ export const FolderList = ({
         ))}
       </Flex>
       <ItemUpdateDialog {...itemUpdateDialogProps} />
+      <DeleteItemConfirmDialog {...deleteItemConfirmDialogProps} />
     </Box>
   );
 };

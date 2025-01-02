@@ -7,6 +7,7 @@ import {
   getFoldersQuery,
   createFolderMutation,
   updateFolderMutation,
+  deleteFolderMutation,
 } from "@/utils/invoke/Folder";
 import { useFolderStore } from "@/utils/stores/folder";
 import { useSearchStore } from "@/utils/stores/search";
@@ -30,6 +31,8 @@ export const FolderList = () => {
     createFolderMutation(queryClient);
   const { mutateAsync: updateFolderMutateAsync } =
     updateFolderMutation(queryClient);
+  const { mutateAsync: deleteFolderMutateAsync } =
+    deleteFolderMutation(queryClient);
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
@@ -37,14 +40,32 @@ export const FolderList = () => {
     id: number;
     name: string;
   } | null>(null);
+  const [folderBeingDeleted, setFolderBeingDeleted] = useState<{
+    id: number;
+    name: string;
+  } | null>(null);
+  const [removeRelationMemo, setRemoveRelationMemo] = useState(false);
 
   const handleClickFolder = (folderId: number) => {
     setSelectedFolderId(folderId);
   };
 
   const handleDeleteFolder = (folderId: number) => {
-    // Implement the logic to delete the folder
-    alert(`Delete folder ${folderId}`);
+    const folder = folderList.find((f) => f.folderId === folderId);
+    if (folder) {
+      setFolderBeingDeleted({ id: folder.folderId, name: folder.name });
+    }
+  };
+
+  const handleConfirmDelete = () => {
+    if (folderBeingDeleted) {
+      deleteFolderMutateAsync({
+        folder_id: folderBeingDeleted.id,
+        remove_relation_memo: removeRelationMemo,
+      }).then(() => {
+        setFolderBeingDeleted(null);
+      });
+    }
   };
 
   const handleRenameFolder = (folderId: number) => {
@@ -129,6 +150,17 @@ export const FolderList = () => {
         setInputValue: (name) =>
           setFolderBeingRenamed((prev) => (prev ? { ...prev, name } : prev)),
         onSave: handleSaveRename,
+      }}
+      deleteItemConfirmDialogProps={{
+        targetItemName: folderBeingDeleted?.name || "",
+        removeRelationMemo: removeRelationMemo,
+        setRemoveRelationMemo: setRemoveRelationMemo,
+        isOpen: !!folderBeingDeleted,
+        onClose: () => {
+          setRemoveRelationMemo(false);
+          setFolderBeingDeleted(null);
+        },
+        onDelete: handleConfirmDelete,
       }}
     />
   );
