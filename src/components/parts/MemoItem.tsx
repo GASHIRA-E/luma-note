@@ -1,4 +1,4 @@
-import { Box, Text, HStack, IconButton } from "@chakra-ui/react";
+import { Box, Text, HStack, IconButton, Float, Circle } from "@chakra-ui/react";
 import { HiDotsHorizontal } from "react-icons/hi";
 import {
   MenuContent,
@@ -12,6 +12,7 @@ export type MemoItemProps = {
   name: string;
   updatedAt: string;
   selected?: boolean;
+  resultIcon?: boolean;
   onClickMoveFolder: (memoId: number) => void;
   onClickMemo: (memoId: number) => void; // Add this line
 };
@@ -21,6 +22,7 @@ export const MemoItem = ({
   name,
   updatedAt,
   selected,
+  resultIcon,
   onClickMoveFolder,
   onClickMemo,
 }: MemoItemProps) => {
@@ -33,18 +35,23 @@ export const MemoItem = ({
   };
   return (
     <Box
+      position="relative"
       borderWidth={1}
       borderColor="border"
       bg={selected ? "bg.emphasized" : "bg.subtle"}
       p={2}
       borderRadius={2}
       cursor="pointer"
-      transition="background-color 0.3s"
       _hover={{
-        bg: "bg.emphasized",
+        borderColor: "border.inverted",
       }}
       onClick={() => onClickMemo(id)}
     >
+      {resultIcon ? (
+        <Float placement="top-end">
+          <Circle size={3} bg="teal.emphasized"></Circle>
+        </Float>
+      ) : null}
       <HStack justifyContent="space-between" alignItems="flex-start">
         <Text textStyle="md">{name}</Text>
         <MenuRoot onSelect={handleSelectMenu}>

@@ -11,6 +11,7 @@ type HeaderProps = {
   editorDisplayModeValue: DisplayMode;
   setEditorDisplayMode: (mode: DisplayMode) => void;
   ConfigMenuButton: () => React.ReactElement;
+  searchInput: React.ComponentProps<typeof SearchInput>;
 };
 
 const SegmentItems = getObjectKeys(DisplayModes).map((k) => DisplayModes[k]);
@@ -23,6 +24,7 @@ export const Header = ({
   editorDisplayModeValue,
   setEditorDisplayMode,
   ConfigMenuButton,
+  searchInput,
 }: HeaderProps) => {
   const handleValueChange: React.ComponentProps<
     typeof SegmentedControl
@@ -41,7 +43,7 @@ export const Header = ({
       borderBottomWidth={1}
       borderBottomColor="border"
     >
-      <SearchInput />
+      <SearchInput {...searchInput} />
 
       <HStack>
         <SegmentedControl
