@@ -61,7 +61,7 @@ export const FolderItem = ({
           </Circle>
         </Float>
       ) : null}
-      <HStack justifyContent="space-between" alignItems="flex-start">
+      <HStack justifyContent="space-between" alignItems="center">
         <Text textStyle="md">{name}</Text>
         {folderId !== -1 && (
           <MenuRoot onSelect={handleSelectMenu}>
