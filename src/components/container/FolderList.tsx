@@ -34,12 +34,17 @@ export const FolderList = () => {
   const { mutateAsync: deleteFolderMutateAsync } =
     deleteFolderMutation(queryClient);
 
+  // フォルダー作成ポップオーバー関連のstate
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
+
+  // 名称変更モーダル関連のstate
   const [folderBeingRenamed, setFolderBeingRenamed] = useState<{
     id: number;
     name: string;
   } | null>(null);
+
+  // 削除確認モーダル関連のstate
   const [folderBeingDeleted, setFolderBeingDeleted] = useState<{
     id: number;
     name: string;
@@ -48,6 +53,17 @@ export const FolderList = () => {
 
   const handleClickFolder = (folderId: number) => {
     setSelectedFolderId(folderId);
+  };
+
+  const handleCreateFolder = () => {
+    if (!newFolderName) return;
+    createFolderMutateAsync({ name: newFolderName })
+      .then(() => {
+        setNewFolderName("");
+      })
+      .finally(() => {
+        setIsPopoverOpen(false);
+      });
   };
 
   const handleDeleteFolder = (folderId: number) => {
@@ -75,7 +91,6 @@ export const FolderList = () => {
     }
   };
 
-  // 名称変更の保存処理
   const handleSaveRename = () => {
     if (folderBeingRenamed) {
       updateFolderMutateAsync({
@@ -87,7 +102,8 @@ export const FolderList = () => {
     }
   };
 
-  const folderList = useMemo(() => {
+  // フォルダーリストの作成
+  const createFolderList = () => {
     const folders =
       foldersData?.map<FolderListItem>((folder) => {
         const memoCounts =
@@ -110,30 +126,25 @@ export const FolderList = () => {
         ? result.filter((r) => r.folderId === null).length
         : undefined;
     return [
-      // 未分類フォルダー
       {
         folderId: -1,
         name: "未分類",
         memoCounts,
         selected: selectedFolderId === -1,
         onClick: handleClickFolder,
-        onClickDelete: handleDeleteFolder,
-        onClickRename: handleRenameFolder,
+        onClickDelete: () => {},
+        onClickRename: () => {},
       },
       ...folders,
     ];
-  }, [foldersData, hasSearched, result, selectedFolderId]);
-
-  const handleCreateFolder = () => {
-    if (!newFolderName) return;
-    createFolderMutateAsync({ name: newFolderName })
-      .then(() => {
-        setNewFolderName("");
-      })
-      .finally(() => {
-        setIsPopoverOpen(false);
-      });
   };
+
+  const folderList = useMemo(createFolderList, [
+    foldersData,
+    hasSearched,
+    result,
+    selectedFolderId,
+  ]);
 
   return (
     <FolderListPresentational
