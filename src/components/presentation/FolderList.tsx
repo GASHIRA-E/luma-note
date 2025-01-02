@@ -9,6 +9,7 @@ import {
 
 import { FolderItem } from "@/components/parts/FolderItem";
 import { NewItemContent } from "@/components/parts/NewItemContent";
+import { ItemUpdateDialog } from "@/components/parts/ItemUpdateDialog";
 
 export type FolderListProps = {
   folderList: React.ComponentProps<typeof FolderItem>[];
@@ -17,6 +18,7 @@ export type FolderListProps = {
   newFolderName: string;
   setNewFolderName: (value: string) => void;
   onClickCreateFolder: React.MouseEventHandler<HTMLButtonElement>;
+  itemUpdateDialogProps: React.ComponentProps<typeof ItemUpdateDialog>;
 };
 
 export const FolderList = ({
@@ -26,6 +28,7 @@ export const FolderList = ({
   newFolderName,
   setNewFolderName,
   onClickCreateFolder,
+  itemUpdateDialogProps,
 }: FolderListProps) => {
   return (
     <Box
@@ -64,6 +67,7 @@ export const FolderList = ({
           <FolderItem key={folder.folderId} {...folder} />
         ))}
       </Flex>
+      <ItemUpdateDialog {...itemUpdateDialogProps} />
     </Box>
   );
 };
