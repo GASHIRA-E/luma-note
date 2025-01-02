@@ -7,8 +7,8 @@
   - create_folder ... フォルダを作成する
   - delete_folder ... フォルダを削除する
   - update_folder ... フォルダを更新する
-  - get_memo_list ... フォルダ内のメモ一覧取得
 - [[domain] Memo](#Memo)
+  - get_memo_list ... フォルダ内のメモ一覧取得
   - get_memo ... メモを取得する
   - create_memo ... メモを作成する
   - delete_memo ... メモを削除する
@@ -126,6 +126,12 @@
 
 なし
 
+</details>
+
+## Memo
+
+<details>
+
 ### get_memo_list
 
 #### 説明
@@ -146,17 +152,11 @@
 
 [MemoInfo 構造体](#MemoInfo)
 
-</details>
-
-## Memo
-
-<details>
-
-### get_memo
+### get_detail_memo
 
 #### 説明
 
-メモを取得する Invoke コマンド
+メモの詳細を取得する Invoke コマンド
 
 #### パラメータ
 
