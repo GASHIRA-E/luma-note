@@ -2,6 +2,7 @@ mod commands;
 mod database;
 mod types;
 use commands::folder::{create_folder, delete_folder, get_folders, update_folder};
+use commands::memo::{create_memo, delete_memo, get_detail_memo, get_memo_list, update_memo};
 use sqlx::{Pool, Sqlite};
 use tauri::Manager;
 
@@ -36,7 +37,12 @@ pub fn run(sqlite_pool: Pool<Sqlite>) -> Result<(), Box<dyn std::error::Error>> 
             get_folders,
             create_folder,
             delete_folder,
-            update_folder
+            update_folder,
+            get_memo_list,
+            get_detail_memo,
+            create_memo,
+            delete_memo,
+            update_memo,
         ])
         // ハンドラからコネクションプールにアクセスできるよう、登録する
         .setup(|app| {
