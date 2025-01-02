@@ -1,7 +1,7 @@
 mod commands;
 mod database;
 mod types;
-use commands::folder::{create_folder, delete_folder, get_folders};
+use commands::folder::{create_folder, delete_folder, get_folders, update_folder};
 use sqlx::{Pool, Sqlite};
 use tauri::Manager;
 
@@ -35,7 +35,8 @@ pub fn run(sqlite_pool: Pool<Sqlite>) -> Result<(), Box<dyn std::error::Error>> 
         .invoke_handler(tauri::generate_handler![
             get_folders,
             create_folder,
-            delete_folder
+            delete_folder,
+            update_folder
         ])
         // ハンドラからコネクションプールにアクセスできるよう、登録する
         .setup(|app| {

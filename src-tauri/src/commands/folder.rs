@@ -18,20 +18,21 @@ async fn get_folders_from_db(sqlite_pool: Pool<Sqlite>) -> Result<Vec<FolderInfo
 }
 
 #[tauri::command]
-pub async fn create_folder(state: tauri::State<'_, Pool<Sqlite>>, name: String) -> Result<(), ()> {
-    let folder = create_folder_in_db(state.inner().clone(), name).await?;
-    Ok(folder)
+pub async fn create_folder(state: tauri::State<'_, Pool<Sqlite>>, name: String) -> Result<u64, ()> {
+    let folder_id = create_folder_in_db(state.inner().clone(), name).await?;
+    Ok(folder_id)
 }
 
-async fn create_folder_in_db(sqlite_pool: Pool<Sqlite>, name: String) -> Result<(), ()> {
+async fn create_folder_in_db(sqlite_pool: Pool<Sqlite>, name: String) -> Result<u64, ()> {
     //　フォルダ作成内部関数
     const SQL: &str = "INSERT INTO Folders (name) VALUES (?)";
-    sqlx::query(SQL)
+    let result = sqlx::query(SQL)
         .bind(name)
         .execute(&sqlite_pool)
         .await
         .map_err(|_| ())?;
-    Ok(())
+    // 作成されたフォルダのIDを返す
+    Ok(result.rows_affected())
 }
 
 #[tauri::command]
@@ -52,6 +53,27 @@ async fn delete_folder_in_db(sqlite_pool: Pool<Sqlite>, id: i64) -> Result<(), (
     if result.rows_affected() == 0 {
         return Err(());
     }
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn update_folder(
+    state: tauri::State<'_, Pool<Sqlite>>,
+    id: i64,
+    name: String,
+) -> Result<(), ()> {
+    let folder = update_folder_in_db(state.inner().clone(), id, name).await?;
+    Ok(folder)
+}
+
+async fn update_folder_in_db(sqlite_pool: Pool<Sqlite>, id: i64, name: String) -> Result<(), ()> {
+    const SQL: &str = "UPDATE Folders SET name = ? WHERE id = ?";
+    sqlx::query(SQL)
+        .bind(name)
+        .bind(id)
+        .execute(&sqlite_pool)
+        .await
+        .map_err(|_| ())?;
     Ok(())
 }
 
@@ -99,6 +121,7 @@ mod tests {
             .await
             .unwrap();
 
+        assert_eq!(result.unwrap(), 1);
         assert_eq!(folder.name, "test");
     }
 
@@ -138,5 +161,27 @@ mod tests {
 
         let result = delete_folder_in_db(sqlite_pool.clone(), 1).await;
         assert!(result.is_err());
+    }
+
+    #[tokio::test]
+    async fn test_フォルダ更新できること() {
+        let sqlite_pool = setup_test_db().await;
+
+        create_folder_in_db(sqlite_pool.clone(), "test".to_string())
+            .await
+            .unwrap();
+
+        let before_folder = get_folders_from_db(sqlite_pool.clone()).await.unwrap();
+        assert_eq!(before_folder.len(), 1);
+        assert_eq!(before_folder[0].name, "test");
+
+        // フォルダ更新
+        update_folder_in_db(sqlite_pool.clone(), 1, "test2".to_string())
+            .await
+            .unwrap();
+
+        let after_folder = get_folders_from_db(sqlite_pool.clone()).await.unwrap();
+        assert_eq!(after_folder.len(), 1);
+        assert_eq!(after_folder[0].name, "test2");
     }
 }
