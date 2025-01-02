@@ -344,12 +344,46 @@
 
 ### DetailMemoInfo
 
-| フィールド | データ型 | 説明         |
-| ---------- | -------- | ------------ |
-| id         | i64      | ファイル ID  |
-| title      | String   | ファイル名   |
-| folder_id  | i64      | フォルダ ID  |
-| updated_at | String   | 最終更新日時 |
+| フィールド | データ型               | 説明           |
+| ---------- | ---------------------- | -------------- |
+| id         | i64                    | ファイル ID    |
+| title      | String                 | ファイル名     |
+| content    | String                 | ファイル内容   |
+| folder_id  | i64                    | フォルダ ID    |
+| updated_at | String                 | 最終更新日時   |
+| tags       | `Option<Vec<TagInfo>>` | タグ情報の配列 |
+
+### MemoListInfo
+
+| フィールド | データ型               | 説明           |
+| ---------- | ---------------------- | -------------- |
+| id         | i64                    | メモ ID        |
+| title      | String                 | メモのタイトル |
+| updated_at | String                 | 最終更新日時   |
+| tags       | `Option<Vec<TagInfo>>` | タグ情報の配列 |
+
+### CreateMemoIn
+
+create_memo のパラメータ
+
+| フィールド | データ型   | 説明                       |
+| ---------- | ---------- | -------------------------- |
+| title      | String     | メモのタイトル             |
+| folder_id  | i64        | フォルダ ID                |
+| content    | String     | メモの Markdown コンテンツ |
+| tags       | `Vec<i64>` | 付与するタグ ID の配列     |
+
+### UpdateMemoIn
+
+update_memo のパラメータ
+
+| フィールド | データ型           | 説明                             |
+| ---------- | ------------------ | -------------------------------- |
+| id         | i64                | 更新するメモの ID                |
+| title      | Option<String>     | 新しいメモのタイトル             |
+| folder_id  | Option<i64>        | 新しいフォルダ ID                |
+| content    | Option<String>     | 新しいメモの Markdown コンテンツ |
+| tags       | Option<`Vec<i64>`> | 新しく付与するタグ ID の配列     |
 
 ### TagInfo
 
@@ -357,14 +391,6 @@
 | ---------- | -------- | ------- |
 | id         | i64      | タグ ID |
 | name       | String   | タグ名  |
-
-### MemoInfo
-
-| フィールド | データ型 | 説明           |
-| ---------- | -------- | -------------- |
-| id         | i64      | メモ ID        |
-| title      | String   | メモのタイトル |
-| updated_at | String   | 最終更新日時   |
 
 ## その他
 
