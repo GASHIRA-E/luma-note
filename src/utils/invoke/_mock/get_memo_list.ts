@@ -1,8 +1,8 @@
-import { FOLDER_KEYS, type FolderInvokes } from "../Folder";
+import { MEMO_KEYS, type MemoInvokes } from "../Memo";
 
 type GetMemoList = Extract<
-  FolderInvokes,
-  { key: typeof FOLDER_KEYS.GET_MEMO_LIST }
+  MemoInvokes,
+  { key: typeof MEMO_KEYS.GET_MEMO_LIST }
 >;
 
 export const get_memo_list = (

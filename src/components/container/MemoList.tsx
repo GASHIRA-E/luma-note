@@ -2,7 +2,7 @@ import { useMemo } from "react";
 
 import { MemoList } from "@/components/presentation/MemoList";
 
-import { getMemoListQuery } from "@/utils/invoke/Folder";
+import { getMemoListQuery } from "@/utils/invoke/Memo";
 import { useFolderStore } from "@/utils/stores/folder";
 import { useEditorStore } from "@/utils/stores/editor";
 import { useSearchStore } from "@/utils/stores/search";

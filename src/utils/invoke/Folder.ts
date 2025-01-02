@@ -6,7 +6,6 @@ export const FOLDER_KEYS = {
   CREATE_FOLDER: "create_folder",
   DELETE_FOLDER: "delete_folder",
   UPDATE_FOLDER: "update_folder",
-  GET_MEMO_LIST: "get_memo_list",
 } as const;
 
 export type FolderKeys = (typeof FOLDER_KEYS)[keyof typeof FOLDER_KEYS];
@@ -15,8 +14,7 @@ export type FolderInvokes =
   | GetFolders
   | CreateFolder
   | DeleteFolder
-  | UpdateFolder
-  | GetMemoList;
+  | UpdateFolder;
 
 export const getFoldersQuery = () => {
   return useQuery({
@@ -92,24 +90,4 @@ type UpdateFolder = InvokeBase<
     name?: string;
   },
   null
->;
-
-export const getMemoListQuery = (props: GetMemoList["props"]) => {
-  return useQuery({
-    queryKey: [FOLDER_KEYS.GET_MEMO_LIST, props.folder_id],
-    queryFn: () => customInvoke(FOLDER_KEYS.GET_MEMO_LIST, props),
-  });
-};
-
-type GetMemoList = InvokeBase<
-  FolderKeys,
-  typeof FOLDER_KEYS.GET_MEMO_LIST,
-  {
-    folder_id: number | null;
-  },
-  {
-    id: number;
-    title: string;
-    updated_at: string;
-  }[]
 >;
