@@ -21,6 +21,7 @@ export const HeaderContainer = ({ ConfigMenuButton }: HeaderContainerProps) => {
   const [inputValue, setInputValue] = useState("");
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
 
+  const hasSearched = useSearchStore((state) => state.hasSearched);
   // storeへ検索結果を格納
   const setSearchedResult = useSearchStore((state) => state.setSearchedResult);
   // storeから検索結果を削除
@@ -72,6 +73,7 @@ export const HeaderContainer = ({ ConfigMenuButton }: HeaderContainerProps) => {
       setEditorDisplayMode={setDisplayMode}
       ConfigMenuButton={ConfigMenuButton}
       searchInput={{
+        hasSearched,
         isOpen: isOpenSearchPopover,
         onFocusTriggerInput: handleFocusTriggerInput,
         onClose: handleClose,

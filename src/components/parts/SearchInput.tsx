@@ -1,4 +1,4 @@
-import { Input, HStack, Button } from "@chakra-ui/react";
+import { Input, HStack, Button, IconButton } from "@chakra-ui/react";
 
 import {
   PopoverBody,
@@ -8,9 +8,12 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Tag } from "@/components/ui/tag";
-import { HiCheck } from "react-icons/hi";
+import { InputGroup } from "@/components/ui/input-group";
+import { HiCheck, HiXCircle } from "react-icons/hi";
 
 type SearchInputProps = {
+  /** 検索が行われたかどうかを示すステート(クリアボタンの活性化) */
+  hasSearched: boolean;
   /** ポップオーバーの表示状態を制御するステート */
   isOpen: boolean;
   /** 入力フォーカスイベントを処理する関数 */
@@ -35,6 +38,7 @@ type SearchInputProps = {
 
 export const SearchInput = ({
   allTags,
+  hasSearched,
   isOpen,
   onClose,
   inputValue,
@@ -59,14 +63,28 @@ export const SearchInput = ({
       onPointerDownOutside={onClose}
     >
       <PopoverTrigger>
-        <Input
-          placeholder="メモタイトル"
-          w={300}
-          value={inputValue}
-          onFocus={onFocusTriggerInput}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
+        <InputGroup
+          endElement={
+            <IconButton
+              aria-label="clear search"
+              variant="ghost"
+              onClick={onClickClear}
+              disabled={!hasSearched}
+              size="sm"
+            >
+              <HiXCircle />
+            </IconButton>
+          }
+        >
+          <Input
+            placeholder="メモタイトル"
+            w={300}
+            value={inputValue}
+            onFocus={onFocusTriggerInput}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+        </InputGroup>
       </PopoverTrigger>
       <PopoverContent>
         <PopoverArrow />
