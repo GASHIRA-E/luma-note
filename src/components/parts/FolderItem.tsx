@@ -75,11 +75,9 @@ export const FolderItem = ({
                 <HiPencil />
                 <Box flex="1">名称変更</Box>
               </MenuItem>
-              <MenuItem value="delete-folder" cursor="pointer">
-                <HiTrash color="red" />
-                <Box flex="1" color="red">
-                  削除
-                </Box>
+              <MenuItem value="delete-folder" cursor="pointer" color="fg.error">
+                <HiTrash />
+                <Box flex="1">削除</Box>
               </MenuItem>
             </MenuContent>
           </MenuRoot>
