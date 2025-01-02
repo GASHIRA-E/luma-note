@@ -173,14 +173,6 @@ async fn delete_memo_in_db(sqlite_pool: Pool<Sqlite>, memo_id: i64) -> Result<()
         return Err(());
     }
 
-    // MemoTagRelationにmemo_idが存在する場合それも削除する
-    const MEMO_TAG_RELATION_SQL: &str = "DELETE FROM MemoTagRelations WHERE memo_id = ?";
-    sqlx::query(MEMO_TAG_RELATION_SQL)
-        .bind(memo_id)
-        .execute(&sqlite_pool)
-        .await
-        .map_err(|_| ())?;
-
     Ok(())
 }
 
