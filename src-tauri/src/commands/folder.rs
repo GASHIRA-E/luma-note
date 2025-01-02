@@ -8,7 +8,8 @@ pub async fn get_folders(state: tauri::State<'_, Pool<Sqlite>>) -> Result<Vec<Fo
 }
 
 async fn get_folders_from_db(sqlite_pool: Pool<Sqlite>) -> Result<Vec<FolderInfo>, ()> {
-    const SQL: &str = "SELECT * FROM Folders";
+    // TODO 各フォルダにあるメモの件数も返す
+    const SQL: &str = "SELECT id, name, updated_at FROM Folders";
     let folders = sqlx::query_as::<_, FolderInfo>(SQL)
         .fetch_all(&sqlite_pool)
         .await
@@ -38,8 +39,7 @@ mod tests {
     use super::*;
     use sqlx::sqlite::SqlitePoolOptions;
 
-    #[tokio::test]
-    async fn test_フォルダ作成できること() {
+    async fn setup_test_db() -> Pool<Sqlite> {
         // テスト用の一時的なインメモリデータベースを使用
         let sqlite_pool = SqlitePoolOptions::new()
             .connect("sqlite::memory:")
@@ -59,6 +59,13 @@ mod tests {
         .await
         .unwrap();
 
+        sqlite_pool
+    }
+
+    #[tokio::test]
+    async fn test_フォルダ作成できること() {
+        let sqlite_pool = setup_test_db().await;
+
         // テスト実行
         let name = "test".to_string();
         let result = create_folder_in_db(sqlite_pool.clone(), name).await;
@@ -72,5 +79,21 @@ mod tests {
             .unwrap();
 
         assert_eq!(folder.name, "test");
+    }
+
+    #[tokio::test]
+    async fn test_フォルダ取得できること() {
+        let sqlite_pool = setup_test_db().await;
+
+        create_folder_in_db(sqlite_pool.clone(), "test".to_string())
+            .await
+            .unwrap();
+        create_folder_in_db(sqlite_pool.clone(), "test2".to_string())
+            .await
+            .unwrap();
+
+        let result = get_folders_from_db(sqlite_pool).await;
+
+        assert_eq!(result.unwrap().len(), 2);
     }
 }

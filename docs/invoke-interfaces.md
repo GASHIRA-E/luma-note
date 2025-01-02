@@ -3,7 +3,7 @@
 - [[domain] Search](#Search)
   - find_memo ... メモを検索する
 - [[domain] Folder](#Folder)
-  - get_folder_list ... フォルダ一覧取得
+  - get_folders ... フォルダ一覧取得
   - create_folder ... フォルダを作成する
   - delete_folder ... フォルダを削除する
   - update_folder ... フォルダを更新する
@@ -57,7 +57,7 @@
 
 <details>
 
-### get_folder_list
+### get_folders
 
 #### 説明
 
