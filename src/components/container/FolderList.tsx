@@ -76,8 +76,8 @@ export const FolderList = () => {
   const handleConfirmDelete = () => {
     if (folderBeingDeleted) {
       deleteFolderMutateAsync({
-        folder_id: folderBeingDeleted.id,
-        remove_relation_memo: removeRelationMemo,
+        folderId: folderBeingDeleted.id,
+        removeRelationMemo: removeRelationMemo,
       }).then(() => {
         setFolderBeingDeleted(null);
       });
@@ -94,7 +94,7 @@ export const FolderList = () => {
   const handleSaveRename = () => {
     if (folderBeingRenamed) {
       updateFolderMutateAsync({
-        folder_id: folderBeingRenamed.id,
+        folderId: folderBeingRenamed.id,
         name: folderBeingRenamed.name,
       }).then(() => {
         setFolderBeingRenamed(null);

@@ -66,8 +66,8 @@ type DeleteFolder = InvokeBase<
   FolderKeys,
   typeof FOLDER_KEYS.DELETE_FOLDER,
   {
-    folder_id: number;
-    remove_relation_memo: boolean;
+    folderId: number;
+    removeRelationMemo: boolean;
   },
   null
 >;
@@ -86,7 +86,7 @@ type UpdateFolder = InvokeBase<
   FolderKeys,
   typeof FOLDER_KEYS.UPDATE_FOLDER,
   {
-    folder_id: number;
+    folderId: number;
     name?: string;
   },
   null
