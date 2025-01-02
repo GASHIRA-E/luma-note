@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { FolderList as FolderListPresentational } from "@/components/presentation/FolderList";
 
-import { getFoldersQuery } from "@/utils/invoke/Folder";
+import { getFoldersQuery, createFolderMutation } from "@/utils/invoke/Folder";
 import { useFolderStore } from "@/utils/stores/folder";
 import { useSearchStore } from "@/utils/stores/search";
 
@@ -11,6 +12,8 @@ type FolderListItem = React.ComponentProps<
 >["folderList"][number];
 
 export const FolderList = () => {
+  const queryClient = useQueryClient();
+
   const selectedFolderId = useFolderStore((state) => state.selectedFolderId);
   const setSelectedFolderId = useFolderStore(
     (state) => state.setSelectedFolderId
@@ -19,6 +22,7 @@ export const FolderList = () => {
   const { data: foldersData } = getFoldersQuery();
   const hasSearched = useSearchStore((state) => state.hasSearched);
   const result = useSearchStore((state) => state.result);
+  const { mutateAsync } = createFolderMutation(queryClient);
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
@@ -53,9 +57,14 @@ export const FolderList = () => {
   }, [foldersData, hasSearched, result]);
 
   const handleCreateFolder = () => {
-    alert(`Creating folder: ${newFolderName}`);
-    setIsPopoverOpen(false);
-    setNewFolderName("");
+    if (!newFolderName) return;
+    mutateAsync({ name: newFolderName })
+      .then(() => {
+        setNewFolderName("");
+      })
+      .finally(() => {
+        setIsPopoverOpen(false);
+      });
   };
 
   const handleClickFolder = (folderId: number) => {
