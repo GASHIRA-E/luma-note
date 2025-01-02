@@ -18,12 +18,12 @@ async fn get_folders_from_db(sqlite_pool: Pool<Sqlite>) -> Result<Vec<FolderInfo
 }
 
 #[tauri::command]
-pub async fn create_folder(state: tauri::State<'_, Pool<Sqlite>>, name: String) -> Result<u64, ()> {
+pub async fn create_folder(state: tauri::State<'_, Pool<Sqlite>>, name: String) -> Result<i64, ()> {
     let folder_id = create_folder_in_db(state.inner().clone(), name).await?;
     Ok(folder_id)
 }
 
-async fn create_folder_in_db(sqlite_pool: Pool<Sqlite>, name: String) -> Result<u64, ()> {
+pub async fn create_folder_in_db(sqlite_pool: Pool<Sqlite>, name: String) -> Result<i64, ()> {
     //　フォルダ作成内部関数
     const SQL: &str = "INSERT INTO Folders (name) VALUES (?)";
     let result = sqlx::query(SQL)
@@ -32,7 +32,7 @@ async fn create_folder_in_db(sqlite_pool: Pool<Sqlite>, name: String) -> Result<
         .await
         .map_err(|_| ())?;
     // 作成されたフォルダのIDを返す
-    Ok(result.rows_affected())
+    Ok(result.rows_affected() as i64)
 }
 
 #[tauri::command]
