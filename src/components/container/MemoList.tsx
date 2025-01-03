@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { MemoList } from "@/components/presentation/MemoList";
 
@@ -19,8 +19,14 @@ export const MemoListContainer = () => {
   const hasSearched = useSearchStore((state) => state.hasSearched);
   const result = useSearchStore((state) => state.result);
 
+  // 新規メモ作成のポップオーバーの開閉状態と入力値
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+
   const onClickNewMemo = () => {
     alert("新規メモ作成");
+    setIsPopoverOpen(false);
+    setInputValue("");
   };
 
   const onClickMemo = (memoId: number) => {
@@ -58,5 +64,14 @@ export const MemoListContainer = () => {
     }));
   }, [data, hasSearched, result, selectedMemoIdInStore]);
 
-  return <MemoList memos={memos} onClickNewMemo={onClickNewMemo} />;
+  return (
+    <MemoList
+      memos={memos}
+      onClickNewMemo={onClickNewMemo}
+      isPopoverOpen={isPopoverOpen}
+      setIsPopoverOpen={setIsPopoverOpen}
+      inputValue={inputValue}
+      setInputValue={setInputValue}
+    />
+  );
 };
