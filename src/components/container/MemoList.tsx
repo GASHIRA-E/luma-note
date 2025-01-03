@@ -56,7 +56,7 @@ export const MemoListContainer = () => {
       onClickRenameMemo: onClickRenameMemo,
       onClickDeleteMemo: onClickDeleteMemo,
     }));
-  }, [data, hasSearched, result]);
+  }, [data, hasSearched, result, selectedMemoIdInStore]);
 
   return <MemoList memos={memos} onClickNewMemo={onClickNewMemo} />;
 };
