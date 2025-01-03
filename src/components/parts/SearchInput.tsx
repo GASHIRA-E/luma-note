@@ -98,7 +98,7 @@ export const SearchInput = ({
           <HStack flexWrap="wrap" mb={4}>
             {allTags.map((tag) => (
               <Tag
-                key={tag.id}
+                key={`search-tag-${tag.id}`}
                 cursor="pointer"
                 variant={selectedTagIds.includes(tag.id) ? "solid" : "surface"}
                 endElement={
