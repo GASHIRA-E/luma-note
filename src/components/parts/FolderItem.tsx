@@ -8,13 +8,13 @@ import {
 } from "@/components/ui/menu";
 
 export type FolderProps = {
-  folderId: number;
+  folderId: number | null;
   name: string;
   selected?: boolean;
   memoCounts?: number;
-  onClick: (folderId: number) => void;
-  onClickDelete: (folderId: number) => void;
-  onClickRename: (folderId: number) => void;
+  onClick: (folderId: number | null) => void;
+  onClickDelete: (folderId: number | null) => void;
+  onClickRename: (folderId: number | null) => void;
 };
 
 export const FolderItem = ({
@@ -63,19 +63,33 @@ export const FolderItem = ({
       ) : null}
       <HStack justifyContent="space-between" alignItems="center">
         <Text textStyle="md">{name}</Text>
-        {folderId !== -1 && (
+        {folderId !== null && (
           <MenuRoot onSelect={handleSelectMenu}>
             <MenuTrigger asChild>
-              <IconButton size="xs" aria-label="More options" variant="outline">
+              <IconButton
+                size="xs"
+                aria-label="More options"
+                variant="outline"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <HiDotsHorizontal />
               </IconButton>
             </MenuTrigger>
             <MenuContent>
-              <MenuItem value="rename-folder" cursor="pointer">
+              <MenuItem
+                value="rename-folder"
+                cursor="pointer"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <HiPencil />
                 <Box flex="1">名称変更</Box>
               </MenuItem>
-              <MenuItem value="delete-folder" cursor="pointer" color="fg.error">
+              <MenuItem
+                value="delete-folder"
+                cursor="pointer"
+                color="fg.error"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <HiTrash />
                 <Box flex="1">削除</Box>
               </MenuItem>

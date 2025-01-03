@@ -51,7 +51,7 @@ export const FolderList = () => {
   } | null>(null);
   const [removeRelationMemo, setRemoveRelationMemo] = useState(false);
 
-  const handleClickFolder = (folderId: number) => {
+  const handleClickFolder = (folderId: number | null) => {
     setSelectedFolderId(folderId);
   };
 
@@ -66,9 +66,9 @@ export const FolderList = () => {
       });
   };
 
-  const handleDeleteFolder = (folderId: number) => {
+  const handleDeleteFolder = (folderId: number | null) => {
     const folder = folderList.find((f) => f.folderId === folderId);
-    if (folder) {
+    if (folder && folder.folderId !== null) {
       setFolderBeingDeleted({ id: folder.folderId, name: folder.name });
     }
   };
@@ -84,9 +84,10 @@ export const FolderList = () => {
     }
   };
 
-  const handleRenameFolder = (folderId: number) => {
+  const handleRenameFolder = (folderId: number | null) => {
+    if (folderId === null) return;
     const folder = folderList.find((f) => f.folderId === folderId);
-    if (folder) {
+    if (folder && folder.folderId !== null) {
       setFolderBeingRenamed({ id: folder.folderId, name: folder.name });
     }
   };
@@ -127,10 +128,10 @@ export const FolderList = () => {
         : undefined;
     return [
       {
-        folderId: -1,
+        folderId: null,
         name: "未分類",
         memoCounts,
-        selected: selectedFolderId === -1,
+        selected: selectedFolderId === null,
         onClick: handleClickFolder,
         onClickDelete: () => {},
         onClickRename: () => {},

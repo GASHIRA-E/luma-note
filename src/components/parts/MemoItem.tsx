@@ -1,5 +1,10 @@
 import { Box, Text, HStack, IconButton, Float, Circle } from "@chakra-ui/react";
-import { HiDotsHorizontal } from "react-icons/hi";
+import {
+  HiDotsHorizontal,
+  HiFolderOpen,
+  HiTrash,
+  HiPencil,
+} from "react-icons/hi";
 import {
   MenuContent,
   MenuItem,
@@ -14,7 +19,9 @@ export type MemoItemProps = {
   selected?: boolean;
   resultIcon?: boolean;
   onClickMoveFolder: (memoId: number) => void;
-  onClickMemo: (memoId: number) => void; // Add this line
+  onClickMemo: (memoId: number) => void;
+  onClickRenameMemo: (memoId: number) => void;
+  onClickDeleteMemo: (memoId: number) => void;
 };
 
 export const MemoItem = ({
@@ -25,14 +32,21 @@ export const MemoItem = ({
   resultIcon,
   onClickMoveFolder,
   onClickMemo,
+  onClickRenameMemo,
+  onClickDeleteMemo,
 }: MemoItemProps) => {
   const handleSelectMenu: React.ComponentProps<typeof MenuRoot>["onSelect"] = (
     select
   ) => {
     if (select.value === "move-folder") {
       onClickMoveFolder(id);
+    } else if (select.value === "rename-memo") {
+      onClickRenameMemo(id);
+    } else if (select.value === "delete-memo") {
+      onClickDeleteMemo(id);
     }
   };
+
   return (
     <Box
       position="relative"
@@ -56,12 +70,41 @@ export const MemoItem = ({
         <Text textStyle="md">{name}</Text>
         <MenuRoot onSelect={handleSelectMenu}>
           <MenuTrigger asChild>
-            <IconButton size="xs" aria-label="More options" variant="outline">
+            <IconButton
+              size="xs"
+              aria-label="More options"
+              variant="outline"
+              onClick={(e) => e.stopPropagation()}
+            >
               <HiDotsHorizontal />
             </IconButton>
           </MenuTrigger>
           <MenuContent>
-            <MenuItem value="move-folder">フォルダ移動</MenuItem>
+            <MenuItem
+              value="move-folder"
+              cursor="pointer"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <HiFolderOpen />
+              <Box flex="1">フォルダ移動</Box>
+            </MenuItem>
+            <MenuItem
+              value="rename-memo"
+              cursor="pointer"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <HiPencil />
+              <Box flex="1">名前変更</Box>
+            </MenuItem>
+            <MenuItem
+              value="delete-memo"
+              cursor="pointer"
+              color="fg.error"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <HiTrash />
+              <Box flex="1">削除</Box>
+            </MenuItem>
           </MenuContent>
         </MenuRoot>
       </HStack>

@@ -55,9 +55,12 @@ type CreateMemo = InvokeBase<
   MemoKeys,
   typeof MEMO_KEYS.CREATE_MEMO,
   {
-    title: string;
-    content: string;
-    tags?: number[];
+    memo: {
+      title: string;
+      folder_id: number | null;
+      content: string;
+      tags?: number[];
+    };
   },
   null
 >;
@@ -67,7 +70,9 @@ export const createMemoMutation = (queryClient: QueryClient) => {
     mutationFn: (props: CreateMemo["props"]) =>
       customInvoke(MEMO_KEYS.CREATE_MEMO, props),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [MEMO_KEYS.GET_MEMO] });
+      queryClient.invalidateQueries({
+        queryKey: [MEMO_KEYS.GET_MEMO_LIST],
+      });
     },
   });
 };
@@ -76,21 +81,26 @@ type UpdateMemo = InvokeBase<
   MemoKeys,
   typeof MEMO_KEYS.UPDATE_MEMO,
   {
-    memoId: number;
-    title?: string;
-    content?: string;
-    tags?: number[];
+    memo: {
+      id: number;
+      title?: string;
+      folder_id?: number;
+      content?: string;
+      tags?: number[];
+    };
   },
   null
 >;
 
 export const updateMemoMutation = (queryClient: QueryClient) => {
   return useMutation({
-    mutationFn: (props: UpdateMemo["props"]) =>
-      customInvoke(MEMO_KEYS.UPDATE_MEMO, props),
-    onSuccess: (_, variables) => {
+    mutationFn: (props: UpdateMemo["props"]) => {
+      console.log("updateMemoMutation", props);
+      return customInvoke(MEMO_KEYS.UPDATE_MEMO, props);
+    },
+    onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [MEMO_KEYS.GET_MEMO, variables.memoId],
+        queryKey: [[MEMO_KEYS.GET_MEMO], [MEMO_KEYS.GET_MEMO_LIST]],
       });
     },
   });
@@ -100,7 +110,7 @@ type DeleteMemo = InvokeBase<
   MemoKeys,
   typeof MEMO_KEYS.DELETE_MEMO,
   {
-    memo_id: number;
+    memoId: number;
   },
   null
 >;
@@ -110,7 +120,9 @@ export const deleteMemoMutation = (queryClient: QueryClient) => {
     mutationFn: (props: DeleteMemo["props"]) =>
       customInvoke(MEMO_KEYS.DELETE_MEMO, props),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [MEMO_KEYS.GET_MEMO] });
+      queryClient.invalidateQueries({
+        queryKey: [MEMO_KEYS.GET_MEMO_LIST],
+      });
     },
   });
 };
@@ -124,7 +136,7 @@ type GetMemoList = InvokeBase<
   {
     id: number;
     title: string;
-    updatedAt: string;
+    updated_at: string;
   }[]
 >;
 
