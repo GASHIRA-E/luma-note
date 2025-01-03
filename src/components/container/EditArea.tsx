@@ -35,7 +35,7 @@ export const EditArea = () => {
     // メモが選択されていない場合は何もしない(エラー処理)
     if (!selectedMemoId) return;
     // タグ一覧から選択されたタグのIDを取得する
-    const tagId = tagsData?.tags.find((t) => t.name === tagName)?.id;
+    const tagId = tagsData?.find((t) => t.name === tagName)?.id;
     let newTagId: number;
     if (tagId === undefined) {
       // タグが存在しない場合は新規作成
@@ -44,7 +44,7 @@ export const EditArea = () => {
     } else {
       newTagId = tagId;
     }
-    const currentTagIds = tagsData?.tags.map((tag) => tag.id) || [];
+    const currentTagIds = tagsData?.map((tag) => tag.id) || [];
     // タグを追加する
     updateMemoMutate({
       memo: {
@@ -60,7 +60,7 @@ export const EditArea = () => {
     if (!selectedMemoId) return;
     // 除外後のタグIDリスト
     const removedTagIds =
-      tagsData?.tags.flatMap((t) => (t.name !== tag ? [t.id] : [])) || [];
+      tagsData?.flatMap((t) => (t.name !== tag ? [t.id] : [])) || [];
     // タグを削除する
     updateMemoMutate({
       memo: {
@@ -76,9 +76,12 @@ export const EditArea = () => {
     if (!tagsData) {
       return [];
     }
-    return tagsData.tags
-      .flatMap((tag) => tag.name)
-      .filter((tag) => !tags.includes(tag));
+    return tagsData.flatMap((tag) => {
+      if (tags.includes(tag.name)) {
+        return [];
+      }
+      return tag.name;
+    });
   }, [tags, tagsData]);
 
   if (!memoData || selectedMemoId === null) {

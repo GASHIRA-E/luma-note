@@ -30,7 +30,7 @@ export const ConfigMenuContainer = () => {
     if (!data) {
       return [];
     }
-    return data.tags.flatMap((tag) => tag.name);
+    return data.flatMap((tag) => tag.name);
   }, [data]);
 
   const handleValueThemeChange = (themeValue: string) => {

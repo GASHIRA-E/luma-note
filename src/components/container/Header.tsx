@@ -79,7 +79,7 @@ export const HeaderContainer = ({ ConfigMenuButton }: HeaderContainerProps) => {
         onClose: handleClose,
         inputValue,
         setInputValue,
-        allTags: tagsData?.tags || [],
+        allTags: tagsData || [],
         selectedTagIds,
         onClickTag: handleClickTag,
         onClickFilterButton: handleClickFilterButton,

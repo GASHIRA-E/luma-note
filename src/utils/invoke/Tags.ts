@@ -19,9 +19,7 @@ type GetTags = InvokeBase<
   TagsKeys,
   typeof TAGS_KEYS.GET_TAGS,
   undefined,
-  {
-    tags: TagInfo[];
-  }
+  TagInfo[]
 >;
 
 export const getTagsQuery = () => {
