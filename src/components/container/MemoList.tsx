@@ -23,26 +23,58 @@ export const MemoListContainer = () => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
 
+  // 名称変更モーダル関連のstate
+  const [memoBeingRenamed, setMemoBeingRenamed] = useState<{
+    id: number;
+    name: string;
+  } | null>(null);
+
+  // 削除確認モーダル関連のstate
+  const [memoBeingDeleted, setMemoBeingDeleted] = useState<{
+    id: number;
+    name: string;
+  } | null>(null);
+
   const onClickNewMemo = () => {
     alert("新規メモ作成");
     setIsPopoverOpen(false);
     setInputValue("");
   };
 
-  const onClickMemo = (memoId: number) => {
+  const handleClickMemo = (memoId: number) => {
     setSelectedMemoId(memoId);
   };
 
-  const onClickMoveFolder = (memoId: number) => {
+  const handleClickMenuMoveFolder = (memoId: number) => {
     alert(`フォルダ移動をクリック: ${memoId}`);
   };
 
-  const onClickRenameMemo = (memoId: number) => {
-    alert(`名前変更をクリック: ${memoId}`);
+  const handleClickMenuRenameMemo = (memoId: number) => {
+    const memo = memos.find((m) => m.id === memoId);
+    if (memo) {
+      setMemoBeingRenamed({ id: memo.id, name: memo.name });
+    }
   };
 
-  const onClickDeleteMemo = (memoId: number) => {
-    alert(`削除をクリック: ${memoId}`);
+  const handleSaveRename = () => {
+    if (memoBeingRenamed) {
+      alert(`名前変更を保存: ${memoBeingRenamed.name}`);
+      setMemoBeingRenamed(null);
+    }
+  };
+
+  const handleClickMenuDeleteMemo = (memoId: number) => {
+    const memo = memos.find((m) => m.id === memoId);
+    if (memo) {
+      setMemoBeingDeleted({ id: memo.id, name: memo.name });
+    }
+  };
+
+  const handleConfirmDelete = () => {
+    if (memoBeingDeleted) {
+      alert(`メモを削除: ${memoBeingDeleted.name}`);
+      setMemoBeingDeleted(null);
+    }
   };
 
   const memos = useMemo(() => {
@@ -57,10 +89,10 @@ export const MemoListContainer = () => {
       resultIcon:
         (hasSearched && result?.some((r) => r.id === memo.id)) ?? false,
       selected: memo.id === selectedMemoIdInStore,
-      onClickMemo: onClickMemo,
-      onClickMoveFolder: onClickMoveFolder,
-      onClickRenameMemo: onClickRenameMemo,
-      onClickDeleteMemo: onClickDeleteMemo,
+      onClickMemo: handleClickMemo,
+      onClickMoveFolder: handleClickMenuMoveFolder,
+      onClickRenameMemo: handleClickMenuRenameMemo,
+      onClickDeleteMemo: handleClickMenuDeleteMemo,
     }));
   }, [data, hasSearched, result, selectedMemoIdInStore]);
 
@@ -72,6 +104,20 @@ export const MemoListContainer = () => {
       setIsPopoverOpen={setIsPopoverOpen}
       inputValue={inputValue}
       setInputValue={setInputValue}
+      itemUpdateDialogProps={{
+        isOpen: !!memoBeingRenamed,
+        onClose: () => setMemoBeingRenamed(null),
+        inputValue: memoBeingRenamed?.name || "",
+        setInputValue: (name) =>
+          setMemoBeingRenamed((prev) => (prev ? { ...prev, name } : prev)),
+        onSave: handleSaveRename,
+      }}
+      deleteItemConfirmDialogProps={{
+        targetItemName: memoBeingDeleted?.name || "",
+        isOpen: !!memoBeingDeleted,
+        onClose: () => setMemoBeingDeleted(null),
+        onDelete: handleConfirmDelete,
+      }}
     />
   );
 };

@@ -12,8 +12,8 @@ import {
 
 type DeleteItemConfirmDialogProps = {
   targetItemName: string;
-  removeRelationMemo: boolean;
-  setRemoveRelationMemo: (value: boolean) => void;
+  removeRelationMemo?: boolean;
+  setRemoveRelationMemo?: (value: boolean) => void;
   isOpen: boolean;
   onClose: () => void;
   onDelete: () => void;
@@ -49,13 +49,19 @@ export const DeleteItemConfirmDialog = ({
       <Portal>
         <DialogContent>
           <DialogBody>
-            <Text mb={2}>{`"${targetItemName}"を削除してもよろしいですか？`}</Text>
-            <Checkbox
-              checked={removeRelationMemo}
-              onCheckedChange={(d) => setRemoveRelationMemo(!!d.checked)}
-            >
-              関連するメモも削除する
-            </Checkbox>
+            <Text
+              mb={2}
+            >{`"${targetItemName}"を削除してもよろしいですか？`}</Text>
+            {removeRelationMemo !== undefined && (
+              <Checkbox
+                checked={removeRelationMemo}
+                onCheckedChange={(d) =>
+                  setRemoveRelationMemo && setRemoveRelationMemo(!!d.checked)
+                }
+              >
+                関連するメモも削除する
+              </Checkbox>
+            )}
           </DialogBody>
           <DialogFooter>
             <Button onClick={onClose}>Cancel</Button>
