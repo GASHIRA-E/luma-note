@@ -95,7 +95,6 @@ type UpdateMemo = InvokeBase<
 export const updateMemoMutation = (queryClient: QueryClient) => {
   return useMutation({
     mutationFn: (props: UpdateMemo["props"]) => {
-      console.log("updateMemoMutation", props);
       return customInvoke(MEMO_KEYS.UPDATE_MEMO, props);
     },
     onSuccess: () => {
