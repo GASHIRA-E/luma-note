@@ -3,12 +3,14 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import { MemoList } from "@/components/presentation/MemoList";
 
+import { getFoldersQuery } from "@/utils/invoke/Folder";
 import {
   getMemoListQuery,
   createMemoMutation,
   updateMemoMutation,
   deleteMemoMutation,
 } from "@/utils/invoke/Memo";
+
 import { useFolderStore } from "@/utils/stores/folder";
 import { useEditorStore } from "@/utils/stores/editor";
 import { useSearchStore } from "@/utils/stores/search";
@@ -18,6 +20,8 @@ type MemoItem = React.ComponentProps<typeof MemoList>["memos"][number];
 export const MemoListContainer = () => {
   const selectedFolderId = useFolderStore((state) => state.selectedFolderId);
   const { data } = getMemoListQuery({ folderId: selectedFolderId });
+
+  const { data: foldersData } = getFoldersQuery();
 
   const selectedMemoIdInStore = useEditorStore((state) => state.selectedMemoId);
   const setSelectedMemoId = useEditorStore((state) => state.setSelectedMemoId);
@@ -40,6 +44,13 @@ export const MemoListContainer = () => {
     id: number;
     name: string;
   } | null>(null);
+
+  // フォルダー変更モーダル関連のstate
+  const [memoBeingMoved, setMemoBeingMoved] = useState<{
+    id: number;
+    folderId: number | null;
+  } | null>(null);
+  const [moveFolderId, setMoveFolderId] = useState<number | null>(null);
 
   const queryClient = useQueryClient();
   const { mutateAsync: createMemoMutateAsync } =
@@ -71,7 +82,26 @@ export const MemoListContainer = () => {
   };
 
   const handleClickMenuMoveFolder = (memoId: number) => {
-    alert(`フォルダ移動をクリック: ${memoId}`);
+    const memo = memos.find((m) => m.id === memoId);
+    if (memo) {
+      setMemoBeingMoved({ id: memo.id, folderId: selectedFolderId });
+    }
+  };
+
+  const handleClickSaveMoveFolder = () => {
+    if (memoBeingMoved) {
+      updateMemoMutateAsync({
+        memo: {
+          id: memoBeingMoved.id,
+          title: "Rustで作るWASM - 読書メモ",
+          // TODO: invokeの型がnull対応できていないのでfolder_idがnullの場合は後で実装
+          folder_id: moveFolderId || undefined,
+          content: "",
+        },
+      }).then(() => {
+        setMemoBeingMoved(null);
+      });
+    }
   };
 
   const handleClickMenuRenameMemo = (memoId: number) => {
@@ -141,6 +171,20 @@ export const MemoListContainer = () => {
       setIsPopoverOpen={setIsPopoverOpen}
       inputValue={inputValue}
       setInputValue={setInputValue}
+      memoChangeFolderDialogProps={{
+        currentFolderId: memoBeingMoved?.folderId || null,
+        folders: foldersData
+          ? [{ id: null, name: "未分類" }, ...foldersData]
+          : [{ id: null, name: "未分類" }],
+        folderId: moveFolderId,
+        setFolderId: setMoveFolderId,
+        isOpen: !!memoBeingMoved,
+        onClose: () => {
+          setMemoBeingMoved(null);
+          setMoveFolderId(null);
+        },
+        onClickSave: handleClickSaveMoveFolder,
+      }}
       itemUpdateDialogProps={{
         isOpen: !!memoBeingRenamed,
         onClose: () => setMemoBeingRenamed(null),

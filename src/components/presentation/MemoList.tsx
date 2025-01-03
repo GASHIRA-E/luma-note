@@ -6,6 +6,7 @@ import { MemoItem } from "@/components/parts/MemoItem";
 import { NewItemPopover } from "@/components/parts/NewItemContent";
 import { ItemUpdateDialog } from "@/components/parts/ItemUpdateDialog";
 import { DeleteItemConfirmDialog } from "@/components/parts/DeleteItemConfirmDialog";
+import { MemoChangeFolderDialog } from "@/components/parts/memoList/MemoChangeFolderDialog";
 
 interface MemoListProps {
   memos: React.ComponentProps<typeof MemoItem>[];
@@ -14,6 +15,9 @@ interface MemoListProps {
   setIsPopoverOpen: (isOpen: boolean) => void;
   inputValue: string;
   setInputValue: (value: string) => void;
+  memoChangeFolderDialogProps: React.ComponentProps<
+    typeof MemoChangeFolderDialog
+  >;
   itemUpdateDialogProps: React.ComponentProps<typeof ItemUpdateDialog>;
   deleteItemConfirmDialogProps: React.ComponentProps<
     typeof DeleteItemConfirmDialog
@@ -27,6 +31,7 @@ export const MemoList: React.FC<MemoListProps> = ({
   setIsPopoverOpen,
   inputValue,
   setInputValue,
+  memoChangeFolderDialogProps,
   itemUpdateDialogProps,
   deleteItemConfirmDialogProps,
 }) => {
@@ -59,6 +64,7 @@ export const MemoList: React.FC<MemoListProps> = ({
           <MemoItem key={memo.id} {...memo} />
         ))}
       </Flex>
+      <MemoChangeFolderDialog {...memoChangeFolderDialogProps} />
       <ItemUpdateDialog {...itemUpdateDialogProps} />
       <DeleteItemConfirmDialog {...deleteItemConfirmDialogProps} />
     </Box>
