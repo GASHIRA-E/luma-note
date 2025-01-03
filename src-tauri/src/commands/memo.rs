@@ -119,7 +119,7 @@ pub async fn create_memo(
     Ok(memo_id)
 }
 
-async fn create_memo_in_db(sqlite_pool: Pool<Sqlite>, memo: CreateMemoIn) -> Result<i32, ()> {
+pub async fn create_memo_in_db(sqlite_pool: Pool<Sqlite>, memo: CreateMemoIn) -> Result<i32, ()> {
     // トランザクション開始
     let mut tx = sqlite_pool.begin().await.map_err(|_| ())?;
 
@@ -291,7 +291,7 @@ mod tests {
 
         let memo1 = CreateMemoIn {
             title: "test1".to_string(),
-            folder_id: Some(folder_id),
+            folder_id: Some(folder_id as i64),
             content: "test_content1".to_string(),
             tags: Some(vec![1]),
         };
@@ -299,7 +299,7 @@ mod tests {
 
         let memo2 = CreateMemoIn {
             title: "test2".to_string(),
-            folder_id: Some(folder_id),
+            folder_id: Some(folder_id as i64),
             content: "test_content2".to_string(),
             tags: Some(vec![1]),
         };
@@ -343,7 +343,7 @@ mod tests {
 
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: Some(folder_id),
+            folder_id: Some(folder_id as i64),
             content: "test".to_string(),
             tags: Some(vec![1]),
         };
@@ -397,7 +397,7 @@ mod tests {
         // 更新前のメモ
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: Some(folder_id),
+            folder_id: Some(folder_id as i64),
             content: "test".to_string(),
             tags: Some(vec![tag1_id]),
         };
@@ -411,7 +411,7 @@ mod tests {
         let update_memo = UpdateMemoIn {
             id: created_memo_id,
             title: Some("test".to_string()),
-            folder_id: Some(folder_id),
+            folder_id: Some(folder_id.into()),
             content: Some("test".to_string()),
             tags: Some(vec![tag2_id]),
         };
@@ -447,7 +447,7 @@ mod tests {
 
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: Some(folder_id),
+            folder_id: Some(folder_id.into()),
             content: "test".to_string(),
             tags: Some(vec![tag_id]),
         };
