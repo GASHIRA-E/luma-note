@@ -12,28 +12,30 @@ pub async fn get_memo_list(
     Ok(memos)
 }
 
-async fn get_memo_list_from_db(
+pub async fn get_memo_list_from_db(
     sqlite_pool: Pool<Sqlite>,
     folder_id: i32,
 ) -> Result<Vec<MemoListInfo>, ()> {
     const SQL: &str = r#"
-        SELECT 
-            m.id,
-            m.title,
-            m.updated_at,
-            json_group_array(
-                json_object(
-                    'id', t.id,
-                    'name', t.name
-                )
-            ) as tags
-        FROM Memos m
-        LEFT JOIN MemoTagRelations mt ON m.id = mt.memo_id
-        LEFT JOIN Tags t ON mt.tag_id = t.id
-        WHERE m.folder_id = ?
-        GROUP BY m.id, m.title, m.updated_at"#;
+    SELECT 
+        m.id,
+        m.title,
+        m.updated_at,
+        json_group_array(
+            json_object(
+                'id', t.id,
+                'name', t.name
+            )
+        ) as tags
+    FROM Memos m
+    LEFT JOIN MemoTagRelations mt ON m.id = mt.memo_id
+    LEFT JOIN Tags t ON mt.tag_id = t.id
+    WHERE (? > 0 AND m.folder_id = ?) OR (? = 0 AND m.folder_id IS NULL)
+    GROUP BY m.id, m.title, m.updated_at"#;
 
     let raw_memos = sqlx::query_as::<_, RawMemoList>(SQL)
+        .bind(folder_id)
+        .bind(folder_id)
         .bind(folder_id)
         .fetch_all(&sqlite_pool)
         .await
@@ -66,26 +68,26 @@ pub async fn get_detail_memo_in_db(
     memo_id: i32,
 ) -> Result<DetailMemoInfo, ()> {
     const SQL: &str = r#"
-    SELECT 
-        m.id,
-        m.title,
-        m.content,
-        m.updated_at,
-        m.folder_id,
-        CASE 
-            WHEN COUNT(t.id) > 0 THEN json_group_array(
-                json_object(
-                    'id', t.id,
-                    'name', t.name
+        SELECT 
+            m.id,
+            m.title,
+            m.content,
+            m.updated_at,
+            m.folder_id,
+            CASE 
+                WHEN COUNT(t.id) > 0 THEN json_group_array(
+                    json_object(
+                        'id', t.id,
+                        'name', t.name
+                    )
                 )
-            )
-            ELSE NULL 
-        END as tags
-    FROM Memos m
-    LEFT JOIN MemoTagRelations mt ON m.id = mt.memo_id
-    LEFT JOIN Tags t ON mt.tag_id = t.id
-    WHERE m.id = ?
-    GROUP BY m.id, m.title, m.content, m.updated_at, m.folder_id"#;
+                ELSE NULL 
+            END as tags
+        FROM Memos m
+        LEFT JOIN MemoTagRelations mt ON m.id = mt.memo_id
+        LEFT JOIN Tags t ON mt.tag_id = t.id
+        WHERE m.id = ?
+        GROUP BY m.id, m.title, m.content, m.updated_at, m.folder_id"#;
 
     let raw_memo = sqlx::query_as::<_, RawDetailMemo>(SQL)
         .bind(memo_id)
@@ -468,5 +470,22 @@ mod tests {
 
         let result = delete_memo_in_db(sqlite_pool.clone(), 1).await;
         assert!(result.is_err());
+    }
+
+    #[tokio::test]
+    async fn test_メモのfolder_idがnullの場合はfolder_idがnullのメモ一覧に表示されること() {
+        let sqlite_pool = setup_test_db().await;
+
+        let memo = CreateMemoIn {
+            title: "test".to_string(),
+            folder_id: None,
+            content: "test".to_string(),
+            tags: Some(vec![]),
+        };
+        create_memo_in_db(sqlite_pool.clone(), memo).await.unwrap();
+
+        let memos = get_memo_list_from_db(sqlite_pool.clone(), 0).await.unwrap();
+        assert_eq!(memos.len(), 1);
+        assert_eq!(memos[0].id, 1);
     }
 }
