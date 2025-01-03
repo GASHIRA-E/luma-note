@@ -6,7 +6,7 @@ use sqlx::{Pool, Sqlite};
 #[tauri::command]
 pub async fn get_memo_list(
     state: tauri::State<'_, Pool<Sqlite>>,
-    folder_id: i64,
+    folder_id: i32,
 ) -> Result<Vec<MemoListInfo>, ()> {
     let memos = get_memo_list_from_db(state.inner().clone(), folder_id).await?;
     Ok(memos)
@@ -14,7 +14,7 @@ pub async fn get_memo_list(
 
 async fn get_memo_list_from_db(
     sqlite_pool: Pool<Sqlite>,
-    folder_id: i64,
+    folder_id: i32,
 ) -> Result<Vec<MemoListInfo>, ()> {
     const SQL: &str = r#"
         SELECT 
@@ -55,7 +55,7 @@ async fn get_memo_list_from_db(
 #[tauri::command]
 pub async fn get_detail_memo(
     state: tauri::State<'_, Pool<Sqlite>>,
-    memo_id: i64,
+    memo_id: i32,
 ) -> Result<DetailMemoInfo, ()> {
     let memo = get_detail_memo_in_db(state.inner().clone(), memo_id).await?;
     Ok(memo)
@@ -63,7 +63,7 @@ pub async fn get_detail_memo(
 
 pub async fn get_detail_memo_in_db(
     sqlite_pool: Pool<Sqlite>,
-    memo_id: i64,
+    memo_id: i32,
 ) -> Result<DetailMemoInfo, ()> {
     const SQL: &str = r#"
     SELECT 
@@ -114,12 +114,12 @@ pub async fn get_detail_memo_in_db(
 pub async fn create_memo(
     state: tauri::State<'_, Pool<Sqlite>>,
     memo: CreateMemoIn,
-) -> Result<i64, ()> {
+) -> Result<i32, ()> {
     let memo_id = create_memo_in_db(state.inner().clone(), memo).await?;
     Ok(memo_id)
 }
 
-pub async fn create_memo_in_db(sqlite_pool: Pool<Sqlite>, memo: CreateMemoIn) -> Result<i64, ()> {
+async fn create_memo_in_db(sqlite_pool: Pool<Sqlite>, memo: CreateMemoIn) -> Result<i32, ()> {
     // トランザクション開始
     let mut tx = sqlite_pool.begin().await.map_err(|_| ())?;
 
@@ -151,16 +151,16 @@ pub async fn create_memo_in_db(sqlite_pool: Pool<Sqlite>, memo: CreateMemoIn) ->
     // トランザクションをコミット
     tx.commit().await.map_err(|_| ())?;
 
-    Ok(memo_id)
+    Ok(memo_id as i32)
 }
 
 #[tauri::command]
-pub async fn delete_memo(state: tauri::State<'_, Pool<Sqlite>>, memo_id: i64) -> Result<(), ()> {
+pub async fn delete_memo(state: tauri::State<'_, Pool<Sqlite>>, memo_id: i32) -> Result<(), ()> {
     delete_memo_in_db(state.inner().clone(), memo_id).await?;
     Ok(())
 }
 
-async fn delete_memo_in_db(sqlite_pool: Pool<Sqlite>, memo_id: i64) -> Result<(), ()> {
+async fn delete_memo_in_db(sqlite_pool: Pool<Sqlite>, memo_id: i32) -> Result<(), ()> {
     const SQL: &str = "DELETE FROM Memos WHERE id = ?";
     let result = sqlx::query(SQL)
         .bind(memo_id)

@@ -19,6 +19,11 @@ pub fn db_init() -> Result<Pool<Sqlite>, Box<dyn std::error::Error>> {
 
     let database_path = current_dir.join("md-memo-light-db").join("db.sqlite");
 
+    // データベースディレクトリが存在しない場合は作成
+    if let Some(parent) = database_path.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+
     // パスを文字列に変換（Windows対応）
     let database_url = format!("sqlite:{}", database_path.to_str().ok_or("Invalid path")?);
 
@@ -26,7 +31,11 @@ pub fn db_init() -> Result<Pool<Sqlite>, Box<dyn std::error::Error>> {
 
     // SQLiteのコネクションプールを作成する
     let sqlite_pool = block_on(database::create_sqlite_pool(&database_url))?;
-    println!("データベース接続成功");
+
+    // マイグレーションの実行
+    block_on(async { sqlx::migrate!("../migrations").run(&sqlite_pool).await })?;
+
+    println!("データベース接続・マイグレーション成功");
 
     Ok(sqlite_pool)
 }
