@@ -51,7 +51,13 @@ export const MemoListContainer = () => {
 
   const onClickNewMemo = () => {
     if (!inputValue) return;
-    createMemoMutateAsync({ title: inputValue, content: "" })
+    createMemoMutateAsync({
+      memo: {
+        title: inputValue,
+        folder_id: selectedFolderId,
+        content: "",
+      },
+    })
       .then(() => {
         setInputValue("");
       })
@@ -78,8 +84,10 @@ export const MemoListContainer = () => {
   const handleSaveRename = () => {
     if (memoBeingRenamed) {
       updateMemoMutateAsync({
-        memoId: memoBeingRenamed.id,
-        title: memoBeingRenamed.name,
+        memo: {
+          id: memoBeingRenamed.id,
+          title: memoBeingRenamed.name,
+        },
       }).then(() => {
         setMemoBeingRenamed(null);
       });
@@ -97,8 +105,10 @@ export const MemoListContainer = () => {
     if (memoBeingDeleted) {
       deleteMemoMutateAsync({
         memoId: memoBeingDeleted.id,
-        currentFolderId: selectedFolderId,
       }).then(() => {
+        if (selectedMemoIdInStore === memoBeingDeleted.id) {
+          setSelectedMemoId(null);
+        }
         setMemoBeingDeleted(null);
       });
     }
@@ -112,7 +122,7 @@ export const MemoListContainer = () => {
     return data.map<MemoItem>((memo) => ({
       id: memo.id,
       name: memo.title,
-      updatedAt: memo.updatedAt,
+      updatedAt: memo.updated_at,
       resultIcon:
         (hasSearched && result?.some((r) => r.id === memo.id)) ?? false,
       selected: memo.id === selectedMemoIdInStore,

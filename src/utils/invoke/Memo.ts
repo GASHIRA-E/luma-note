@@ -55,9 +55,12 @@ type CreateMemo = InvokeBase<
   MemoKeys,
   typeof MEMO_KEYS.CREATE_MEMO,
   {
-    title: string;
-    content: string;
-    tags?: number[];
+    memo: {
+      title: string;
+      folder_id: number | null;
+      content: string;
+      tags?: number[];
+    };
   },
   null
 >;
@@ -78,10 +81,13 @@ type UpdateMemo = InvokeBase<
   MemoKeys,
   typeof MEMO_KEYS.UPDATE_MEMO,
   {
-    memoId: number;
-    title?: string;
-    content?: string;
-    tags?: number[];
+    memo: {
+      id: number;
+      title?: string;
+      folder_id?: number;
+      content?: string;
+      tags?: number[];
+    };
   },
   null
 >;
@@ -90,7 +96,7 @@ export const updateMemoMutation = (queryClient: QueryClient) => {
   return useMutation({
     mutationFn: (props: UpdateMemo["props"]) =>
       customInvoke(MEMO_KEYS.UPDATE_MEMO, props),
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [MEMO_KEYS.GET_MEMO, MEMO_KEYS.GET_MEMO_LIST],
       });
@@ -128,7 +134,7 @@ type GetMemoList = InvokeBase<
   {
     id: number;
     title: string;
-    updatedAt: string;
+    updated_at: string;
   }[]
 >;
 
