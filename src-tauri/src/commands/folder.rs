@@ -32,7 +32,7 @@ pub async fn create_folder_in_db(sqlite_pool: Pool<Sqlite>, name: String) -> Res
         .await
         .map_err(|_| ())?;
     // 作成されたフォルダのIDを返す
-    Ok(result.rows_affected() as i64)
+    Ok(result.last_insert_rowid())
 }
 
 #[tauri::command]
