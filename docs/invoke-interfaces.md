@@ -28,8 +28,6 @@
 
 ## Search
 
-<details>
-
 ### find_memo
 
 #### 説明
@@ -54,8 +52,6 @@
 </details>
 
 ## Folder
-
-<details>
 
 ### get_folders
 
@@ -101,10 +97,10 @@
 
 #### パラメータ
 
-| パラメータ名         | データ型 | 必須 | 説明                             |
-| -------------------- | -------- | ---- | -------------------------------- |
-| folder_id            | u64      | はい | 削除するフォルダの ID            |
-| remove_relation_memo | bool     | はい | trueの場合紐づいたメモを全て削除 |
+| パラメータ名         | データ型 | 必須 | 説明                              |
+| -------------------- | -------- | ---- | --------------------------------- |
+| folder_id            | u64      | はい | 削除するフォルダの ID             |
+| remove_relation_memo | bool     | はい | true の場合紐づいたメモを全て削除 |
 
 #### 戻り値
 
@@ -130,8 +126,6 @@
 </details>
 
 ## Memo
-
-<details>
 
 ### get_memo_list
 
@@ -237,8 +231,6 @@
 
 ## [domain] tags
 
-<details>
-
 ### get_tags
 
 #### 説明
@@ -294,8 +286,6 @@
 </details>
 
 ## config
-
-<details>
 
 ### get_config
 
