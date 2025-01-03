@@ -1,70 +1,113 @@
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
+use typeshare::typeshare;
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
+#[typeshare]
 pub struct DetailMemoInfo {
-    pub id: i64,
+    /// メモID  
+    pub id: i32,
+    /// メモタイトル
     pub title: String,
-    pub folder_id: i64,
+    /// メモフォルダID
+    pub folder_id: i32,
+    /// メモ内容
     pub content: String,
+    /// メモ更新日時
     pub updated_at: String,
+    /// メモタグ
     pub tags: Option<Vec<TagInfo>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
+#[typeshare]
+/// DBから受け取った情報をDetailMemoInfoにパースする前の型(バックエンドのみ利用)
 pub struct RawDetailMemo {
-    // DBから受け取った情報をDetailMemoInfoにパースする前の型
-    pub id: i64,
+    /// メモID
+    pub id: i32,
+    /// メモタイトル
     pub title: String,
+    /// メモ内容
     pub content: String,
+    /// メモ更新日時
     pub updated_at: String,
-    pub folder_id: i64,
+    /// メモフォルダID
+    pub folder_id: i32,
+    /// メモタグ
     pub tags: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
+#[typeshare]
 pub struct CreateMemoIn {
+    /// メモタイトル
     pub title: String,
-    pub folder_id: i64,
+    /// メモフォルダID
+    pub folder_id: i32,
+    /// メモ内容
     pub content: String,
-    pub tags: Option<Vec<i64>>,
+    /// メモタグ
+    pub tags: Option<Vec<i32>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
+#[typeshare]
 pub struct UpdateMemoIn {
-    pub id: i64,
+    /// メモID
+    pub id: i32,
+    /// メモタイトル
     pub title: Option<String>,
-    pub folder_id: Option<i64>,
+    /// メモフォルダID
+    pub folder_id: Option<i32>,
+    /// メモ内容
     pub content: Option<String>,
-    pub tags: Option<Vec<i64>>,
+    /// メモタグ
+    pub tags: Option<Vec<i32>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
+#[typeshare]
 pub struct MemoListInfo {
-    pub id: i64,
+    /// メモID
+    pub id: i32,
+    /// メモタイトル
     pub title: String,
+    /// メモ更新日時
     pub updated_at: String,
+    /// メモタグ
     pub tags: Option<Vec<TagInfo>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
+#[typeshare]
+/// DBから受け取った情報をMemoListInfoにパースする前の型(バックエンドのみ利用)
 pub struct RawMemoList {
-    // DBから受け取った情報をMemoListInfoにパースする前の型
-    pub id: i64,
+    /// メモID
+    pub id: i32,
+    /// メモタイトル
     pub title: String,
+    /// メモ更新日時
     pub updated_at: String,
+    /// メモタグ
     pub tags: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow, PartialEq, Eq)]
+#[typeshare]
 pub struct TagInfo {
-    pub id: i64,
+    /// タグID
+    pub id: i32,
+    /// タグ名
     pub name: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
+#[typeshare]
 pub struct FolderInfo {
-    pub id: i64,
+    /// フォルダID
+    pub id: i32,
+    /// フォルダ名
     pub name: String,
+    /// フォルダ更新日時
     pub updated_at: String,
 }
