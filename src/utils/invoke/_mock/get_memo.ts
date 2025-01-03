@@ -4,10 +4,10 @@ type GetMemo = Extract<MemoInvokes, { key: typeof MEMO_KEYS.GET_MEMO }>;
 
 export const get_memo = (props: GetMemo["props"]): GetMemo["return"] => {
   console.log("call mock invoke: get_memo", props);
-  if (props.memo_id === null) {
+  if (props.memoId === null) {
     return null;
   }
-  if (props.memo_id === 1) {
+  if (props.memoId === 1) {
     return {
       id: 1,
       title: "メモ1",
@@ -37,8 +37,8 @@ const sample = "Hello, World!";
 console.log(sample);
 \`\`\`
 `,
-      created_at: "2021-01-01 00:00:00",
-      updated_at: "2021-01-01 00:00:00",
+      createdAt: "2021-01-01 00:00:00",
+      updatedAt: "2021-01-01 00:00:00",
       tags: [
         {
           id: 1,
@@ -51,13 +51,13 @@ console.log(sample);
       ],
     };
   }
-  if (props.memo_id === 2) {
+  if (props.memoId === 2) {
     return {
       id: 2,
       title: "メモ2",
       content: "hoge",
-      created_at: "2021-01-01 00:00:00",
-      updated_at: "2021-01-01 00:00:00",
+      createdAt: "2021-01-01 00:00:00",
+      updatedAt: "2021-01-01 00:00:00",
       tags: [],
     };
   }
@@ -65,8 +65,8 @@ console.log(sample);
     id: 3,
     title: "メモother",
     content: "fuga",
-    created_at: "2021-01-01 00:00:00",
-    updated_at: "2021-01-01 00:00:00",
+    createdAt: "2021-01-01 00:00:00",
+    updatedAt: "2021-01-01 00:00:00",
     tags: [
       {
         id: 3,

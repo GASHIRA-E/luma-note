@@ -44,12 +44,10 @@ type CreateTag = InvokeBase<
   }
 >;
 
-export const createTagMutation = (
-  props: CreateTag["props"],
-  queryClient: QueryClient
-) => {
+export const createTagMutation = (queryClient: QueryClient) => {
   return useMutation({
-    mutationFn: () => customInvoke(TAGS_KEYS.CREATE_TAG, props),
+    mutationFn: (props: CreateTag["props"]) =>
+      customInvoke(TAGS_KEYS.CREATE_TAG, props),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [TAGS_KEYS.GET_TAGS] });
     },
@@ -60,17 +58,15 @@ type DeleteTag = InvokeBase<
   TagsKeys,
   typeof TAGS_KEYS.DELETE_TAG,
   {
-    tag_id: number;
+    tagId: number;
   },
   null
 >;
 
-export const deleteTagMutation = (
-  props: DeleteTag["props"],
-  queryClient: QueryClient
-) => {
+export const deleteTagMutation = (queryClient: QueryClient) => {
   return useMutation({
-    mutationFn: () => customInvoke(TAGS_KEYS.DELETE_TAG, props),
+    mutationFn: (props: DeleteTag["props"]) =>
+      customInvoke(TAGS_KEYS.DELETE_TAG, props),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [TAGS_KEYS.GET_TAGS] });
     },
