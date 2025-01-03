@@ -14,7 +14,7 @@ type FindMemoCommand = InvokeBase<
   SearchKeys,
   typeof SEARCH_KEYS.FIND_MEMO,
   {
-    memo_title: string;
+    memoTitle: string;
     tags?: number[];
   },
   {
@@ -29,6 +29,6 @@ export const findMemo = (props: FindMemoCommand["props"]) => {
 type DetailMemoInfo = {
   id: number;
   title: string;
-  folder_id: number;
-  updated_at: string;
+  folderId: number;
+  updatedAt: string;
 };

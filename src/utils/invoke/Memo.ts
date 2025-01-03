@@ -6,26 +6,32 @@ export const MEMO_KEYS = {
   CREATE_MEMO: "create_memo",
   DELETE_MEMO: "delete_memo",
   UPDATE_MEMO: "update_memo",
+  GET_MEMO_LIST: "get_memo_list",
 } as const;
 
 // コマンド名の一覧
 export type MemoKeys = (typeof MEMO_KEYS)[keyof typeof MEMO_KEYS];
 
 // コマンドの型定義をまとめる
-export type MemoInvokes = GetMemo | CreateMemo | DeleteMemo | UpdateMemo;
+export type MemoInvokes =
+  | GetMemo
+  | CreateMemo
+  | DeleteMemo
+  | UpdateMemo
+  | GetMemoList;
 
 type GetMemo = InvokeBase<
   MemoKeys,
   typeof MEMO_KEYS.GET_MEMO,
   {
-    memo_id: number | null;
+    memoId: number | null;
   },
   {
     id: number;
     title: string;
     content: string;
-    created_at: string;
-    updated_at: string;
+    createdAt: string;
+    updatedAt: string;
     tags: {
       id: number;
       name: string;
@@ -35,9 +41,9 @@ type GetMemo = InvokeBase<
 
 export const getMemoQuery = (props: GetMemo["props"]) => {
   return useQuery({
-    queryKey: [MEMO_KEYS.GET_MEMO, props.memo_id],
+    queryKey: [MEMO_KEYS.GET_MEMO, props.memoId],
     queryFn: () => {
-      if (props.memo_id === null) {
+      if (props.memoId === null) {
         return Promise.resolve(null);
       }
       return customInvoke(MEMO_KEYS.GET_MEMO, props);
@@ -53,14 +59,16 @@ type CreateMemo = InvokeBase<
     content: string;
     tags?: number[];
   },
-  {
-    id: number;
-  }
+  null
 >;
 
-export const createMemoMutation = (props: CreateMemo["props"]) => {
+export const createMemoMutation = (queryClient: QueryClient) => {
   return useMutation({
-    mutationFn: () => customInvoke(MEMO_KEYS.CREATE_MEMO, props),
+    mutationFn: (props: CreateMemo["props"]) =>
+      customInvoke(MEMO_KEYS.CREATE_MEMO, props),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [MEMO_KEYS.GET_MEMO] });
+    },
   });
 };
 
@@ -68,7 +76,7 @@ type UpdateMemo = InvokeBase<
   MemoKeys,
   typeof MEMO_KEYS.UPDATE_MEMO,
   {
-    memo_id: number;
+    memoId: number;
     title?: string;
     content?: string;
     tags?: number[];
@@ -76,15 +84,13 @@ type UpdateMemo = InvokeBase<
   null
 >;
 
-export const updateMemoMutation = (
-  props: UpdateMemo["props"],
-  queryClient: QueryClient
-) => {
+export const updateMemoMutation = (queryClient: QueryClient) => {
   return useMutation({
-    mutationFn: () => customInvoke(MEMO_KEYS.UPDATE_MEMO, props),
-    onSuccess: () => {
+    mutationFn: (props: UpdateMemo["props"]) =>
+      customInvoke(MEMO_KEYS.UPDATE_MEMO, props),
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: [MEMO_KEYS.GET_MEMO, props.memo_id],
+        queryKey: [MEMO_KEYS.GET_MEMO, variables.memoId],
       });
     },
   });
@@ -99,8 +105,32 @@ type DeleteMemo = InvokeBase<
   null
 >;
 
-export const deleteMemoMutation = (props: DeleteMemo["props"]) => {
+export const deleteMemoMutation = (queryClient: QueryClient) => {
   return useMutation({
-    mutationFn: () => customInvoke(MEMO_KEYS.DELETE_MEMO, props),
+    mutationFn: (props: DeleteMemo["props"]) =>
+      customInvoke(MEMO_KEYS.DELETE_MEMO, props),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [MEMO_KEYS.GET_MEMO] });
+    },
+  });
+};
+
+type GetMemoList = InvokeBase<
+  MemoKeys,
+  typeof MEMO_KEYS.GET_MEMO_LIST,
+  {
+    folderId: number | null;
+  },
+  {
+    id: number;
+    title: string;
+    updatedAt: string;
+  }[]
+>;
+
+export const getMemoListQuery = (props: GetMemoList["props"]) => {
+  return useQuery({
+    queryKey: [MEMO_KEYS.GET_MEMO_LIST, props.folderId],
+    queryFn: () => customInvoke(MEMO_KEYS.GET_MEMO_LIST, props),
   });
 };
