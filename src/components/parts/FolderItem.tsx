@@ -8,13 +8,13 @@ import {
 } from "@/components/ui/menu";
 
 export type FolderProps = {
-  folderId: number;
+  folderId: number | null;
   name: string;
   selected?: boolean;
   memoCounts?: number;
-  onClick: (folderId: number) => void;
-  onClickDelete: (folderId: number) => void;
-  onClickRename: (folderId: number) => void;
+  onClick: (folderId: number | null) => void;
+  onClickDelete: (folderId: number | null) => void;
+  onClickRename: (folderId: number | null) => void;
 };
 
 export const FolderItem = ({
@@ -63,7 +63,7 @@ export const FolderItem = ({
       ) : null}
       <HStack justifyContent="space-between" alignItems="center">
         <Text textStyle="md">{name}</Text>
-        {folderId !== -1 && (
+        {folderId !== null && (
           <MenuRoot onSelect={handleSelectMenu}>
             <MenuTrigger asChild>
               <IconButton
