@@ -66,16 +66,30 @@ export const FolderItem = ({
         {folderId !== -1 && (
           <MenuRoot onSelect={handleSelectMenu}>
             <MenuTrigger asChild>
-              <IconButton size="xs" aria-label="More options" variant="outline">
+              <IconButton
+                size="xs"
+                aria-label="More options"
+                variant="outline"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <HiDotsHorizontal />
               </IconButton>
             </MenuTrigger>
             <MenuContent>
-              <MenuItem value="rename-folder" cursor="pointer">
+              <MenuItem
+                value="rename-folder"
+                cursor="pointer"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <HiPencil />
                 <Box flex="1">名称変更</Box>
               </MenuItem>
-              <MenuItem value="delete-folder" cursor="pointer" color="fg.error">
+              <MenuItem
+                value="delete-folder"
+                cursor="pointer"
+                color="fg.error"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <HiTrash />
                 <Box flex="1">削除</Box>
               </MenuItem>
