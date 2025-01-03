@@ -37,7 +37,7 @@ pub struct RawDetailMemo {
     pub tags: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize, FromRow)]
+#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
 #[typeshare]
 pub struct CreateMemoIn {
     /// メモタイトル
