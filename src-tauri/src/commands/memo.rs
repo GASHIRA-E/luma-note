@@ -242,62 +242,8 @@ mod tests {
     use super::*;
     use crate::commands::folder::create_folder_in_db;
     use crate::commands::tag::create_tag_in_db;
+    use crate::database::setup_test_db;
     use crate::types::TagInfo;
-    use sqlx::sqlite::SqlitePoolOptions;
-
-    async fn setup_test_db() -> Pool<Sqlite> {
-        let sqlite_pool = SqlitePoolOptions::new()
-            .connect("sqlite::memory:")
-            .await
-            .unwrap();
-
-        // テーブル作成
-        create_tables(&sqlite_pool).await;
-
-        sqlite_pool
-    }
-
-    async fn create_tables(pool: &Pool<Sqlite>) {
-        sqlx::query(
-            r#"
-            CREATE TABLE IF NOT EXISTS Folders(
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name TEXT NOT NULL,
-                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-            );
-
-            CREATE TABLE IF NOT EXISTS Memos (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                folder_id INTEGER DEFAULT NULL, -- folderID=0:フォルダ未選択
-                title TEXT NOT NULL,
-                content TEXT NOT NULL,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (folder_id) REFERENCES Folders(id) ON DELETE SET DEFAULT
-                DEFERRABLE INITIALLY DEFERRED
-            );
-
-            CREATE TABLE IF NOT EXISTS Tags (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-            );
-
-            CREATE TABLE IF NOT EXISTS MemoTagRelations (
-                memo_id INTEGER,
-                tag_id INTEGER,
-                PRIMARY KEY (memo_id, tag_id),
-                FOREIGN KEY (memo_id) REFERENCES Memos(id) ON DELETE CASCADE,
-                FOREIGN KEY (tag_id) REFERENCES Tags(id) ON DELETE CASCADE
-            );
-            "#,
-        )
-        .execute(pool)
-        .await
-        .unwrap();
-    }
 
     #[tokio::test]
     async fn test_メモが作成して詳細取得できること() {
