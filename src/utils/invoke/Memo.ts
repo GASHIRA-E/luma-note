@@ -67,7 +67,9 @@ export const createMemoMutation = (queryClient: QueryClient) => {
     mutationFn: (props: CreateMemo["props"]) =>
       customInvoke(MEMO_KEYS.CREATE_MEMO, props),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [MEMO_KEYS.GET_MEMO] });
+      queryClient.invalidateQueries({
+        queryKey: [MEMO_KEYS.GET_MEMO_LIST],
+      });
     },
   });
 };
@@ -90,7 +92,7 @@ export const updateMemoMutation = (queryClient: QueryClient) => {
       customInvoke(MEMO_KEYS.UPDATE_MEMO, props),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: [MEMO_KEYS.GET_MEMO, variables.memoId],
+        queryKey: [MEMO_KEYS.GET_MEMO, MEMO_KEYS.GET_MEMO_LIST],
       });
     },
   });
@@ -100,7 +102,7 @@ type DeleteMemo = InvokeBase<
   MemoKeys,
   typeof MEMO_KEYS.DELETE_MEMO,
   {
-    memo_id: number;
+    memoId: number;
   },
   null
 >;
@@ -110,7 +112,9 @@ export const deleteMemoMutation = (queryClient: QueryClient) => {
     mutationFn: (props: DeleteMemo["props"]) =>
       customInvoke(MEMO_KEYS.DELETE_MEMO, props),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [MEMO_KEYS.GET_MEMO] });
+      queryClient.invalidateQueries({
+        queryKey: [MEMO_KEYS.GET_MEMO_LIST],
+      });
     },
   });
 };

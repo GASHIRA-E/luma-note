@@ -1,8 +1,14 @@
 import { useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { MemoList } from "@/components/presentation/MemoList";
 
-import { getMemoListQuery } from "@/utils/invoke/Memo";
+import {
+  getMemoListQuery,
+  createMemoMutation,
+  updateMemoMutation,
+  deleteMemoMutation,
+} from "@/utils/invoke/Memo";
 import { useFolderStore } from "@/utils/stores/folder";
 import { useEditorStore } from "@/utils/stores/editor";
 import { useSearchStore } from "@/utils/stores/search";
@@ -35,10 +41,23 @@ export const MemoListContainer = () => {
     name: string;
   } | null>(null);
 
+  const queryClient = useQueryClient();
+  const { mutateAsync: createMemoMutateAsync } =
+    createMemoMutation(queryClient);
+  const { mutateAsync: updateMemoMutateAsync } =
+    updateMemoMutation(queryClient);
+  const { mutateAsync: deleteMemoMutateAsync } =
+    deleteMemoMutation(queryClient);
+
   const onClickNewMemo = () => {
-    alert("新規メモ作成");
-    setIsPopoverOpen(false);
-    setInputValue("");
+    if (!inputValue) return;
+    createMemoMutateAsync({ title: inputValue, content: "" })
+      .then(() => {
+        setInputValue("");
+      })
+      .finally(() => {
+        setIsPopoverOpen(false);
+      });
   };
 
   const handleClickMemo = (memoId: number) => {
@@ -58,8 +77,12 @@ export const MemoListContainer = () => {
 
   const handleSaveRename = () => {
     if (memoBeingRenamed) {
-      alert(`名前変更を保存: ${memoBeingRenamed.name}`);
-      setMemoBeingRenamed(null);
+      updateMemoMutateAsync({
+        memoId: memoBeingRenamed.id,
+        title: memoBeingRenamed.name,
+      }).then(() => {
+        setMemoBeingRenamed(null);
+      });
     }
   };
 
@@ -72,8 +95,12 @@ export const MemoListContainer = () => {
 
   const handleConfirmDelete = () => {
     if (memoBeingDeleted) {
-      alert(`メモを削除: ${memoBeingDeleted.name}`);
-      setMemoBeingDeleted(null);
+      deleteMemoMutateAsync({
+        memoId: memoBeingDeleted.id,
+        currentFolderId: selectedFolderId,
+      }).then(() => {
+        setMemoBeingDeleted(null);
+      });
     }
   };
 
