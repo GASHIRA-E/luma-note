@@ -28,5 +28,18 @@ export const customInvoke = async <K extends InvokeKeys>(
     const mock = await import(`./_mock/${key}.ts`);
     return mock[key](props) as Extract<InvokeTypes, { key: K }>["return"];
   }
-  return await invoke<Extract<InvokeTypes, { key: K }>["return"]>(key, props);
+  return await invoke<Extract<InvokeTypes, { key: K }>["return"]>(key, props)
+    .then(
+      // @ts-ignore
+      (result) => {
+        if (import.meta.env.MODE === "development") {
+          console.log("invoke: ", { key, props, return: result });
+        }
+        return result;
+      }
+    )
+    .catch((e) => {
+      console.error("invoke error: ", { key, props, error: e });
+      throw e;
+    });
 };

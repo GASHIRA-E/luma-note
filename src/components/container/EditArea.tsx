@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { EditArea as EditorPresentation } from "@/components/presentation/EditArea";
-import { getMemoQuery, updateMemoMutation } from "@/utils/invoke/Memo";
+import { getDetailMemoQuery, updateMemoMutation } from "@/utils/invoke/Memo";
 import { getTagsQuery, createTagMutation } from "@/utils/invoke/Tags";
 import { useEditorStore } from "@/utils/stores/editor";
 
@@ -10,7 +10,7 @@ export const EditArea = () => {
   const editorDisplayMode = useEditorStore((state) => state.displayMode);
   const selectedMemoId = useEditorStore((state) => state.selectedMemoId);
 
-  const { data: memoData } = getMemoQuery({ memoId: selectedMemoId });
+  const { data: memoData } = getDetailMemoQuery({ memoId: selectedMemoId });
   const { data: tagsData } = getTagsQuery();
 
   const queryClient = useQueryClient();
