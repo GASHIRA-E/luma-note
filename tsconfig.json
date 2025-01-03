@@ -13,7 +13,6 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "jsxImportSource": "@emotion/react",
 
     /* Linting */
     "strict": true,
@@ -27,5 +26,6 @@
     }
   },
   "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "references": [{ "path": "./tsconfig.node.json" }],
+  "exclude": ["src/components/ui/**/*.tsx"]
 }

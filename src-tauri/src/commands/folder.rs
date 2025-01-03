@@ -18,12 +18,12 @@ async fn get_folders_from_db(sqlite_pool: Pool<Sqlite>) -> Result<Vec<FolderInfo
 }
 
 #[tauri::command]
-pub async fn create_folder(state: tauri::State<'_, Pool<Sqlite>>, name: String) -> Result<i64, ()> {
+pub async fn create_folder(state: tauri::State<'_, Pool<Sqlite>>, name: String) -> Result<i32, ()> {
     let folder_id = create_folder_in_db(state.inner().clone(), name).await?;
     Ok(folder_id)
 }
 
-pub async fn create_folder_in_db(sqlite_pool: Pool<Sqlite>, name: String) -> Result<i64, ()> {
+pub async fn create_folder_in_db(sqlite_pool: Pool<Sqlite>, name: String) -> Result<i32, ()> {
     //　フォルダ作成内部関数
     const SQL: &str = "INSERT INTO Folders (name) VALUES (?)";
     let result = sqlx::query(SQL)
@@ -32,19 +32,19 @@ pub async fn create_folder_in_db(sqlite_pool: Pool<Sqlite>, name: String) -> Res
         .await
         .map_err(|_| ())?;
     // 作成されたフォルダのIDを返す
-    Ok(result.last_insert_rowid())
+    Ok(result.last_insert_rowid() as i32)
 }
 
 #[tauri::command]
 pub async fn delete_folder(
     state: tauri::State<'_, Pool<Sqlite>>,
-    folder_id: i64,
+    folder_id: i32,
 ) -> Result<(), ()> {
     delete_folder_in_db(state.inner().clone(), folder_id).await?;
     Ok(())
 }
 
-async fn delete_folder_in_db(sqlite_pool: Pool<Sqlite>, folder_id: i64) -> Result<(), ()> {
+async fn delete_folder_in_db(sqlite_pool: Pool<Sqlite>, folder_id: i32) -> Result<(), ()> {
     const SQL: &str = "DELETE FROM Folders WHERE id = ?";
     let result = sqlx::query(SQL)
         .bind(folder_id)
@@ -62,7 +62,7 @@ async fn delete_folder_in_db(sqlite_pool: Pool<Sqlite>, folder_id: i64) -> Resul
 #[tauri::command]
 pub async fn update_folder(
     state: tauri::State<'_, Pool<Sqlite>>,
-    folder_id: i64,
+    folder_id: i32,
     name: String,
 ) -> Result<(), ()> {
     update_folder_in_db(state.inner().clone(), folder_id, name).await?;
@@ -71,7 +71,7 @@ pub async fn update_folder(
 
 async fn update_folder_in_db(
     sqlite_pool: Pool<Sqlite>,
-    folder_id: i64,
+    folder_id: i32,
     name: String,
 ) -> Result<(), ()> {
     const SQL: &str = "UPDATE Folders SET name = ? WHERE id = ?";

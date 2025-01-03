@@ -1,13 +1,14 @@
+import React from "react";
 import { Box, Heading, Flex } from "@chakra-ui/react";
+
 import { Button } from "@/components/ui/button";
 import { MemoItem } from "@/components/parts/MemoItem";
 
 interface MemoListProps {
-  memos: Array<{
-    id: number;
-    name: string;
-    updatedAt: string;
-  }>;
+  memos: Omit<
+    React.ComponentProps<typeof MemoItem>,
+    "onClickMemo" | "onClickMoveFolder" | "selected"
+  >[];
   selectedMemoId: number | null;
   onClickMoveFolder: (memoId: number) => void;
   onClickNewMemo: () => void;
@@ -41,9 +42,7 @@ export const MemoList: React.FC<MemoListProps> = ({
         {memos.map((memo) => (
           <MemoItem
             key={memo.id}
-            id={memo.id}
-            name={memo.name}
-            updatedAt={memo.updatedAt}
+            {...memo}
             selected={memo.id === selectedMemoId}
             onClickMoveFolder={onClickMoveFolder}
             onClickMemo={onClickMemo}

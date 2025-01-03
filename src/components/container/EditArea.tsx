@@ -9,7 +9,7 @@ export const EditArea = () => {
   const editorDisplayMode = useEditorStore((state) => state.displayMode);
   const selectedMemoId = useEditorStore((state) => state.selectedMemoId);
 
-  const { data } = getMemoQuery({ memo_id: selectedMemoId });
+  const { data } = getMemoQuery({ memoId: selectedMemoId });
 
   const [tags, setTags] = useState<string[]>([]);
   const [mdText, setMdText] = useState("");

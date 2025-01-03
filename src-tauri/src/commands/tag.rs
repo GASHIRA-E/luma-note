@@ -2,27 +2,27 @@ use crate::types::TagInfo;
 use sqlx::{Pool, Sqlite};
 
 #[tauri::command]
-pub async fn create_tag(state: tauri::State<'_, Pool<Sqlite>>, name: String) -> Result<i64, ()> {
+pub async fn create_tag(state: tauri::State<'_, Pool<Sqlite>>, name: String) -> Result<i32, ()> {
     let tag_id = create_tag_in_db(state.inner().clone(), name).await?;
     Ok(tag_id)
 }
 
-pub(crate) async fn create_tag_in_db(sqlite_pool: Pool<Sqlite>, name: String) -> Result<i64, ()> {
+pub async fn create_tag_in_db(sqlite_pool: Pool<Sqlite>, name: String) -> Result<i32, ()> {
     let tag = sqlx::query("INSERT INTO Tags (name) VALUES (?)")
         .bind(name)
         .execute(&sqlite_pool)
         .await
         .unwrap();
-    Ok(tag.last_insert_rowid())
+    Ok(tag.last_insert_rowid() as i32)
 }
 
 #[tauri::command]
-pub async fn delete_tag(state: tauri::State<'_, Pool<Sqlite>>, tag_id: i64) -> Result<(), ()> {
+pub async fn delete_tag(state: tauri::State<'_, Pool<Sqlite>>, tag_id: i32) -> Result<(), ()> {
     delete_tag_in_db(state.inner().clone(), tag_id).await?;
     Ok(())
 }
 
-async fn delete_tag_in_db(sqlite_pool: Pool<Sqlite>, tag_id: i64) -> Result<(), ()> {
+async fn delete_tag_in_db(sqlite_pool: Pool<Sqlite>, tag_id: i32) -> Result<(), ()> {
     const SQL: &str = "DELETE FROM Tags WHERE id = ?";
     let result = sqlx::query(SQL)
         .bind(tag_id)

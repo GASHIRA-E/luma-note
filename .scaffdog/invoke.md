@@ -13,15 +13,20 @@ questions:
 import { useQuery, useMutation, QueryClient } from "@tanstack/react-query";
 import { InvokeBase, customInvoke } from "./_base";
 
+export const {{ inputs.domainName | constant }}_KEYS = {
+  EXAMPLE_GET: "example_get_command",
+  EXAMPLE_UPDATE: "example_update_command"
+} as const;
+
 // コマンド名の一覧
-export type {{ inputs.domainName | pascal }}Keys = "example_get_command" | "example_update_command";
+export type {{ inputs.domainName | pascal }}Keys = (typeof {{ inputs.domainName | constant }}_KEYS)[keyof typeof {{ inputs.domainName | constant }}_KEYS];
 
 // コマンドの型定義をまとめる
 export type {{ inputs.domainName | pascal }}Invokes = ExampleGetCommand | ExampleUpdateCommand;
 
 type ExampleGetCommand = InvokeBase<
   {{ inputs.domainName | pascal }}Keys,
-  "example_get_command",
+  typeof {{ inputs.domainName | constant }}_KEYS.EXAMPLE_GET,
   undefined,
   {
     id: number;
@@ -31,14 +36,14 @@ type ExampleGetCommand = InvokeBase<
 
 export const exampleGetCommandQuery = () => {
   return useQuery({
-    queryKey: ["example_get_command"],
-    queryFn: () => customInvoke("example_get_command", undefined),
+    queryKey: [{{ inputs.domainName | constant }}_KEYS.EXAMPLE_GET],
+    queryFn: () => customInvoke({{ inputs.domainName | constant }}_KEYS.EXAMPLE_GET, undefined),
   });
 };
 
 type ExampleUpdateCommand = InvokeBase<
   {{ inputs.domainName | pascal }}Keys,
-  "example_update_command",
+  typeof {{ inputs.domainName | constant }}_KEYS.EXAMPLE_UPDATE,
   {
     id: number;
     name: string;
@@ -51,9 +56,9 @@ export const exampleUpdateCommandQuery = (
   queryClient: QueryClient
 ) => {
   return useMutation({
-    mutationFn: () => customInvoke("example_update_command", props),
+    mutationFn: () => customInvoke({{ inputs.domainName | constant }}_KEYS.EXAMPLE_UPDATE, props),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["example_get_command"] });
+      queryClient.invalidateQueries({ queryKey: [{{ inputs.domainName | constant }}_KEYS.EXAMPLE_GET] });
     },
   });
 };
