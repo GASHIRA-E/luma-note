@@ -15,7 +15,7 @@
 #### エディタ周りのライブラリ
 
 - [marked](https://marked.js.org/)
-  - markdownテキストからhtmlテキストへ変換を行うため
+  - markdown テキストから html テキストへ変換を行うため
 - [highlight.js](https://highlightjs.org/)
   - コード関連のハイライトを行うため
 
@@ -59,10 +59,10 @@ For iOS development, run:
 
 ### npm scripts
 
-| command             | 目的                             |
-| ------------------- | -------------------------------- |
-| `npm run web`       | Mockを使用してフロントを起動する |
-| `npm run tauri dev` | tauriアプリを起動する            |
+| command             | 目的                              |
+| ------------------- | --------------------------------- |
+| `npm run web`       | Mock を使用してフロントを起動する |
+| `npm run tauri dev` | tauri アプリを起動する            |
 
 ### ディレクトリ構成
 
@@ -97,6 +97,18 @@ npx scaffdog generate
 ```
 
 ## バックエンド Tips
+
+### typeshare で ts 型定義ファイルを生成
+
+```bash
+cargo install typeshare
+```
+
+下記コマンドで src-tauri/src/types.rs から src/types/invokeGenerate.d.ts へ変換する
+
+```bash
+make typeshare
+```
 
 ### データベースの設定
 
@@ -231,7 +243,7 @@ cd src-tauri
 cargo run --example [example対象]
 ```
 
-作成しているexampleフォルダ
+作成している example フォルダ
 
 - `sample_simple`
   - `cargo run --example sample_simple`
