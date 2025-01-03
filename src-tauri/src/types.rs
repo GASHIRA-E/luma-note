@@ -25,7 +25,7 @@ pub struct RawDetailMemo {
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct CreateMemoIn {
     pub title: String,
-    pub folder_id: i64,
+    pub folder_id: Option<i64>,
     pub content: String,
     pub tags: Option<Vec<i64>>,
 }

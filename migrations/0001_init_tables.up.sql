@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS Folders(
 
 CREATE TABLE IF NOT EXISTS Memos (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    folder_id INTEGER DEFAULT 0, -- folderID=0:フォルダ未選択
+    folder_id INTEGER DEFAULT NULL, -- folderID=NULL:フォルダ未選択
     title TEXT NOT NULL,
     content TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,

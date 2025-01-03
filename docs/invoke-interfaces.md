@@ -367,12 +367,12 @@
 
 create_memo のパラメータ
 
-| フィールド | データ型   | 説明                       |
-| ---------- | ---------- | -------------------------- |
-| title      | String     | メモのタイトル             |
-| folder_id  | i64        | フォルダ ID                |
-| content    | String     | メモの Markdown コンテンツ |
-| tags       | `Vec<i64>` | 付与するタグ ID の配列     |
+| フィールド | データ型    | 説明                       |
+| ---------- | ----------- | -------------------------- |
+| title      | String      | メモのタイトル             |
+| folder_id  | Option<i64> | フォルダ ID                |
+| content    | String      | メモの Markdown コンテンツ |
+| tags       | `Vec<i64>`  | 付与するタグ ID の配列     |
 
 ### UpdateMemoIn
 
