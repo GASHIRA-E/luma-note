@@ -5,22 +5,13 @@ import { Button } from "@/components/ui/button";
 import { MemoItem } from "@/components/parts/MemoItem";
 
 interface MemoListProps {
-  memos: Omit<
-    React.ComponentProps<typeof MemoItem>,
-    "onClickMemo" | "onClickMoveFolder" | "selected"
-  >[];
-  selectedMemoId: number | null;
-  onClickMoveFolder: (memoId: number) => void;
+  memos: React.ComponentProps<typeof MemoItem>[];
   onClickNewMemo: () => void;
-  onClickMemo: (memoId: number) => void;
 }
 
 export const MemoList: React.FC<MemoListProps> = ({
   memos,
-  selectedMemoId,
-  onClickMoveFolder,
   onClickNewMemo,
-  onClickMemo,
 }) => {
   return (
     <Box
@@ -40,13 +31,7 @@ export const MemoList: React.FC<MemoListProps> = ({
       </Button>
       <Flex direction="column" gap={2}>
         {memos.map((memo) => (
-          <MemoItem
-            key={memo.id}
-            {...memo}
-            selected={memo.id === selectedMemoId}
-            onClickMoveFolder={onClickMoveFolder}
-            onClickMemo={onClickMemo}
-          />
+          <MemoItem key={memo.id} {...memo} />
         ))}
       </Flex>
     </Box>
