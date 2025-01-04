@@ -101,7 +101,7 @@ npx scaffdog generate
 ### typeshare で ts 型定義ファイルを生成
 
 ```bash
-cargo install typeshare
+cargo install typeshare-cli
 ```
 
 下記コマンドで src-tauri/src/types.rs から src/types/invokeGenerate.d.ts へ変換する
