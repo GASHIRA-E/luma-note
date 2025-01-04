@@ -6,10 +6,10 @@ use typeshare::typeshare;
 #[serde(tag = "type", content = "content")]
 #[typeshare]
 pub enum NullableId<T> {
-    /// フィールドが存在しない場合
+    /// NULL_ID
     Null,
-    /// フィールドが存在する場合(IDがNULLもしくは整数型)
-    Value(Option<T>),
+    /// IDが整数型
+    Value(T),
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
@@ -53,7 +53,7 @@ pub struct CreateMemoIn {
     /// メモタイトル
     pub title: String,
     /// メモフォルダID
-    pub folder_id: NullableId<i32>,
+    pub folder_id: Option<NullableId<i32>>,
     /// メモ内容
     pub content: String,
     /// メモタグ
@@ -68,7 +68,7 @@ pub struct UpdateMemoIn {
     /// メモタイトル
     pub title: Option<String>,
     /// メモフォルダID
-    pub folder_id: NullableId<i32>,
+    pub folder_id: Option<NullableId<i32>>,
     /// メモ内容
     pub content: Option<String>,
     /// メモタグ

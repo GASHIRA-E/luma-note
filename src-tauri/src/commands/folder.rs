@@ -182,7 +182,7 @@ mod tests {
         let create_memo_in = CreateMemoIn {
             title: "test".to_string(),
             content: "test".to_string(),
-            folder_id: NullableId::Value(Some(folder_id)),
+            folder_id: Some(NullableId::Value(folder_id)),
             tags: None,
         };
 
@@ -222,7 +222,7 @@ mod tests {
         let create_memo_in = CreateMemoIn {
             title: "test".to_string(),
             content: "test".to_string(),
-            folder_id: NullableId::Value(Some(folder_id)),
+            folder_id: Some(NullableId::Value(folder_id)),
             tags: None,
         };
 

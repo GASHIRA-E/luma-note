@@ -129,10 +129,10 @@ pub async fn create_memo_in_db(sqlite_pool: Pool<Sqlite>, memo: CreateMemoIn) ->
     const MEMO_SQL: &str = "INSERT INTO Memos (title, folder_id, content) VALUES (?, ?, ?)";
     let result = sqlx::query(MEMO_SQL)
         .bind(&memo.title)
-        .bind(match memo.folder_id {
-            NullableId::Null => None::<i32>,
-            NullableId::Value(v) => v,
-        })
+        .bind(memo.folder_id.and_then(|id| match id {
+            NullableId::Null => None,
+            NullableId::Value(v) => Some(v),
+        }))
         .bind(&memo.content)
         .execute(&mut *tx)
         .await
@@ -194,7 +194,7 @@ async fn update_memo_in_db(sqlite_pool: Pool<Sqlite>, memo: UpdateMemoIn) -> Res
     // 更新対象のフィールドが1つも存在しないかつタグの更新もない場合は早期リターン
     if memo.title.is_none()
         && memo.content.is_none()
-        && memo.folder_id == NullableId::Null
+        && memo.folder_id.is_none()
         && memo.tags.is_none()
     {
         return Ok(());
@@ -216,10 +216,10 @@ async fn update_memo_in_db(sqlite_pool: Pool<Sqlite>, memo: UpdateMemoIn) -> Res
         bindings.push(content.clone());
     }
 
-    if let NullableId::Value(Some(folder_id)) = memo.folder_id {
+    if let Some(NullableId::Value(folder_id)) = memo.folder_id {
         update_parts.push("folder_id = ?");
         bindings.push(folder_id.to_string());
-    } else if memo.folder_id == NullableId::Value(None)
+    } else if memo.folder_id == Some(NullableId::Null)
         && memo.title.is_none()
         && memo.content.is_none()
         && memo.tags.is_none()
@@ -294,7 +294,7 @@ mod tests {
 
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: NullableId::Value(Some(1)),
+            folder_id: Some(NullableId::Value(1)),
             content: "test".to_string(),
             tags: Some(vec![1, 2]),
         };
@@ -331,7 +331,7 @@ mod tests {
 
         let memo1 = CreateMemoIn {
             title: "test1".to_string(),
-            folder_id: NullableId::Value(Some(folder_id)),
+            folder_id: Some(NullableId::Value(folder_id)),
             content: "test_content1".to_string(),
             tags: Some(vec![1]),
         };
@@ -339,7 +339,7 @@ mod tests {
 
         let memo2 = CreateMemoIn {
             title: "test2".to_string(),
-            folder_id: NullableId::Value(Some(folder_id)),
+            folder_id: Some(NullableId::Value(folder_id)),
             content: "test_content2".to_string(),
             tags: Some(vec![1]),
         };
@@ -383,7 +383,7 @@ mod tests {
 
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: NullableId::Value(Some(folder_id)),
+            folder_id: Some(NullableId::Value(folder_id)),
             content: "test".to_string(),
             tags: Some(vec![1]),
         };
@@ -392,7 +392,7 @@ mod tests {
         let update_memo = UpdateMemoIn {
             id: created_memo_id,
             title: Some("test2".to_string()),
-            folder_id: NullableId::Value(Some(folder_id)),
+            folder_id: Some(NullableId::Value(folder_id)),
             content: Some("test2".to_string()),
             tags: Some(vec![tag_id]),
         };
@@ -432,7 +432,7 @@ mod tests {
 
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: NullableId::Value(Some(folder_id)),
+            folder_id: Some(NullableId::Value(folder_id)),
             content: "test".to_string(),
             tags: Some(vec![tag_id]),
         };
@@ -441,7 +441,7 @@ mod tests {
         let update_memo = UpdateMemoIn {
             id: created_memo_id,
             title: None,
-            folder_id: NullableId::Value(Some(folder2_id)),
+            folder_id: Some(NullableId::Value(folder2_id)),
             content: None,
             tags: None,
         };
@@ -474,7 +474,7 @@ mod tests {
 
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: NullableId::Value(Some(folder_id)),
+            folder_id: Some(NullableId::Value(folder_id)),
             content: "test".to_string(),
             tags: None,
         };
@@ -483,7 +483,7 @@ mod tests {
         let update_memo = UpdateMemoIn {
             id: created_memo_id,
             title: None,
-            folder_id: NullableId::Value(None),
+            folder_id: Some(NullableId::Null),
             content: None,
             tags: None,
         };
@@ -514,7 +514,7 @@ mod tests {
 
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: NullableId::Value(Some(folder_id)),
+            folder_id: Some(NullableId::Value(folder_id)),
             content: "test".to_string(),
             tags: Some(vec![tag_id]),
         };
@@ -524,7 +524,7 @@ mod tests {
         let update_memo = UpdateMemoIn {
             id: created_memo_id,
             title: Some("test2".to_string()),
-            folder_id: NullableId::Value(None),
+            folder_id: None,
             content: None,
             tags: None,
         };
@@ -563,7 +563,7 @@ mod tests {
 
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: NullableId::Value(Some(folder_id)),
+            folder_id: Some(NullableId::Value(folder_id)),
             content: "test".to_string(),
             tags: Some(vec![tag_id]),
         };
@@ -573,7 +573,7 @@ mod tests {
         let update_memo = UpdateMemoIn {
             id: created_memo_id,
             title: None,
-            folder_id: NullableId::Value(None),
+            folder_id: None,
             content: Some("test2".to_string()),
             tags: None,
         };
@@ -616,7 +616,7 @@ mod tests {
 
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: NullableId::Value(Some(folder_id)),
+            folder_id: Some(NullableId::Value(folder_id)),
             content: "test".to_string(),
             tags: Some(vec![tag_id]),
         };
@@ -626,7 +626,7 @@ mod tests {
         let update_memo = UpdateMemoIn {
             id: created_memo_id,
             title: None,
-            folder_id: NullableId::Value(None),
+            folder_id: None,
             content: None,
             tags: Some(vec![tag2_id]),
         };
@@ -673,7 +673,7 @@ mod tests {
         // 更新前のメモ
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: NullableId::Value(Some(folder_id)),
+            folder_id: Some(NullableId::Value(folder_id)),
             content: "test".to_string(),
             tags: Some(vec![tag1_id]),
         };
@@ -687,7 +687,7 @@ mod tests {
         let update_memo = UpdateMemoIn {
             id: created_memo_id,
             title: Some("test".to_string()),
-            folder_id: NullableId::Value(Some(folder_id)),
+            folder_id: Some(NullableId::Value(folder_id)),
             content: Some("test".to_string()),
             tags: Some(vec![tag2_id]),
         };
@@ -723,7 +723,7 @@ mod tests {
 
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: NullableId::Value(Some(folder_id)),
+            folder_id: Some(NullableId::Value(folder_id)),
             content: "test".to_string(),
             tags: Some(vec![tag_id]),
         };
@@ -752,14 +752,14 @@ mod tests {
 
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: NullableId::Value(None),
+            folder_id: Some(NullableId::Null),
             content: "test".to_string(),
             tags: Some(vec![]),
         };
         create_memo_in_db(sqlite_pool.clone(), memo).await.unwrap();
         let memo2 = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: NullableId::Value(None),
+            folder_id: Some(NullableId::Null),
             content: "test".to_string(),
             tags: Some(vec![]),
         };

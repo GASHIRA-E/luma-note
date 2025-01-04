@@ -140,7 +140,7 @@ mod tests {
             sqlite_pool.clone(),
             CreateMemoIn {
                 title: "abc".to_string(),
-                folder_id: NullableId::Value(Some(1)),
+                folder_id: Some(NullableId::Value(1)),
                 content: "test".to_string(),
                 tags: Some(vec![rust_tag_id, typescript_tag_id, javascript_tag_id]),
             },
@@ -152,7 +152,7 @@ mod tests {
             sqlite_pool.clone(),
             CreateMemoIn {
                 title: "abcd".to_string(),
-                folder_id: NullableId::Value(Some(1)),
+                folder_id: Some(NullableId::Value(1)),
                 content: "test".to_string(),
                 tags: Some(vec![rust_tag_id, typescript_tag_id]),
             },
@@ -164,7 +164,7 @@ mod tests {
             sqlite_pool.clone(),
             CreateMemoIn {
                 title: "abcde".to_string(),
-                folder_id: NullableId::Value(Some(1)),
+                folder_id: Some(NullableId::Value(1)),
                 content: "test".to_string(),
                 tags: Some(vec![]),
             },
@@ -176,7 +176,7 @@ mod tests {
             sqlite_pool.clone(),
             CreateMemoIn {
                 title: "abcdef".to_string(),
-                folder_id: NullableId::Value(Some(1)),
+                folder_id: Some(NullableId::Value(1)),
                 content: "test".to_string(),
                 tags: Some(vec![typescript_tag_id]),
             },
