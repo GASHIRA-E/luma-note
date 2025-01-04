@@ -1,5 +1,6 @@
 import React from "react";
-import { Box, Heading, Flex } from "@chakra-ui/react";
+import { Box, Heading, Flex, IconButton } from "@chakra-ui/react";
+import { HiPencilAlt } from "react-icons/hi";
 
 import { Button } from "@/components/ui/button";
 import { MemoItem } from "@/components/parts/MemoItem";
@@ -22,6 +23,7 @@ interface MemoListProps {
   deleteItemConfirmDialogProps: React.ComponentProps<
     typeof DeleteItemConfirmDialog
   >;
+  onClickQuickCreateMemo: React.MouseEventHandler<HTMLButtonElement>;
 }
 
 export const MemoList: React.FC<MemoListProps> = ({
@@ -34,6 +36,7 @@ export const MemoList: React.FC<MemoListProps> = ({
   memoChangeFolderDialogProps,
   itemUpdateDialogProps,
   deleteItemConfirmDialogProps,
+  onClickQuickCreateMemo,
 }) => {
   return (
     <Box
@@ -50,17 +53,22 @@ export const MemoList: React.FC<MemoListProps> = ({
         <Heading size="lg" mb={2}>
           Memo List
         </Heading>
-        <NewItemPopover
-          isPopoverOpen={isPopoverOpen}
-          setIsPopoverOpen={setIsPopoverOpen}
-          inputValue={inputValue}
-          setInputValue={setInputValue}
-          onClickCreate={onClickNewMemo}
-        >
-          <Button w="full" mb={2}>
-            + 新規メモ
-          </Button>
-        </NewItemPopover>
+        <Flex gap={1}>
+          <NewItemPopover
+            isPopoverOpen={isPopoverOpen}
+            setIsPopoverOpen={setIsPopoverOpen}
+            inputValue={inputValue}
+            setInputValue={setInputValue}
+            onClickCreate={onClickNewMemo}
+          >
+            <Button flex={1} mb={2}>
+              + 新規メモ
+            </Button>
+          </NewItemPopover>
+          <IconButton onClick={onClickQuickCreateMemo}>
+            <HiPencilAlt />
+          </IconButton>
+        </Flex>
       </Box>
 
       <Flex direction="column" gap={2} mt={3}>
