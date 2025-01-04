@@ -56,13 +56,13 @@ export const HeaderContainer = ({ ConfigMenuButton }: HeaderContainerProps) => {
 
   const handleClickFilterButton = () => {
     findMemo({ memoTitle: inputValue, tags: selectedTagIds }).then((res) => {
-      const files = res.files.map((file) => ({
+      const resultMemos = res.map((file) => ({
         id: file.id,
         title: file.title,
         folderId: file.folder_id,
         updateAt: file.updated_at,
       }));
-      setSearchedResult(files);
+      setSearchedResult(resultMemos);
       handleClose();
     });
   };

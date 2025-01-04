@@ -1,4 +1,5 @@
 import { InvokeBase, customInvoke } from "./_base";
+import { type DetailMemoInfo } from "@/types/invokeGenerate";
 
 export const SEARCH_KEYS = {
   FIND_MEMO: "find_memo",
@@ -17,18 +18,9 @@ type FindMemoCommand = InvokeBase<
     memoTitle: string;
     tags?: number[];
   },
-  {
-    files: DetailMemoInfo[];
-  }
+  DetailMemoInfo[]
 >;
 
 export const findMemo = (props: FindMemoCommand["props"]) => {
   return customInvoke(SEARCH_KEYS.FIND_MEMO, props);
-};
-
-type DetailMemoInfo = {
-  id: number;
-  title: string;
-  folder_id: number;
-  updated_at: string;
 };
