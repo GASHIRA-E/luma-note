@@ -23,7 +23,7 @@ export const EditArea = () => {
   useEffect(() => {
     if (memoData) {
       setMdText(memoData.content);
-      setTags(memoData.tags.map((tag) => tag.name));
+      setTags(memoData.tags?.map((tag) => tag.name) || []);
     } else {
       setMdText("");
       setTags([]);

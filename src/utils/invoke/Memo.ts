@@ -59,7 +59,7 @@ type CreateMemo = InvokeBase<
       title: string;
       folder_id: number | null;
       content: string;
-      tags?: number[];
+      tags?: number[] | null;
     };
   },
   null
