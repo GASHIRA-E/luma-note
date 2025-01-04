@@ -86,6 +86,7 @@ export const FolderList = () => {
         removeRelationMemo: removeRelationMemo,
       }).then(() => {
         setFolderBeingDeleted(null);
+        setSelectedFolderId(null);
       });
     }
   };
