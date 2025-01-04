@@ -84,7 +84,7 @@ type UpdateMemo = InvokeBase<
     memo: {
       id: number;
       title?: string;
-      folder_id?: number;
+      folder_id?: number | null;
       content?: string;
       tags?: number[];
     };

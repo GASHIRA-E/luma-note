@@ -95,12 +95,10 @@ export const MemoListContainer = () => {
       updateMemoMutateAsync({
         memo: {
           id: memoBeingMoved.id,
-          title: "Rustで作るWASM - 読書メモ",
-          // TODO: invokeの型がnull対応できていないのでfolder_idがnullの場合は後で実装
-          folder_id: moveFolderId || undefined,
-          content: "",
+          folder_id: moveFolderId,
         },
       }).then(() => {
+        refetchGetMemoList();
         setMemoBeingMoved(null);
       });
     }
