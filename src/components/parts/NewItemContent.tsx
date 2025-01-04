@@ -13,6 +13,7 @@ type NewItemPopoverProps = {
   inputValue: string;
   setInputValue: (value: string) => void;
   onClickCreate: React.MouseEventHandler<HTMLButtonElement>;
+  onKeyPressEnter: React.KeyboardEventHandler<HTMLInputElement>;
   children: ReactNode;
 };
 
@@ -20,6 +21,7 @@ export const NewItemPopover = ({
   isPopoverOpen,
   setIsPopoverOpen,
   onClickCreate,
+  onKeyPressEnter,
   inputValue,
   setInputValue,
   children,
@@ -41,6 +43,11 @@ export const NewItemPopover = ({
               width="full"
               value={inputValue}
               onChange={handleOnChange}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  onKeyPressEnter(e);
+                }
+              }}
             />
             <Button mt={4} onClick={onClickCreate}>
               Create

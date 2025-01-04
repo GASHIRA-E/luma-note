@@ -23,7 +23,7 @@ interface MemoListProps {
   deleteItemConfirmDialogProps: React.ComponentProps<
     typeof DeleteItemConfirmDialog
   >;
-  onClickQuickCreateMemo: React.MouseEventHandler<HTMLButtonElement>;
+  onClickQuickCreateMemo: () => void;
 }
 
 export const MemoList: React.FC<MemoListProps> = ({
@@ -60,6 +60,7 @@ export const MemoList: React.FC<MemoListProps> = ({
             inputValue={inputValue}
             setInputValue={setInputValue}
             onClickCreate={onClickNewMemo}
+            onKeyPressEnter={onClickNewMemo}
           >
             <Button flex={1} mb={2}>
               + 新規メモ

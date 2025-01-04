@@ -13,7 +13,7 @@ export type FolderListProps = {
   setIsPopoverOpen: (value: boolean) => void;
   newFolderName: string;
   setNewFolderName: (value: string) => void;
-  onClickCreateFolder: React.MouseEventHandler<HTMLButtonElement>;
+  onCreateFolder: () => void;
   itemUpdateDialogProps: React.ComponentProps<typeof ItemUpdateDialog>;
   deleteItemConfirmDialogProps: React.ComponentProps<
     typeof DeleteItemConfirmDialog
@@ -27,7 +27,7 @@ export const FolderList = ({
   setIsPopoverOpen,
   newFolderName,
   setNewFolderName,
-  onClickCreateFolder,
+  onCreateFolder,
   itemUpdateDialogProps,
   deleteItemConfirmDialogProps,
   onClickQuickCreateFolder,
@@ -53,7 +53,8 @@ export const FolderList = ({
             setIsPopoverOpen={setIsPopoverOpen}
             inputValue={newFolderName}
             setInputValue={setNewFolderName}
-            onClickCreate={onClickCreateFolder}
+            onClickCreate={onCreateFolder}
+            onKeyPressEnter={onCreateFolder}
           >
             <Button flex={1} mb={2}>
               + 新規フォルダー

@@ -171,7 +171,7 @@ export const FolderList = () => {
       setIsPopoverOpen={setIsPopoverOpen}
       newFolderName={newFolderName}
       setNewFolderName={setNewFolderName}
-      onClickCreateFolder={handleCreateFolder}
+      onCreateFolder={handleCreateFolder}
       itemUpdateDialogProps={{
         isOpen: !!folderBeingRenamed,
         onClose: () => setFolderBeingRenamed(null),
