@@ -39,14 +39,31 @@ pub async fn create_folder_in_db(sqlite_pool: Pool<Sqlite>, name: String) -> Res
 pub async fn delete_folder(
     state: tauri::State<'_, Pool<Sqlite>>,
     folder_id: i32,
+    remove_relation_memo: bool,
 ) -> Result<(), ()> {
-    delete_folder_in_db(state.inner().clone(), folder_id).await?;
+    // folder_id=NULL(フォルダ未指定)は削除しない
+    delete_folder_in_db(state.inner().clone(), folder_id, remove_relation_memo).await?;
     Ok(())
 }
 
-async fn delete_folder_in_db(sqlite_pool: Pool<Sqlite>, folder_id: i32) -> Result<(), ()> {
-    const SQL: &str = "DELETE FROM Folders WHERE id = ?";
-    let result = sqlx::query(SQL)
+async fn delete_folder_in_db(
+    sqlite_pool: Pool<Sqlite>,
+    folder_id: i32,
+    remove_relation_memo: bool,
+) -> Result<(), ()> {
+    if !remove_relation_memo {
+        // フォルダに紐づいたメモのフォルダIDをNULLにする
+        const UPDATE_FOLDER_ID_SQL: &str = "UPDATE Memos SET folder_id = NULL WHERE folder_id = ?";
+        sqlx::query(UPDATE_FOLDER_ID_SQL)
+            .bind(folder_id)
+            .execute(&sqlite_pool)
+            .await
+            .map_err(|_| ())?;
+    }
+
+    // フォルダを削除する
+    const DELETE_FOLDER_SQL: &str = "DELETE FROM Folders WHERE id = ?";
+    let result = sqlx::query(DELETE_FOLDER_SQL)
         .bind(folder_id)
         .execute(&sqlite_pool)
         .await
@@ -56,6 +73,7 @@ async fn delete_folder_in_db(sqlite_pool: Pool<Sqlite>, folder_id: i32) -> Resul
     if result.rows_affected() == 0 {
         return Err(());
     }
+
     Ok(())
 }
 
@@ -65,6 +83,7 @@ pub async fn update_folder(
     folder_id: i32,
     name: String,
 ) -> Result<(), ()> {
+    // folder_id=NULL(フォルダ未指定)は更新しない
     update_folder_in_db(state.inner().clone(), folder_id, name).await?;
     Ok(())
 }
@@ -87,7 +106,10 @@ async fn update_folder_in_db(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::commands::memo::create_memo_in_db;
+    use crate::commands::memo::get_memo_list_from_db;
     use crate::database::setup_test_db;
+    use crate::types::CreateMemoIn;
 
     #[tokio::test]
     async fn test_フォルダ作成できること() {
@@ -129,11 +151,13 @@ mod tests {
     async fn test_フォルダ削除できること() {
         let sqlite_pool = setup_test_db().await;
 
-        create_folder_in_db(sqlite_pool.clone(), "test".to_string())
+        let folder_id = create_folder_in_db(sqlite_pool.clone(), "test".to_string())
             .await
             .unwrap();
 
-        delete_folder_in_db(sqlite_pool.clone(), 1).await.unwrap();
+        delete_folder_in_db(sqlite_pool.clone(), folder_id, false)
+            .await
+            .unwrap();
 
         let result = get_folders_from_db(sqlite_pool).await;
         assert_eq!(result.unwrap().len(), 0);
@@ -143,29 +167,90 @@ mod tests {
     async fn test_存在しないフォルダは削除できないこと() {
         let sqlite_pool = setup_test_db().await;
 
-        let result = delete_folder_in_db(sqlite_pool.clone(), 1).await;
+        let result = delete_folder_in_db(sqlite_pool.clone(), 99, false).await;
         assert!(result.is_err());
     }
 
     #[tokio::test]
-    async fn test_フォルダ更新できること() {
+    async fn test_紐づいているメモを削除しない場合はメモのfolder_idがnullになること() {
         let sqlite_pool = setup_test_db().await;
 
-        create_folder_in_db(sqlite_pool.clone(), "test".to_string())
+        let folder_id = create_folder_in_db(sqlite_pool.clone(), "test".to_string())
+            .await
+            .unwrap();
+
+        let create_memo_in = CreateMemoIn {
+            title: "test".to_string(),
+            content: "test".to_string(),
+            folder_id: Some(folder_id),
+            tags: None,
+        };
+
+        let memo1_id = create_memo_in_db(sqlite_pool.clone(), create_memo_in.clone())
+            .await
+            .unwrap();
+        let memo2_id = create_memo_in_db(sqlite_pool.clone(), create_memo_in.clone())
             .await
             .unwrap();
 
         let before_folder = get_folders_from_db(sqlite_pool.clone()).await.unwrap();
         assert_eq!(before_folder.len(), 1);
-        assert_eq!(before_folder[0].name, "test");
 
-        // フォルダ更新
-        update_folder_in_db(sqlite_pool.clone(), 1, "test2".to_string())
+        delete_folder_in_db(sqlite_pool.clone(), folder_id, false)
             .await
             .unwrap();
 
         let after_folder = get_folders_from_db(sqlite_pool.clone()).await.unwrap();
-        assert_eq!(after_folder.len(), 1);
-        assert_eq!(after_folder[0].name, "test2");
+        assert_eq!(after_folder.len(), 0);
+
+        let memos = get_memo_list_from_db(sqlite_pool.clone(), None)
+            .await
+            .unwrap();
+        assert_eq!(memos.len(), 2);
+        assert_eq!(memos[0].id, memo1_id);
+        assert_eq!(memos[1].id, memo2_id);
+    }
+
+    #[tokio::test]
+    async fn test_フラグがtrueの場合はフォルダに紐づいているメモも削除されること() {
+        let sqlite_pool = setup_test_db().await;
+
+        let folder_id = create_folder_in_db(sqlite_pool.clone(), "test".to_string())
+            .await
+            .unwrap();
+
+        let create_memo_in = CreateMemoIn {
+            title: "test".to_string(),
+            content: "test".to_string(),
+            folder_id: Some(folder_id),
+            tags: None,
+        };
+
+        create_memo_in_db(sqlite_pool.clone(), create_memo_in.clone())
+            .await
+            .unwrap();
+        create_memo_in_db(sqlite_pool.clone(), create_memo_in.clone())
+            .await
+            .unwrap();
+
+        let before_folder = get_folders_from_db(sqlite_pool.clone()).await.unwrap();
+        assert_eq!(before_folder.len(), 1);
+        let before_memos = get_memo_list_from_db(sqlite_pool.clone(), Some(folder_id))
+            .await
+            .unwrap();
+        assert_eq!(before_memos.len(), 2);
+
+        // フォルダに紐づいているメモも削除する
+        delete_folder_in_db(sqlite_pool.clone(), folder_id, true)
+            .await
+            .unwrap();
+
+        let after_folder = get_folders_from_db(sqlite_pool.clone()).await.unwrap();
+        assert_eq!(after_folder.len(), 0);
+
+        let memos = get_memo_list_from_db(sqlite_pool.clone(), None)
+            .await
+            .unwrap();
+        assert_eq!(memos.len(), 0);
     }
 }

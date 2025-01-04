@@ -6,7 +6,7 @@ export interface CreateMemoIn {
 	/** メモタイトル */
 	title: string;
 	/** メモフォルダID */
-	folder_id: number;
+	folder_id?: number;
 	/** メモ内容 */
 	content: string;
 	/** メモタグ */

@@ -32,12 +32,12 @@ async fn get_tags_from_db(sqlite_pool: Pool<Sqlite>) -> Result<Vec<TagInfo>, ()>
 }
 
 #[tauri::command]
-pub async fn delete_tag(state: tauri::State<'_, Pool<Sqlite>>, tag_id: i64) -> Result<(), ()> {
+pub async fn delete_tag(state: tauri::State<'_, Pool<Sqlite>>, tag_id: i32) -> Result<(), ()> {
     delete_tag_in_db(state.inner().clone(), tag_id).await?;
     Ok(())
 }
 
-async fn delete_tag_in_db(sqlite_pool: Pool<Sqlite>, tag_id: i64) -> Result<(), ()> {
+async fn delete_tag_in_db(sqlite_pool: Pool<Sqlite>, tag_id: i32) -> Result<(), ()> {
     const SQL: &str = "DELETE FROM Tags WHERE id = ?";
     let result = sqlx::query(SQL)
         .bind(tag_id)
@@ -129,7 +129,7 @@ mod tests {
         // タグを削除する前にリレーションの存在を確認
         const SQL: &str =
             "SELECT COUNT(*) as count FROM MemoTagRelations WHERE memo_id = ? AND tag_id = ?";
-        let relations = sqlx::query_as::<_, (i64,)>(SQL)
+        let relations = sqlx::query_as::<_, (i32,)>(SQL)
             .bind(memo_id)
             .bind(tag_id)
             .fetch_one(&sqlite_pool)
@@ -140,7 +140,7 @@ mod tests {
         delete_tag_in_db(sqlite_pool.clone(), tag_id).await.unwrap();
 
         // タグ削除後にリレーションが削除されていることを確認
-        let relations = sqlx::query_as::<_, (i64,)>(SQL)
+        let relations = sqlx::query_as::<_, (i32,)>(SQL)
             .bind(memo_id)
             .bind(tag_id)
             .fetch_one(&sqlite_pool)
