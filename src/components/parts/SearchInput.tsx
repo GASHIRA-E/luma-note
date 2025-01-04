@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/popover";
 import { Tag } from "@/components/ui/tag";
 import { InputGroup } from "@/components/ui/input-group";
-import { useInputCompositionControl } from "@/utils/hooks/useInputCompositionControl";
 
 type SearchInputProps = {
   /** 検索が行われたかどうかを示すステート(クリアボタンの活性化) */
@@ -50,10 +49,7 @@ export const SearchInput = ({
   onFocusTriggerInput,
   onClickFilterButton,
 }: SearchInputProps) => {
-  const { wrapExcludeComposingEnter, overrideEvents } =
-    useInputCompositionControl();
-
-  const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
+  const handleKeyPress: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
     if (e.key === "Enter") {
       onClickFilterButton();
     }
@@ -87,8 +83,7 @@ export const SearchInput = ({
             value={inputValue}
             onFocus={onFocusTriggerInput}
             onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={wrapExcludeComposingEnter(handleKeyDown)}
-            {...overrideEvents}
+            onKeyPress={handleKeyPress}
           />
         </InputGroup>
       </PopoverTrigger>
