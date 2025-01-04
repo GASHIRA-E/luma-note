@@ -16,6 +16,7 @@
     "@tanstack/react-query": "^5.62.8",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-shell": "^2",
+    "@tauri-apps/plugin-store": "^2.2.0",
     "@types/node": "^22.10.1",
     "github-markdown-css": "^5.8.1",
     "highlight.js": "^11.11.0",
