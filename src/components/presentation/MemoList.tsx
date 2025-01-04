@@ -63,7 +63,7 @@ export const MemoList: React.FC<MemoListProps> = ({
         </NewItemPopover>
       </Box>
 
-      <Flex direction="column" gap={2}>
+      <Flex direction="column" gap={2} mt={3}>
         {memos.map((memo) => (
           <MemoItem key={memo.id} {...memo} />
         ))}

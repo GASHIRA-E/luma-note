@@ -1,5 +1,6 @@
 import { Box, Flex, Text, Input } from "@chakra-ui/react";
 import { Tag } from "@/components/ui/tag";
+import { useInputCompositionControl } from "@/utils/hooks/useInputCompositionControl";
 
 export type EditorInfoProps = {
   memoTitle: string;
@@ -16,6 +17,16 @@ export const EditorInfo = ({
   removeTag,
   availableTags,
 }: EditorInfoProps) => {
+  const { wrapExcludeComposingEnter, overrideEvents } =
+    useInputCompositionControl();
+
+  const handleKeyDown = wrapExcludeComposingEnter((e) => {
+    if (e.key === "Enter") {
+      addTag(e.currentTarget.value);
+      e.currentTarget.value = "";
+    }
+  });
+
   return (
     <Box px="4" py="2">
       {/* ファイル名 */}
@@ -32,12 +43,8 @@ export const EditorInfo = ({
           maxLength={12}
           width="60"
           list="tags"
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              addTag(e.currentTarget.value);
-              e.currentTarget.value = "";
-            }
-          }}
+          {...overrideEvents}
+          onKeyDown={handleKeyDown}
         />
         <datalist id="tags">
           {availableTags.map((tag, index) => (

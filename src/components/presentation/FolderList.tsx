@@ -56,7 +56,7 @@ export const FolderList = ({
           </Button>
         </NewItemPopover>
       </Box>
-      <Flex direction="column" gap={2}>
+      <Flex direction="column" gap={2} mt={3}>
         {folderList.map((folder) => (
           <FolderItem key={`folder-list-${folder.folderId}`} {...folder} />
         ))}
