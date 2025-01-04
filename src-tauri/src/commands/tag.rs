@@ -17,27 +17,6 @@ pub async fn create_tag_in_db(sqlite_pool: Pool<Sqlite>, name: String) -> Result
 }
 
 #[tauri::command]
-pub async fn delete_tag(state: tauri::State<'_, Pool<Sqlite>>, tag_id: i32) -> Result<(), ()> {
-    delete_tag_in_db(state.inner().clone(), tag_id).await?;
-    Ok(())
-}
-
-async fn delete_tag_in_db(sqlite_pool: Pool<Sqlite>, tag_id: i32) -> Result<(), ()> {
-    const SQL: &str = "DELETE FROM Tags WHERE id = ?";
-    let result = sqlx::query(SQL)
-        .bind(tag_id)
-        .execute(&sqlite_pool)
-        .await
-        .map_err(|_| ())?;
-
-    // 削除された行が0の場合（該当するIDが存在しない場合）はエラーを返す
-    if result.rows_affected() == 0 {
-        return Err(());
-    }
-    Ok(())
-}
-
-#[tauri::command]
 pub async fn get_tags(state: tauri::State<'_, Pool<Sqlite>>) -> Result<Vec<TagInfo>, ()> {
     let tags = get_tags_from_db(state.inner().clone()).await?;
     Ok(tags)
@@ -50,6 +29,27 @@ async fn get_tags_from_db(sqlite_pool: Pool<Sqlite>) -> Result<Vec<TagInfo>, ()>
         .await
         .map_err(|_| ())?;
     Ok(tags)
+}
+
+#[tauri::command]
+pub async fn delete_tag(state: tauri::State<'_, Pool<Sqlite>>, tag_id: i64) -> Result<(), ()> {
+    delete_tag_in_db(state.inner().clone(), tag_id).await?;
+    Ok(())
+}
+
+async fn delete_tag_in_db(sqlite_pool: Pool<Sqlite>, tag_id: i64) -> Result<(), ()> {
+    const SQL: &str = "DELETE FROM Tags WHERE id = ?";
+    let result = sqlx::query(SQL)
+        .bind(tag_id)
+        .execute(&sqlite_pool)
+        .await
+        .map_err(|_| ())?;
+
+    // 削除された行が0の場合（該当するIDが存在しない場合）はエラーを返す
+    if result.rows_affected() == 0 {
+        return Err(());
+    }
+    Ok(())
 }
 
 #[cfg(test)]
