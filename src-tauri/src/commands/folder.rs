@@ -87,30 +87,7 @@ async fn update_folder_in_db(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use sqlx::sqlite::SqlitePoolOptions;
-
-    async fn setup_test_db() -> Pool<Sqlite> {
-        // テスト用の一時的なインメモリデータベースを使用
-        let sqlite_pool = SqlitePoolOptions::new()
-            .connect("sqlite::memory:")
-            .await
-            .unwrap();
-
-        // テスト用のテーブルを作成
-        sqlx::query(
-            "CREATE TABLE IF NOT EXISTS Folders (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-            )",
-        )
-        .execute(&sqlite_pool)
-        .await
-        .unwrap();
-
-        sqlite_pool
-    }
+    use crate::database::setup_test_db;
 
     #[tokio::test]
     async fn test_フォルダ作成できること() {

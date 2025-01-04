@@ -119,7 +119,7 @@ pub async fn create_memo(
     Ok(memo_id)
 }
 
-async fn create_memo_in_db(sqlite_pool: Pool<Sqlite>, memo: CreateMemoIn) -> Result<i32, ()> {
+pub async fn create_memo_in_db(sqlite_pool: Pool<Sqlite>, memo: CreateMemoIn) -> Result<i32, ()> {
     // トランザクション開始
     let mut tx = sqlite_pool.begin().await.map_err(|_| ())?;
 
@@ -186,25 +186,54 @@ pub async fn update_memo(
 }
 
 async fn update_memo_in_db(sqlite_pool: Pool<Sqlite>, memo: UpdateMemoIn) -> Result<(), ()> {
+    // 更新対象のフィールドが1つも存在しないかつタグの更新もない場合は早期リターン
+    if memo.title.is_none()
+        && memo.content.is_none()
+        && memo.folder_id.is_none()
+        && memo.tags.is_none()
+    {
+        return Ok(());
+    }
+
     let mut tx = sqlite_pool.begin().await.map_err(|_| ())?;
 
     // メモの更新
-    if let (Some(title), Some(content)) = (memo.title, memo.content) {
-        const UPDATE_MEMO_SQL: &str =
-            "UPDATE Memos SET title = ?, folder_id = ?, content = ? WHERE id = ?";
-        sqlx::query(UPDATE_MEMO_SQL)
-            .bind(&title)
-            .bind(memo.folder_id.unwrap_or(0))
-            .bind(&content)
-            .bind(memo.id)
-            .execute(&mut *tx)
-            .await
-            .map_err(|_| ())?;
+    let mut update_parts = Vec::new();
+    let mut bindings: Vec<String> = Vec::new();
+
+    if let Some(title) = &memo.title {
+        update_parts.push("title = ?");
+        bindings.push(title.clone());
+    }
+
+    if let Some(content) = &memo.content {
+        update_parts.push("content = ?");
+        bindings.push(content.clone());
+    }
+
+    if let Some(folder_id) = memo.folder_id {
+        update_parts.push("folder_id = ?");
+        bindings.push(folder_id.to_string());
+    }
+
+    // メモのフィールド更新がある場合のみSQLを実行
+    if !update_parts.is_empty() {
+        let mut query = String::from("UPDATE Memos SET ");
+        query.push_str(&update_parts.join(", "));
+        query.push_str(" WHERE id = ?");
+
+        let mut query_builder = sqlx::query(&query);
+
+        for value in bindings {
+            query_builder = query_builder.bind(value);
+        }
+        query_builder = query_builder.bind(memo.id);
+
+        query_builder.execute(&mut *tx).await.map_err(|_| ())?;
     }
 
     // タグの更新
     if let Some(tags) = memo.tags {
-        // 既存のタグ関連をすべて削除
         const DELETE_TAGS_SQL: &str = "DELETE FROM MemoTagRelations WHERE memo_id = ?";
         sqlx::query(DELETE_TAGS_SQL)
             .bind(memo.id)
@@ -212,7 +241,6 @@ async fn update_memo_in_db(sqlite_pool: Pool<Sqlite>, memo: UpdateMemoIn) -> Res
             .await
             .map_err(|_| ())?;
 
-        // 新しいタグを追加
         for tag_id in tags {
             const INSERT_TAG_SQL: &str =
                 "INSERT INTO MemoTagRelations (memo_id, tag_id) VALUES (?, ?)";
@@ -234,62 +262,8 @@ mod tests {
     use super::*;
     use crate::commands::folder::create_folder_in_db;
     use crate::commands::tag::create_tag_in_db;
+    use crate::database::setup_test_db;
     use crate::types::TagInfo;
-    use sqlx::sqlite::SqlitePoolOptions;
-
-    async fn setup_test_db() -> Pool<Sqlite> {
-        let sqlite_pool = SqlitePoolOptions::new()
-            .connect("sqlite::memory:")
-            .await
-            .unwrap();
-
-        // テーブル作成
-        create_tables(&sqlite_pool).await;
-
-        sqlite_pool
-    }
-
-    async fn create_tables(pool: &Pool<Sqlite>) {
-        sqlx::query(
-            r#"
-            CREATE TABLE IF NOT EXISTS Folders(
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name TEXT NOT NULL,
-                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-            );
-
-            CREATE TABLE IF NOT EXISTS Memos (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                folder_id INTEGER DEFAULT 0, -- folderID=0:フォルダ未選択
-                title TEXT NOT NULL,
-                content TEXT NOT NULL,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (folder_id) REFERENCES Folders(id) ON DELETE SET DEFAULT
-                DEFERRABLE INITIALLY DEFERRED
-            );
-
-            CREATE TABLE IF NOT EXISTS Tags (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-            );
-
-            CREATE TABLE IF NOT EXISTS MemoTagRelations (
-                memo_id INTEGER,
-                tag_id INTEGER,
-                PRIMARY KEY (memo_id, tag_id),
-                FOREIGN KEY (memo_id) REFERENCES Memos(id) ON DELETE CASCADE,
-                FOREIGN KEY (tag_id) REFERENCES Tags(id) ON DELETE CASCADE
-            );
-            "#,
-        )
-        .execute(pool)
-        .await
-        .unwrap();
-    }
 
     #[tokio::test]
     async fn test_メモが作成して詳細取得できること() {
@@ -308,7 +282,7 @@ mod tests {
 
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: 1,
+            folder_id: Some(1),
             content: "test".to_string(),
             tags: Some(vec![1, 2]),
         };
@@ -345,7 +319,7 @@ mod tests {
 
         let memo1 = CreateMemoIn {
             title: "test1".to_string(),
-            folder_id,
+            folder_id: Some(folder_id as i64),
             content: "test_content1".to_string(),
             tags: Some(vec![1]),
         };
@@ -353,7 +327,7 @@ mod tests {
 
         let memo2 = CreateMemoIn {
             title: "test2".to_string(),
-            folder_id,
+            folder_id: Some(folder_id as i64),
             content: "test_content2".to_string(),
             tags: Some(vec![1]),
         };
@@ -397,7 +371,7 @@ mod tests {
 
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id,
+            folder_id: Some(folder_id as i64),
             content: "test".to_string(),
             tags: Some(vec![1]),
         };
@@ -430,6 +404,207 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn test_メモのフォルダのみを更新できること() {
+        let sqlite_pool = setup_test_db().await;
+        let folder_id = create_folder_in_db(sqlite_pool.clone(), "test".to_string())
+            .await
+            .unwrap();
+
+        let folder2_id = create_folder_in_db(sqlite_pool.clone(), "test2".to_string())
+            .await
+            .unwrap();
+
+        let tag_id = create_tag_in_db(sqlite_pool.clone(), "tag1".to_string())
+            .await
+            .unwrap();
+
+        let memo = CreateMemoIn {
+            title: "test".to_string(),
+            folder_id: Some(folder_id),
+            content: "test".to_string(),
+            tags: Some(vec![tag_id]),
+        };
+        let created_memo_id = create_memo_in_db(sqlite_pool.clone(), memo).await.unwrap();
+
+        let update_memo = UpdateMemoIn {
+            id: created_memo_id,
+            title: None,
+            folder_id: Some(folder2_id),
+            content: None,
+            tags: None,
+        };
+        update_memo_in_db(sqlite_pool.clone(), update_memo)
+            .await
+            .unwrap();
+
+        let memo = get_detail_memo_in_db(sqlite_pool.clone(), created_memo_id)
+            .await
+            .unwrap();
+        assert_eq!(memo.folder_id, folder2_id);
+        // フォルダ以外変更されていないこと
+        assert_eq!(memo.title, "test".to_string());
+        assert_eq!(memo.content, "test".to_string());
+        assert_eq!(
+            memo.tags,
+            Some(vec![TagInfo {
+                id: tag_id,
+                name: "tag1".to_string()
+            }])
+        );
+    }
+
+    #[tokio::test]
+    async fn test_メモのタイトルだけを更新できること() {
+        let sqlite_pool = setup_test_db().await;
+
+        let folder_id = create_folder_in_db(sqlite_pool.clone(), "test".to_string())
+            .await
+            .unwrap();
+
+        let tag_id = create_tag_in_db(sqlite_pool.clone(), "tag1".to_string())
+            .await
+            .unwrap();
+
+        let memo = CreateMemoIn {
+            title: "test".to_string(),
+            folder_id: Some(folder_id),
+            content: "test".to_string(),
+            tags: Some(vec![tag_id]),
+        };
+        let created_memo_id = create_memo_in_db(sqlite_pool.clone(), memo).await.unwrap();
+
+        // メモのタイトルを更新
+        let update_memo = UpdateMemoIn {
+            id: created_memo_id,
+            title: Some("test2".to_string()),
+            folder_id: None,
+            content: None,
+            tags: None,
+        };
+        update_memo_in_db(sqlite_pool.clone(), update_memo)
+            .await
+            .unwrap();
+
+        let memo = get_detail_memo_in_db(sqlite_pool.clone(), created_memo_id)
+            .await
+            .unwrap();
+        // メモのタイトルを更新を確認
+        assert_eq!(memo.title, "test2".to_string());
+        // 他のメモの情報は更新されていないこと
+        assert_eq!(memo.folder_id, folder_id);
+        assert_eq!(memo.content, "test".to_string());
+        assert_eq!(
+            memo.tags,
+            Some(vec![TagInfo {
+                id: tag_id,
+                name: "tag1".to_string()
+            }])
+        );
+    }
+
+    #[tokio::test]
+    async fn test_メモの内容だけを更新できること() {
+        let sqlite_pool = setup_test_db().await;
+
+        let folder_id = create_folder_in_db(sqlite_pool.clone(), "test".to_string())
+            .await
+            .unwrap();
+
+        let tag_id = create_tag_in_db(sqlite_pool.clone(), "tag1".to_string())
+            .await
+            .unwrap();
+
+        let memo = CreateMemoIn {
+            title: "test".to_string(),
+            folder_id: Some(folder_id),
+            content: "test".to_string(),
+            tags: Some(vec![tag_id]),
+        };
+        let created_memo_id = create_memo_in_db(sqlite_pool.clone(), memo).await.unwrap();
+
+        // メモの内容を更新
+        let update_memo = UpdateMemoIn {
+            id: created_memo_id,
+            title: None,
+            folder_id: None,
+            content: Some("test2".to_string()),
+            tags: None,
+        };
+        update_memo_in_db(sqlite_pool.clone(), update_memo)
+            .await
+            .unwrap();
+
+        let memo = get_detail_memo_in_db(sqlite_pool.clone(), created_memo_id)
+            .await
+            .unwrap();
+        // メモの内容を更新を確認
+        assert_eq!(memo.content, "test2".to_string());
+        // 他のメモの情報は更新されていないこと
+        assert_eq!(memo.folder_id, folder_id);
+        assert_eq!(memo.title, "test".to_string());
+        assert_eq!(
+            memo.tags,
+            Some(vec![TagInfo {
+                id: tag_id,
+                name: "tag1".to_string()
+            }])
+        );
+    }
+
+    #[tokio::test]
+    async fn test_メモのタグのみを更新できること() {
+        let sqlite_pool = setup_test_db().await;
+
+        let folder_id = create_folder_in_db(sqlite_pool.clone(), "test".to_string())
+            .await
+            .unwrap();
+
+        let tag_id = create_tag_in_db(sqlite_pool.clone(), "tag1".to_string())
+            .await
+            .unwrap();
+
+        let tag2_id = create_tag_in_db(sqlite_pool.clone(), "tag2".to_string())
+            .await
+            .unwrap();
+
+        let memo = CreateMemoIn {
+            title: "test".to_string(),
+            folder_id: Some(folder_id),
+            content: "test".to_string(),
+            tags: Some(vec![tag_id]),
+        };
+        let created_memo_id = create_memo_in_db(sqlite_pool.clone(), memo).await.unwrap();
+
+        // メモの内容を更新
+        let update_memo = UpdateMemoIn {
+            id: created_memo_id,
+            title: None,
+            folder_id: None,
+            content: None,
+            tags: Some(vec![tag2_id]),
+        };
+        update_memo_in_db(sqlite_pool.clone(), update_memo)
+            .await
+            .unwrap();
+
+        let memo = get_detail_memo_in_db(sqlite_pool.clone(), created_memo_id)
+            .await
+            .unwrap();
+        // メモのタグを更新を確認
+        assert_eq!(
+            memo.tags,
+            Some(vec![TagInfo {
+                id: tag2_id,
+                name: "tag2".to_string()
+            }])
+        );
+        // 他のメモの情報は更新されていないこと
+        assert_eq!(memo.folder_id, folder_id);
+        assert_eq!(memo.title, "test".to_string());
+        assert_eq!(memo.content, "test".to_string());
+    }
+
+    #[tokio::test]
     async fn test_前のタグを削除して別のタグを登録して更新できること() {
         let sqlite_pool = setup_test_db().await;
 
@@ -451,7 +626,7 @@ mod tests {
         // 更新前のメモ
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id,
+            folder_id: Some(folder_id as i64),
             content: "test".to_string(),
             tags: Some(vec![tag1_id]),
         };
@@ -465,7 +640,7 @@ mod tests {
         let update_memo = UpdateMemoIn {
             id: created_memo_id,
             title: Some("test".to_string()),
-            folder_id: Some(folder_id),
+            folder_id: Some(folder_id.into()),
             content: Some("test".to_string()),
             tags: Some(vec![tag2_id]),
         };
@@ -501,7 +676,7 @@ mod tests {
 
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id,
+            folder_id: Some(folder_id.into()),
             content: "test".to_string(),
             tags: Some(vec![tag_id]),
         };

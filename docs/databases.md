@@ -21,14 +21,14 @@ SQLite
 
 メモを管理するテーブル
 
-| カラム名   | データ型 | 制約                                                 | 説明                     |
-| ---------- | -------- | ---------------------------------------------------- | ------------------------ |
-| id         | INTEGER  | PRIMARY KEY                                          | メモの一意識別子         |
-| folder_id  | INTEGER  | FOREIGN KEY REFERENCES Folders(id) ON DELETE CASCADE | フォルダのID             |
-| title      | TEXT     | NOT NULL                                             | メモのタイトル           |
-| content    | TEXT     | NOT NULL                                             | メモのMarkdownコンテンツ |
-| created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP                            | 作成日時                 |
-| updated_at | DATETIME | DEFAULT CURRENT_TIMESTAMP                            | 最終更新日時             |
+| カラム名   | データ型 | 制約                                                               | 説明                       |
+| ---------- | -------- | ------------------------------------------------------------------ | -------------------------- |
+| id         | INTEGER  | PRIMARY KEY                                                        | メモの一意識別子           |
+| folder_id  | INTEGER  | DEFAULT NULL, FOREIGN KEY REFERENCES Folders(id) ON DELETE CASCADE | フォルダの ID              |
+| title      | TEXT     | NOT NULL                                                           | メモのタイトル             |
+| content    | TEXT     | NOT NULL                                                           | メモの Markdown コンテンツ |
+| created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP                                          | 作成日時                   |
+| updated_at | DATETIME | DEFAULT CURRENT_TIMESTAMP                                          | 最終更新日時               |
 
 ### Tags
 
@@ -43,10 +43,10 @@ SQLite
 
 メモとタグのリレーションを管理するテーブル
 
-| カラム名 | データ型 | 制約                                               | 説明     |
-| -------- | -------- | -------------------------------------------------- | -------- |
-| memo_id  | INTEGER  | FOREIGN KEY REFERENCES Memos(id) ON DELETE CASCADE | メモのID |
-| tag_id   | INTEGER  | FOREIGN KEY REFERENCES Tags(id) ON DELETE CASCADE  | タグのID |
+| カラム名 | データ型 | 制約                                               | 説明      |
+| -------- | -------- | -------------------------------------------------- | --------- |
+| memo_id  | INTEGER  | FOREIGN KEY REFERENCES Memos(id) ON DELETE CASCADE | メモの ID |
+| tag_id   | INTEGER  | FOREIGN KEY REFERENCES Tags(id) ON DELETE CASCADE  | タグの ID |
 
 ## ER Diagram
 
