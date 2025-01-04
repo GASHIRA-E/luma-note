@@ -119,7 +119,7 @@ pub async fn create_memo(
     Ok(memo_id)
 }
 
-async fn create_memo_in_db(sqlite_pool: Pool<Sqlite>, memo: CreateMemoIn) -> Result<i32, ()> {
+pub async fn create_memo_in_db(sqlite_pool: Pool<Sqlite>, memo: CreateMemoIn) -> Result<i32, ()> {
     // トランザクション開始
     let mut tx = sqlite_pool.begin().await.map_err(|_| ())?;
 
@@ -234,62 +234,8 @@ mod tests {
     use super::*;
     use crate::commands::folder::create_folder_in_db;
     use crate::commands::tag::create_tag_in_db;
+    use crate::database::setup_test_db;
     use crate::types::TagInfo;
-    use sqlx::sqlite::SqlitePoolOptions;
-
-    async fn setup_test_db() -> Pool<Sqlite> {
-        let sqlite_pool = SqlitePoolOptions::new()
-            .connect("sqlite::memory:")
-            .await
-            .unwrap();
-
-        // テーブル作成
-        create_tables(&sqlite_pool).await;
-
-        sqlite_pool
-    }
-
-    async fn create_tables(pool: &Pool<Sqlite>) {
-        sqlx::query(
-            r#"
-            CREATE TABLE IF NOT EXISTS Folders(
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name TEXT NOT NULL,
-                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-            );
-
-            CREATE TABLE IF NOT EXISTS Memos (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                folder_id INTEGER DEFAULT 0, -- folderID=0:フォルダ未選択
-                title TEXT NOT NULL,
-                content TEXT NOT NULL,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (folder_id) REFERENCES Folders(id) ON DELETE SET DEFAULT
-                DEFERRABLE INITIALLY DEFERRED
-            );
-
-            CREATE TABLE IF NOT EXISTS Tags (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-            );
-
-            CREATE TABLE IF NOT EXISTS MemoTagRelations (
-                memo_id INTEGER,
-                tag_id INTEGER,
-                PRIMARY KEY (memo_id, tag_id),
-                FOREIGN KEY (memo_id) REFERENCES Memos(id) ON DELETE CASCADE,
-                FOREIGN KEY (tag_id) REFERENCES Tags(id) ON DELETE CASCADE
-            );
-            "#,
-        )
-        .execute(pool)
-        .await
-        .unwrap();
-    }
 
     #[tokio::test]
     async fn test_メモが作成して詳細取得できること() {
@@ -308,7 +254,7 @@ mod tests {
 
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: 1,
+            folder_id: Some(1),
             content: "test".to_string(),
             tags: Some(vec![1, 2]),
         };
@@ -345,7 +291,7 @@ mod tests {
 
         let memo1 = CreateMemoIn {
             title: "test1".to_string(),
-            folder_id,
+            folder_id: Some(folder_id as i64),
             content: "test_content1".to_string(),
             tags: Some(vec![1]),
         };
@@ -353,7 +299,7 @@ mod tests {
 
         let memo2 = CreateMemoIn {
             title: "test2".to_string(),
-            folder_id,
+            folder_id: Some(folder_id as i64),
             content: "test_content2".to_string(),
             tags: Some(vec![1]),
         };
@@ -397,7 +343,7 @@ mod tests {
 
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id,
+            folder_id: Some(folder_id as i64),
             content: "test".to_string(),
             tags: Some(vec![1]),
         };
@@ -451,7 +397,7 @@ mod tests {
         // 更新前のメモ
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id,
+            folder_id: Some(folder_id as i64),
             content: "test".to_string(),
             tags: Some(vec![tag1_id]),
         };
@@ -465,7 +411,7 @@ mod tests {
         let update_memo = UpdateMemoIn {
             id: created_memo_id,
             title: Some("test".to_string()),
-            folder_id: Some(folder_id),
+            folder_id: Some(folder_id.into()),
             content: Some("test".to_string()),
             tags: Some(vec![tag2_id]),
         };
@@ -501,7 +447,7 @@ mod tests {
 
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id,
+            folder_id: Some(folder_id.into()),
             content: "test".to_string(),
             tags: Some(vec![tag_id]),
         };

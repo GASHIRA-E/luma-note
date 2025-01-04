@@ -24,3 +24,26 @@ pub(crate) async fn create_sqlite_pool(database_url: &str) -> DbResult<SqlitePoo
 
     Ok(sqlite_pool)
 }
+
+#[cfg(test)]
+use sqlx::{Pool, Sqlite};
+
+#[cfg(test)]
+/// テスト用DB構築
+pub async fn setup_test_db() -> Pool<Sqlite> {
+    let sqlite_pool = SqlitePoolOptions::new()
+        .connect("sqlite::memory:")
+        .await
+        .unwrap();
+
+    // テーブル作成
+    create_tables(&sqlite_pool).await;
+
+    sqlite_pool
+}
+#[cfg(test)]
+/// migrationファイルを読み込んでテーブル作成
+async fn create_tables(pool: &Pool<Sqlite>) {
+    let sql = include_str!("../../migrations/0001_init_tables.up.sql");
+    sqlx::query(sql).execute(pool).await.unwrap();
+}
