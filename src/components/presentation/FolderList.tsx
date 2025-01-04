@@ -58,7 +58,7 @@ export const FolderList = ({
       </Box>
       <Flex direction="column" gap={2}>
         {folderList.map((folder) => (
-          <FolderItem key={folder.folderId} {...folder} />
+          <FolderItem key={`folder-list-${folder.folderId}`} {...folder} />
         ))}
       </Flex>
       <ItemUpdateDialog {...itemUpdateDialogProps} />

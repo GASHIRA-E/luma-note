@@ -2,7 +2,7 @@ import { useQuery, useMutation, QueryClient } from "@tanstack/react-query";
 import { InvokeBase, customInvoke } from "./_base";
 
 export const MEMO_KEYS = {
-  GET_MEMO: "get_memo",
+  GET_DETAIL_MEMO: "get_detail_memo",
   CREATE_MEMO: "create_memo",
   DELETE_MEMO: "delete_memo",
   UPDATE_MEMO: "update_memo",
@@ -22,7 +22,7 @@ export type MemoInvokes =
 
 type GetMemo = InvokeBase<
   MemoKeys,
-  typeof MEMO_KEYS.GET_MEMO,
+  typeof MEMO_KEYS.GET_DETAIL_MEMO,
   {
     memoId: number | null;
   },
@@ -39,14 +39,14 @@ type GetMemo = InvokeBase<
   } | null
 >;
 
-export const getMemoQuery = (props: GetMemo["props"]) => {
+export const getDetailMemoQuery = (props: GetMemo["props"]) => {
   return useQuery({
-    queryKey: [MEMO_KEYS.GET_MEMO, props.memoId],
+    queryKey: [MEMO_KEYS.GET_DETAIL_MEMO, props.memoId],
     queryFn: () => {
       if (props.memoId === null) {
         return Promise.resolve(null);
       }
-      return customInvoke(MEMO_KEYS.GET_MEMO, props);
+      return customInvoke(MEMO_KEYS.GET_DETAIL_MEMO, props);
     },
   });
 };
@@ -59,7 +59,7 @@ type CreateMemo = InvokeBase<
       title: string;
       folder_id: number | null;
       content: string;
-      tags?: number[];
+      tags?: number[] | null;
     };
   },
   null
@@ -95,12 +95,11 @@ type UpdateMemo = InvokeBase<
 export const updateMemoMutation = (queryClient: QueryClient) => {
   return useMutation({
     mutationFn: (props: UpdateMemo["props"]) => {
-      console.log("updateMemoMutation", props);
       return customInvoke(MEMO_KEYS.UPDATE_MEMO, props);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [[MEMO_KEYS.GET_MEMO], [MEMO_KEYS.GET_MEMO_LIST]],
+        queryKey: [[MEMO_KEYS.GET_DETAIL_MEMO], [MEMO_KEYS.GET_MEMO_LIST]],
       });
     },
   });

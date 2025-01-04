@@ -17,12 +17,12 @@ export const get_memo_list = (
       {
         id: 1,
         title: "フォルダ1のメモ1",
-        updatedAt: "2021-01-01 00:00:00",
+        updated_at: "2021-01-01 00:00:00",
       },
       {
         id: 2,
         title: "フォルダ1のメモ2",
-        updatedAt: "2021-01-02 00:00:00",
+        updated_at: "2021-01-02 00:00:00",
       },
     ];
   }
@@ -31,7 +31,7 @@ export const get_memo_list = (
       {
         id: 3,
         title: "フォルダ2のメモ3",
-        updatedAt: "2021-01-03 00:00:00",
+        updated_at: "2021-01-03 00:00:00",
       },
     ];
   }

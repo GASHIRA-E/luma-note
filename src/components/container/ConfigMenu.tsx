@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { useMemo, useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useColorMode } from "@/components/ui/color-mode";
 
 import { ConfigMenu } from "@/components/presentation/ConfigMenu";
 
-import { getTagsQuery } from "@/utils/invoke/Tags";
+import { getTagsQuery, deleteTagMutation } from "@/utils/invoke/Tags";
 import { useConfigStore } from "@/utils/stores/config";
 import { AppThemes, type AppTheme } from "@/utils/constants";
 import { getObjectKeys } from "@/utils/helpers/getObjectKeys";
@@ -25,12 +27,14 @@ export const ConfigMenuContainer = () => {
     setColorMode(currentTheme);
   }, [currentTheme, setColorMode]);
 
+  const queryClient = useQueryClient();
   const { data } = getTagsQuery();
+  const { mutateAsync: deleteTagMutateAsync } = deleteTagMutation(queryClient);
   const allTags = useMemo<string[]>(() => {
     if (!data) {
       return [];
     }
-    return data.tags.flatMap((tag) => tag.name);
+    return data.flatMap((tag) => tag.name);
   }, [data]);
 
   const handleValueThemeChange = (themeValue: string) => {
@@ -39,9 +43,30 @@ export const ConfigMenuContainer = () => {
     }
   };
 
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [removeSelectedTag, setRemoveSelectedTag] = useState<string | null>(
+    null
+  );
+
   const handleRemoveTag = (tag: string) => {
-    // 未実装
-    alert("remove tag: " + tag);
+    setRemoveSelectedTag(tag);
+    setIsDialogOpen(true);
+  };
+
+  const handleDeleteTag = () => {
+    const selectedTagId =
+      data?.find((tag) => tag.name === removeSelectedTag)?.id || 0;
+    if (selectedTagId) {
+      deleteTagMutateAsync({
+        tagId: selectedTagId,
+      })
+        .then(() => {
+          setRemoveSelectedTag(null);
+        })
+        .finally(() => {
+          setIsDialogOpen(false);
+        });
+    }
   };
 
   return (
@@ -50,6 +75,12 @@ export const ConfigMenuContainer = () => {
       allTags={allTags}
       onChangeTheme={handleValueThemeChange}
       onClickRemoveTag={handleRemoveTag}
+      deleteItemConfigDialogProps={{
+        isOpen: isDialogOpen,
+        onClose: () => setIsDialogOpen(false),
+        onDelete: handleDeleteTag,
+        targetItemName: removeSelectedTag || "",
+      }}
     />
   );
 };

@@ -1,5 +1,6 @@
 import { useQuery, useMutation, QueryClient } from "@tanstack/react-query";
 import { InvokeBase, customInvoke } from "./_base";
+import type { TagInfo } from "@/types/invokeGenerate";
 
 // コマンド名の定数
 export const TAGS_KEYS = {
@@ -18,12 +19,7 @@ type GetTags = InvokeBase<
   TagsKeys,
   typeof TAGS_KEYS.GET_TAGS,
   undefined,
-  {
-    tags: {
-      id: number;
-      name: string;
-    }[];
-  }
+  TagInfo[]
 >;
 
 export const getTagsQuery = () => {

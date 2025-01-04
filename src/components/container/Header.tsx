@@ -59,8 +59,8 @@ export const HeaderContainer = ({ ConfigMenuButton }: HeaderContainerProps) => {
       const files = res.files.map((file) => ({
         id: file.id,
         title: file.title,
-        folderId: file.folderId,
-        updateAt: file.updatedAt,
+        folderId: file.folder_id,
+        updateAt: file.updated_at,
       }));
       setSearchedResult(files);
       handleClose();
@@ -79,7 +79,7 @@ export const HeaderContainer = ({ ConfigMenuButton }: HeaderContainerProps) => {
         onClose: handleClose,
         inputValue,
         setInputValue,
-        allTags: tagsData?.tags || [],
+        allTags: tagsData || [],
         selectedTagIds,
         onClickTag: handleClickTag,
         onClickFilterButton: handleClickFilterButton,

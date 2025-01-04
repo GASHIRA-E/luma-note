@@ -29,6 +29,6 @@ export const findMemo = (props: FindMemoCommand["props"]) => {
 type DetailMemoInfo = {
   id: number;
   title: string;
-  folderId: number;
-  updatedAt: string;
+  folder_id: number;
+  updated_at: string;
 };
