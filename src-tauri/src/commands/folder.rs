@@ -50,9 +50,7 @@ async fn delete_folder_in_db(
     folder_id: i32,
     remove_relation_memo: bool,
 ) -> Result<(), ()> {
-    println!("remove_relation_memo: {}", remove_relation_memo);
     if !remove_relation_memo {
-        println!("フォルダに紐づいたメモのフォルダIDをNULLにする");
         // フォルダに紐づいたメモのフォルダIDをNULLにする
         const UPDATE_FOLDER_ID_SQL: &str = "UPDATE Memos SET folder_id = NULL WHERE folder_id = ?";
         sqlx::query(UPDATE_FOLDER_ID_SQL)
