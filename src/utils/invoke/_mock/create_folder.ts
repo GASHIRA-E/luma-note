@@ -9,5 +9,5 @@ export const create_folder = (
   props: CreateFolder["props"]
 ): CreateFolder["return"] => {
   console.log("call mock invoke: create_folder", props);
-  return null;
+  return 1;
 };
