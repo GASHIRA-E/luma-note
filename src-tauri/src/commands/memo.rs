@@ -6,34 +6,36 @@ use sqlx::{Pool, Sqlite};
 #[tauri::command]
 pub async fn get_memo_list(
     state: tauri::State<'_, Pool<Sqlite>>,
-    folder_id: i32,
+    folder_id: Option<i32>,
 ) -> Result<Vec<MemoListInfo>, ()> {
     let memos = get_memo_list_from_db(state.inner().clone(), folder_id).await?;
     Ok(memos)
 }
 
-async fn get_memo_list_from_db(
+pub async fn get_memo_list_from_db(
     sqlite_pool: Pool<Sqlite>,
-    folder_id: i32,
+    folder_id: Option<i32>,
 ) -> Result<Vec<MemoListInfo>, ()> {
     const SQL: &str = r#"
-        SELECT 
-            m.id,
-            m.title,
-            m.updated_at,
-            json_group_array(
-                json_object(
-                    'id', t.id,
-                    'name', t.name
-                )
-            ) as tags
-        FROM Memos m
-        LEFT JOIN MemoTagRelations mt ON m.id = mt.memo_id
-        LEFT JOIN Tags t ON mt.tag_id = t.id
-        WHERE m.folder_id = ?
-        GROUP BY m.id, m.title, m.updated_at"#;
+    SELECT 
+        m.id,
+        m.title,
+        m.updated_at,
+        json_group_array(
+            json_object(
+                'id', t.id,
+                'name', t.name
+            )
+        ) as tags
+    FROM Memos m
+    LEFT JOIN MemoTagRelations mt ON m.id = mt.memo_id
+    LEFT JOIN Tags t ON mt.tag_id = t.id
+    WHERE (? IS NOT NULL AND m.folder_id = ?) OR (? IS NULL AND m.folder_id IS NULL)
+    GROUP BY m.id, m.title, m.updated_at"#;
 
     let raw_memos = sqlx::query_as::<_, RawMemoList>(SQL)
+        .bind(folder_id)
+        .bind(folder_id)
         .bind(folder_id)
         .fetch_all(&sqlite_pool)
         .await
@@ -66,26 +68,26 @@ pub async fn get_detail_memo_in_db(
     memo_id: i32,
 ) -> Result<DetailMemoInfo, ()> {
     const SQL: &str = r#"
-    SELECT 
-        m.id,
-        m.title,
-        m.content,
-        m.updated_at,
-        m.folder_id,
-        CASE 
-            WHEN COUNT(t.id) > 0 THEN json_group_array(
-                json_object(
-                    'id', t.id,
-                    'name', t.name
+        SELECT 
+            m.id,
+            m.title,
+            m.content,
+            m.updated_at,
+            m.folder_id,
+            CASE 
+                WHEN COUNT(t.id) > 0 THEN json_group_array(
+                    json_object(
+                        'id', t.id,
+                        'name', t.name
+                    )
                 )
-            )
-            ELSE NULL 
-        END as tags
-    FROM Memos m
-    LEFT JOIN MemoTagRelations mt ON m.id = mt.memo_id
-    LEFT JOIN Tags t ON mt.tag_id = t.id
-    WHERE m.id = ?
-    GROUP BY m.id, m.title, m.content, m.updated_at, m.folder_id"#;
+                ELSE NULL 
+            END as tags
+        FROM Memos m
+        LEFT JOIN MemoTagRelations mt ON m.id = mt.memo_id
+        LEFT JOIN Tags t ON mt.tag_id = t.id
+        WHERE m.id = ?
+        GROUP BY m.id, m.title, m.content, m.updated_at, m.folder_id"#;
 
     let raw_memo = sqlx::query_as::<_, RawDetailMemo>(SQL)
         .bind(memo_id)
@@ -319,7 +321,7 @@ mod tests {
 
         let memo1 = CreateMemoIn {
             title: "test1".to_string(),
-            folder_id: Some(folder_id as i64),
+            folder_id: Some(folder_id),
             content: "test_content1".to_string(),
             tags: Some(vec![1]),
         };
@@ -327,13 +329,13 @@ mod tests {
 
         let memo2 = CreateMemoIn {
             title: "test2".to_string(),
-            folder_id: Some(folder_id as i64),
+            folder_id: Some(folder_id),
             content: "test_content2".to_string(),
             tags: Some(vec![1]),
         };
         create_memo_in_db(sqlite_pool.clone(), memo2).await.unwrap();
 
-        let memos = get_memo_list_from_db(sqlite_pool.clone(), folder_id)
+        let memos = get_memo_list_from_db(sqlite_pool.clone(), Some(folder_id))
             .await
             .unwrap();
         assert_eq!(memos.len(), 2);
@@ -371,7 +373,7 @@ mod tests {
 
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: Some(folder_id as i64),
+            folder_id: Some(folder_id),
             content: "test".to_string(),
             tags: Some(vec![1]),
         };
@@ -626,7 +628,7 @@ mod tests {
         // 更新前のメモ
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: Some(folder_id as i64),
+            folder_id: Some(folder_id),
             content: "test".to_string(),
             tags: Some(vec![tag1_id]),
         };
@@ -640,7 +642,7 @@ mod tests {
         let update_memo = UpdateMemoIn {
             id: created_memo_id,
             title: Some("test".to_string()),
-            folder_id: Some(folder_id.into()),
+            folder_id: Some(folder_id),
             content: Some("test".to_string()),
             tags: Some(vec![tag2_id]),
         };
@@ -676,7 +678,7 @@ mod tests {
 
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: Some(folder_id.into()),
+            folder_id: Some(folder_id),
             content: "test".to_string(),
             tags: Some(vec![tag_id]),
         };
@@ -685,7 +687,7 @@ mod tests {
 
         delete_memo_in_db(sqlite_pool.clone(), 1).await.unwrap();
 
-        let memos = get_memo_list_from_db(sqlite_pool.clone(), folder_id)
+        let memos = get_memo_list_from_db(sqlite_pool.clone(), Some(folder_id))
             .await
             .unwrap();
         assert_eq!(memos.len(), 0);
@@ -697,5 +699,32 @@ mod tests {
 
         let result = delete_memo_in_db(sqlite_pool.clone(), 1).await;
         assert!(result.is_err());
+    }
+
+    #[tokio::test]
+    async fn test_メモのfolder_idがnullの場合はfolder_idがnullのメモ一覧に表示されること() {
+        let sqlite_pool = setup_test_db().await;
+
+        let memo = CreateMemoIn {
+            title: "test".to_string(),
+            folder_id: None,
+            content: "test".to_string(),
+            tags: Some(vec![]),
+        };
+        create_memo_in_db(sqlite_pool.clone(), memo).await.unwrap();
+        let memo2 = CreateMemoIn {
+            title: "test".to_string(),
+            folder_id: None,
+            content: "test".to_string(),
+            tags: Some(vec![]),
+        };
+        create_memo_in_db(sqlite_pool.clone(), memo2).await.unwrap();
+
+        let memos = get_memo_list_from_db(sqlite_pool.clone(), None)
+            .await
+            .unwrap();
+        assert_eq!(memos.len(), 2);
+        assert_eq!(memos[0].id, 1);
+        assert_eq!(memos[1].id, 2);
     }
 }
