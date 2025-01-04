@@ -5,6 +5,7 @@ import { EditArea as EditorPresentation } from "@/components/presentation/EditAr
 import { getDetailMemoQuery, updateMemoMutation } from "@/utils/invoke/Memo";
 import { getTagsQuery, createTagMutation } from "@/utils/invoke/Tags";
 import { useEditorStore } from "@/utils/stores/editor";
+import { useDebounce } from "@/utils/hooks/useDebounce";
 
 export const EditArea = () => {
   const editorDisplayMode = useEditorStore((state) => state.displayMode);
@@ -19,6 +20,27 @@ export const EditArea = () => {
 
   const [tags, setTags] = useState<string[]>([]);
   const [mdText, setMdText] = useState("");
+
+  const updateMdTextDebounce = useDebounce(
+    (mdText: string) => {
+      if (!selectedMemoId) return;
+      setMdText(mdText);
+      updateMemoMutate({
+        memo: {
+          id: selectedMemoId,
+          content: mdText,
+        },
+      });
+    },
+    {
+      delay: 500,
+    }
+  );
+
+  const handleUpdateMdText = (mdText: string) => {
+    setMdText(mdText);
+    updateMdTextDebounce(mdText);
+  };
 
   useEffect(() => {
     if (memoData) {
@@ -45,6 +67,7 @@ export const EditArea = () => {
       newTagId = tagId;
     }
     const currentTagIds = memoData?.tags?.map((tag) => tag.id) || [];
+    setTags([...tags, tagName]);
     // タグを追加する
     updateMemoMutate({
       memo: {
@@ -61,6 +84,7 @@ export const EditArea = () => {
     // 除外後のタグIDリスト
     const removedTagIds =
       memoData?.tags?.flatMap((t) => (t.name !== tag ? t.id : [])) || [];
+    setTags(tags.filter((t) => t !== tag));
     // タグを削除する
     updateMemoMutate({
       memo: {
@@ -99,7 +123,7 @@ export const EditArea = () => {
       }}
       editorDisplay={{
         mdText: mdText,
-        updateMdText: setMdText,
+        updateMdText: handleUpdateMdText,
         displayMode: editorDisplayMode,
       }}
     />
