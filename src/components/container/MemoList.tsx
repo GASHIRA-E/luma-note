@@ -19,7 +19,9 @@ type MemoItem = React.ComponentProps<typeof MemoList>["memos"][number];
 
 export const MemoListContainer = () => {
   const selectedFolderId = useFolderStore((state) => state.selectedFolderId);
-  const { data } = getMemoListQuery({ folderId: selectedFolderId });
+  const { data, refetch: refetchGetMemoList } = getMemoListQuery({
+    folderId: selectedFolderId,
+  });
 
   const { data: foldersData } = getFoldersQuery();
 
@@ -119,6 +121,7 @@ export const MemoListContainer = () => {
           title: memoBeingRenamed.name,
         },
       }).then(() => {
+        refetchGetMemoList();
         setMemoBeingRenamed(null);
       });
     }

@@ -40,11 +40,11 @@ export const EditArea = () => {
     if (tagId === undefined) {
       // タグが存在しない場合は新規作成
       const res = await createTagMutateAsync({ name: tagName });
-      newTagId = res.id;
+      newTagId = res;
     } else {
       newTagId = tagId;
     }
-    const currentTagIds = tagsData?.map((tag) => tag.id) || [];
+    const currentTagIds = memoData?.tags?.map((tag) => tag.id) || [];
     // タグを追加する
     updateMemoMutate({
       memo: {
@@ -60,7 +60,7 @@ export const EditArea = () => {
     if (!selectedMemoId) return;
     // 除外後のタグIDリスト
     const removedTagIds =
-      tagsData?.flatMap((t) => (t.name !== tag ? [t.id] : [])) || [];
+      memoData?.tags?.flatMap((t) => (t.name !== tag ? t.id : [])) || [];
     // タグを削除する
     updateMemoMutate({
       memo: {
