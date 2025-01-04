@@ -11,6 +11,7 @@ import {
 } from "@/utils/invoke/Folder";
 import { useFolderStore } from "@/utils/stores/folder";
 import { useSearchStore } from "@/utils/stores/search";
+import { useEditorStore } from "@/utils/stores/editor";
 
 type FolderListItem = React.ComponentProps<
   typeof FolderListPresentational
@@ -34,6 +35,8 @@ export const FolderList = () => {
   const { mutateAsync: deleteFolderMutateAsync } =
     deleteFolderMutation(queryClient);
 
+  const setSelectedMemoId = useEditorStore((state) => state.setSelectedMemoId);
+
   // フォルダー作成ポップオーバー関連のstate
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
@@ -52,7 +55,9 @@ export const FolderList = () => {
   const [removeRelationMemo, setRemoveRelationMemo] = useState(false);
 
   const handleClickFolder = (folderId: number | null) => {
+    if (folderId === selectedFolderId) return;
     setSelectedFolderId(folderId);
+    setSelectedMemoId(null);
   };
 
   const handleCreateFolder = () => {
