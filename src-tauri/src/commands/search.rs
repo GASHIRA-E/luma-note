@@ -1,6 +1,5 @@
 use crate::types::{DetailMemoInfo, RawDetailMemo, TagInfo};
 use sqlx::{Pool, Sqlite};
-
 #[tauri::command]
 pub async fn find_memo(
     state: tauri::State<'_, Pool<Sqlite>>,
@@ -95,6 +94,8 @@ mod tests {
     use crate::commands::tag::create_tag_in_db;
     use crate::database::setup_test_db;
     use crate::types::CreateMemoIn;
+    use crate::types::NullableId;
+
     #[cfg(test)]
     async fn setup_test_data(sqlite_pool: Pool<Sqlite>) -> Vec<TagInfo> {
         //[
@@ -139,7 +140,7 @@ mod tests {
             sqlite_pool.clone(),
             CreateMemoIn {
                 title: "abc".to_string(),
-                folder_id: Some(1),
+                folder_id: NullableId::Value(Some(1)),
                 content: "test".to_string(),
                 tags: Some(vec![rust_tag_id, typescript_tag_id, javascript_tag_id]),
             },
@@ -151,7 +152,7 @@ mod tests {
             sqlite_pool.clone(),
             CreateMemoIn {
                 title: "abcd".to_string(),
-                folder_id: Some(1),
+                folder_id: NullableId::Value(Some(1)),
                 content: "test".to_string(),
                 tags: Some(vec![rust_tag_id, typescript_tag_id]),
             },
@@ -163,7 +164,7 @@ mod tests {
             sqlite_pool.clone(),
             CreateMemoIn {
                 title: "abcde".to_string(),
-                folder_id: Some(1),
+                folder_id: NullableId::Value(Some(1)),
                 content: "test".to_string(),
                 tags: Some(vec![]),
             },
@@ -175,7 +176,7 @@ mod tests {
             sqlite_pool.clone(),
             CreateMemoIn {
                 title: "abcdef".to_string(),
-                folder_id: Some(1),
+                folder_id: NullableId::Value(Some(1)),
                 content: "test".to_string(),
                 tags: Some(vec![typescript_tag_id]),
             },

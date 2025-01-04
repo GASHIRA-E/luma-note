@@ -58,6 +58,7 @@ mod tests {
     use crate::commands::memo::create_memo_in_db;
     use crate::database::setup_test_db;
     use crate::types::CreateMemoIn;
+    use crate::types::NullableId;
 
     #[tokio::test]
     async fn test_タグ作成できること() {
@@ -118,7 +119,7 @@ mod tests {
             sqlite_pool.clone(),
             CreateMemoIn {
                 title: "memo1".to_string(),
-                folder_id: None,
+                folder_id: NullableId::Null,
                 content: "content1".to_string(),
                 tags: Some(vec![tag_id]),
             },

@@ -1,6 +1,5 @@
 use crate::types::FolderInfo;
 use sqlx::{Pool, Sqlite};
-
 #[tauri::command]
 pub async fn get_folders(state: tauri::State<'_, Pool<Sqlite>>) -> Result<Vec<FolderInfo>, ()> {
     let folders = get_folders_from_db(state.inner().clone()).await?;
@@ -110,6 +109,7 @@ mod tests {
     use crate::commands::memo::get_memo_list_from_db;
     use crate::database::setup_test_db;
     use crate::types::CreateMemoIn;
+    use crate::types::NullableId;
 
     #[tokio::test]
     async fn test_フォルダ作成できること() {
@@ -182,7 +182,7 @@ mod tests {
         let create_memo_in = CreateMemoIn {
             title: "test".to_string(),
             content: "test".to_string(),
-            folder_id: Some(folder_id),
+            folder_id: NullableId::Value(Some(folder_id)),
             tags: None,
         };
 
@@ -222,7 +222,7 @@ mod tests {
         let create_memo_in = CreateMemoIn {
             title: "test".to_string(),
             content: "test".to_string(),
-            folder_id: Some(folder_id),
+            folder_id: NullableId::Value(Some(folder_id)),
             tags: None,
         };
 
