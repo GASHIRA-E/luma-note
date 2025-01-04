@@ -6,20 +6,10 @@ import { useColorMode } from "@/components/ui/color-mode";
 import { ConfigMenu } from "@/components/presentation/ConfigMenu";
 
 import { getTagsQuery, deleteTagMutation } from "@/utils/invoke/Tags";
-import { useConfigStore } from "@/utils/stores/config";
-import { AppThemes, type AppTheme } from "@/utils/constants";
-import { getObjectKeys } from "@/utils/helpers/getObjectKeys";
-
-// AppThemeのValueかどうかを判定
-const isAppTheme = (value: any): value is AppTheme => {
-  return getObjectKeys(AppThemes)
-    .map((k) => AppThemes[k])
-    .includes(value);
-};
+import { useAppSettingContext } from "@/components/context/AppSettingContext";
 
 export const ConfigMenuContainer = () => {
-  const currentTheme = useConfigStore((state) => state.theme);
-  const setTheme = useConfigStore((state) => state.setTheme);
+  const { theme: currentTheme, setTheme } = useAppSettingContext();
 
   // アプリテーマの変更
   const { setColorMode } = useColorMode();
@@ -38,9 +28,7 @@ export const ConfigMenuContainer = () => {
   }, [data]);
 
   const handleValueThemeChange = (themeValue: string) => {
-    if (isAppTheme(themeValue)) {
-      setTheme(themeValue);
-    }
+    setTheme(themeValue);
   };
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
