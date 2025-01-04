@@ -49,8 +49,6 @@
 
 [DetailMemoInfo 構造体](#DetailMemoInfo)
 
-</details>
-
 ## Folder
 
 ### get_folders
@@ -122,8 +120,6 @@
 #### 戻り値
 
 なし
-
-</details>
 
 ## Memo
 
@@ -227,8 +223,6 @@
 
 なし
 
-</details>
-
 ## [domain] tags
 
 ### get_tags
@@ -283,8 +277,6 @@
 
 なし
 
-</details>
-
 ## config
 
 ### get_config
@@ -320,8 +312,6 @@
 #### 戻り値
 
 なし
-
-</details>
 
 ## Schema
 
