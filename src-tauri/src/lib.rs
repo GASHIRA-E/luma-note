@@ -7,6 +7,32 @@ use commands::tag::{create_tag, delete_tag, get_tags};
 use sqlx::{Pool, Sqlite};
 use tauri::Manager;
 
+use tracing::{info, Level};
+use tracing_appender::rolling::{RollingFileAppender, Rotation};
+use tracing_subscriber::{EnvFilter, FmtSubscriber};
+
+pub fn setup_logger() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    // ログファイルの設定
+    let file_appender = RollingFileAppender::new(
+        Rotation::DAILY,
+        "logs",              // ログディレクトリ
+        "md-memo-light.log", // ログファイル名
+    );
+
+    // ログフォーマットの設定
+    FmtSubscriber::builder()
+        .with_env_filter(EnvFilter::from_default_env().add_directive(Level::INFO.into()))
+        .with_file(true)
+        .with_line_number(true)
+        .with_thread_ids(true)
+        .with_target(false)
+        .with_writer(file_appender)
+        .with_ansi(false)
+        .try_init()?;
+
+    Ok(())
+}
+
 pub fn db_init() -> Result<Pool<Sqlite>, Box<dyn std::error::Error>> {
     use tauri::async_runtime::block_on;
 
@@ -26,7 +52,7 @@ pub fn db_init() -> Result<Pool<Sqlite>, Box<dyn std::error::Error>> {
     // パスを文字列に変換（Windows対応）
     let database_url = format!("sqlite:{}", database_path.to_str().ok_or("Invalid path")?);
 
-    println!("データベースパス: {}", database_url);
+    info!("データベースパス: {}", database_url);
 
     // SQLiteのコネクションプールを作成する
     let sqlite_pool = block_on(database::create_sqlite_pool(&database_url))?;
@@ -34,7 +60,7 @@ pub fn db_init() -> Result<Pool<Sqlite>, Box<dyn std::error::Error>> {
     // マイグレーションの実行
     block_on(async { sqlx::migrate!("../migrations").run(&sqlite_pool).await })?;
 
-    println!("データベース接続・マイグレーション成功");
+    info!("データベース接続・マイグレーション成功");
 
     Ok(sqlite_pool)
 }

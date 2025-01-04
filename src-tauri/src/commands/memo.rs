@@ -2,7 +2,7 @@ use crate::types::{
     CreateMemoIn, DetailMemoInfo, MemoListInfo, RawDetailMemo, RawMemoList, TagInfo, UpdateMemoIn,
 };
 use sqlx::{Pool, Sqlite};
-
+use tracing::info;
 #[tauri::command]
 pub async fn get_memo_list(
     state: tauri::State<'_, Pool<Sqlite>>,
@@ -136,22 +136,24 @@ pub async fn create_memo_in_db(sqlite_pool: Pool<Sqlite>, memo: CreateMemoIn) ->
         .map_err(|_| ())?;
 
     let memo_id = result.last_insert_rowid();
-
+    info!("メモ作成成功: {}", memo_id);
     // タグが存在する場合、一括で関連付けを作成
     if let Some(tags) = memo.tags {
         const TAG_SQL: &str = "INSERT INTO MemoTagRelations (memo_id, tag_id) 
              SELECT ?, value FROM json_each(?)";
 
-        sqlx::query(TAG_SQL)
+        let result = sqlx::query(TAG_SQL)
             .bind(memo_id)
             .bind(serde_json::to_string(&tags).map_err(|_| ())?)
             .execute(&mut *tx)
             .await
             .map_err(|_| ())?;
+        info!("タグ関連付け成功: {}件", result.rows_affected());
     }
 
     // トランザクションをコミット
     tx.commit().await.map_err(|_| ())?;
+    info!("メモ作成コミット成功: {}", memo_id);
 
     Ok(memo_id as i32)
 }
@@ -169,6 +171,8 @@ async fn delete_memo_in_db(sqlite_pool: Pool<Sqlite>, memo_id: i32) -> Result<()
         .execute(&sqlite_pool)
         .await
         .map_err(|_| ())?;
+
+    info!("メモ削除成功: {}件", result.rows_affected());
 
     // 削除された行が0の場合（該当するIDが存在しない場合）はエラーを返す
     if result.rows_affected() == 0 {
@@ -228,6 +232,7 @@ async fn update_memo_in_db(sqlite_pool: Pool<Sqlite>, memo: UpdateMemoIn) -> Res
     }
 
     tx.commit().await.map_err(|_| ())?;
+    info!("メモ更新コミット成功: {}", memo.id);
     Ok(())
 }
 
