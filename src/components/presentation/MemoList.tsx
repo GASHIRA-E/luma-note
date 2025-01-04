@@ -40,25 +40,29 @@ export const MemoList: React.FC<MemoListProps> = ({
       w={240}
       maxH="100vh"
       overflowY="auto"
-      p={3}
+      px={3}
+      pb={3}
       bg="bg"
       borderRightWidth={1}
       borderRightColor="border"
     >
-      <Heading size="lg" mb={2}>
-        Memo List
-      </Heading>
-      <NewItemPopover
-        isPopoverOpen={isPopoverOpen}
-        setIsPopoverOpen={setIsPopoverOpen}
-        inputValue={inputValue}
-        setInputValue={setInputValue}
-        onClickCreate={onClickNewMemo}
-      >
-        <Button w="full" mb={2}>
-          + 新規メモ
-        </Button>
-      </NewItemPopover>
+      <Box position="sticky" top={0} zIndex={1} bg="bg" pt={3}>
+        <Heading size="lg" mb={2}>
+          Memo List
+        </Heading>
+        <NewItemPopover
+          isPopoverOpen={isPopoverOpen}
+          setIsPopoverOpen={setIsPopoverOpen}
+          inputValue={inputValue}
+          setInputValue={setInputValue}
+          onClickCreate={onClickNewMemo}
+        >
+          <Button w="full" mb={2}>
+            + 新規メモ
+          </Button>
+        </NewItemPopover>
+      </Box>
+
       <Flex direction="column" gap={2}>
         {memos.map((memo) => (
           <MemoItem key={memo.id} {...memo} />
