@@ -321,7 +321,7 @@ mod tests {
 
         let memo1 = CreateMemoIn {
             title: "test1".to_string(),
-            folder_id: Some(folder_id as i64),
+            folder_id: Some(folder_id),
             content: "test_content1".to_string(),
             tags: Some(vec![1]),
         };
@@ -329,7 +329,7 @@ mod tests {
 
         let memo2 = CreateMemoIn {
             title: "test2".to_string(),
-            folder_id: Some(folder_id as i64),
+            folder_id: Some(folder_id),
             content: "test_content2".to_string(),
             tags: Some(vec![1]),
         };
@@ -373,7 +373,7 @@ mod tests {
 
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: Some(folder_id as i64),
+            folder_id: Some(folder_id),
             content: "test".to_string(),
             tags: Some(vec![1]),
         };
@@ -628,7 +628,7 @@ mod tests {
         // 更新前のメモ
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: Some(folder_id as i64),
+            folder_id: Some(folder_id),
             content: "test".to_string(),
             tags: Some(vec![tag1_id]),
         };

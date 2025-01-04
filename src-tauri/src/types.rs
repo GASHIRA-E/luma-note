@@ -43,7 +43,7 @@ pub struct CreateMemoIn {
     /// メモタイトル
     pub title: String,
     /// メモフォルダID
-    pub folder_id: Option<i64>,
+    pub folder_id: Option<i32>,
     /// メモ内容
     pub content: String,
     /// メモタグ
