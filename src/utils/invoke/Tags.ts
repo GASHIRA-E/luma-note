@@ -35,9 +35,7 @@ type CreateTag = InvokeBase<
   {
     name: string;
   },
-  {
-    id: number;
-  }
+  number
 >;
 
 export const createTagMutation = (queryClient: QueryClient) => {

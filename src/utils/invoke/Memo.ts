@@ -84,7 +84,7 @@ type UpdateMemo = InvokeBase<
     memo: {
       id: number;
       title?: string;
-      folder_id?: number;
+      folder_id?: number | null;
       content?: string;
       tags?: number[];
     };
@@ -97,9 +97,9 @@ export const updateMemoMutation = (queryClient: QueryClient) => {
     mutationFn: (props: UpdateMemo["props"]) => {
       return customInvoke(MEMO_KEYS.UPDATE_MEMO, props);
     },
-    onSuccess: () => {
+    onSuccess: (_) => {
       queryClient.invalidateQueries({
-        queryKey: [[MEMO_KEYS.GET_DETAIL_MEMO], [MEMO_KEYS.GET_MEMO_LIST]],
+        queryKey: [MEMO_KEYS.GET_DETAIL_MEMO],
       });
     },
   });

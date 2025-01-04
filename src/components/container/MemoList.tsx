@@ -19,7 +19,9 @@ type MemoItem = React.ComponentProps<typeof MemoList>["memos"][number];
 
 export const MemoListContainer = () => {
   const selectedFolderId = useFolderStore((state) => state.selectedFolderId);
-  const { data } = getMemoListQuery({ folderId: selectedFolderId });
+  const { data, refetch: refetchGetMemoList } = getMemoListQuery({
+    folderId: selectedFolderId,
+  });
 
   const { data: foldersData } = getFoldersQuery();
 
@@ -93,12 +95,10 @@ export const MemoListContainer = () => {
       updateMemoMutateAsync({
         memo: {
           id: memoBeingMoved.id,
-          title: "Rustで作るWASM - 読書メモ",
-          // TODO: invokeの型がnull対応できていないのでfolder_idがnullの場合は後で実装
-          folder_id: moveFolderId || undefined,
-          content: "",
+          folder_id: moveFolderId,
         },
       }).then(() => {
+        refetchGetMemoList();
         setMemoBeingMoved(null);
       });
     }
@@ -119,6 +119,7 @@ export const MemoListContainer = () => {
           title: memoBeingRenamed.name,
         },
       }).then(() => {
+        refetchGetMemoList();
         setMemoBeingRenamed(null);
       });
     }
