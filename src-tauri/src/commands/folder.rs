@@ -41,6 +41,7 @@ pub async fn delete_folder(
     folder_id: i32,
     remove_relation_memo: bool,
 ) -> Result<(), ()> {
+    // folder_id=NULL(フォルダ未指定)は削除しない
     delete_folder_in_db(state.inner().clone(), folder_id, remove_relation_memo).await?;
     Ok(())
 }
@@ -82,6 +83,7 @@ pub async fn update_folder(
     folder_id: i32,
     name: String,
 ) -> Result<(), ()> {
+    // folder_id=NULL(フォルダ未指定)は更新しない
     update_folder_in_db(state.inner().clone(), folder_id, name).await?;
     Ok(())
 }
@@ -180,7 +182,7 @@ mod tests {
         let create_memo_in = CreateMemoIn {
             title: "test".to_string(),
             content: "test".to_string(),
-            folder_id: Some(folder_id.into()),
+            folder_id: Some(folder_id),
             tags: None,
         };
 
@@ -201,7 +203,9 @@ mod tests {
         let after_folder = get_folders_from_db(sqlite_pool.clone()).await.unwrap();
         assert_eq!(after_folder.len(), 0);
 
-        let memos = get_memo_list_from_db(sqlite_pool.clone(), 0).await.unwrap();
+        let memos = get_memo_list_from_db(sqlite_pool.clone(), None)
+            .await
+            .unwrap();
         assert_eq!(memos.len(), 2);
         assert_eq!(memos[0].id, memo1_id);
         assert_eq!(memos[1].id, memo2_id);
@@ -218,7 +222,7 @@ mod tests {
         let create_memo_in = CreateMemoIn {
             title: "test".to_string(),
             content: "test".to_string(),
-            folder_id: Some(folder_id.into()),
+            folder_id: Some(folder_id),
             tags: None,
         };
 
@@ -231,7 +235,7 @@ mod tests {
 
         let before_folder = get_folders_from_db(sqlite_pool.clone()).await.unwrap();
         assert_eq!(before_folder.len(), 1);
-        let before_memos = get_memo_list_from_db(sqlite_pool.clone(), folder_id)
+        let before_memos = get_memo_list_from_db(sqlite_pool.clone(), Some(folder_id))
             .await
             .unwrap();
         assert_eq!(before_memos.len(), 2);
@@ -244,7 +248,9 @@ mod tests {
         let after_folder = get_folders_from_db(sqlite_pool.clone()).await.unwrap();
         assert_eq!(after_folder.len(), 0);
 
-        let memos = get_memo_list_from_db(sqlite_pool.clone(), 0).await.unwrap();
+        let memos = get_memo_list_from_db(sqlite_pool.clone(), None)
+            .await
+            .unwrap();
         assert_eq!(memos.len(), 0);
     }
 }
