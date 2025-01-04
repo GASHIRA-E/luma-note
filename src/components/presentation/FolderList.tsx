@@ -1,5 +1,6 @@
-import { Box, Flex, Heading } from "@chakra-ui/react";
+import { Box, Flex, Heading, IconButton } from "@chakra-ui/react";
 import { Button } from "@/components/ui/button";
+import { HiPencilAlt } from "react-icons/hi";
 
 import { FolderItem } from "@/components/parts/FolderItem";
 import { NewItemPopover } from "@/components/parts/NewItemContent";
@@ -17,6 +18,7 @@ export type FolderListProps = {
   deleteItemConfirmDialogProps: React.ComponentProps<
     typeof DeleteItemConfirmDialog
   >;
+  onClickQuickCreateFolder: React.MouseEventHandler<HTMLButtonElement>;
 };
 
 export const FolderList = ({
@@ -28,6 +30,7 @@ export const FolderList = ({
   onClickCreateFolder,
   itemUpdateDialogProps,
   deleteItemConfirmDialogProps,
+  onClickQuickCreateFolder,
 }: FolderListProps) => {
   return (
     <Box
@@ -44,17 +47,22 @@ export const FolderList = ({
         <Heading size="lg" mb={2}>
           Folder List
         </Heading>
-        <NewItemPopover
-          isPopoverOpen={isPopoverOpen}
-          setIsPopoverOpen={setIsPopoverOpen}
-          inputValue={newFolderName}
-          setInputValue={setNewFolderName}
-          onClickCreate={onClickCreateFolder}
-        >
-          <Button w="full" mb={2}>
-            + 新規フォルダー
-          </Button>
-        </NewItemPopover>
+        <Flex gap={1}>
+          <NewItemPopover
+            isPopoverOpen={isPopoverOpen}
+            setIsPopoverOpen={setIsPopoverOpen}
+            inputValue={newFolderName}
+            setInputValue={setNewFolderName}
+            onClickCreate={onClickCreateFolder}
+          >
+            <Button flex={1} mb={2}>
+              + 新規フォルダー
+            </Button>
+          </NewItemPopover>
+          <IconButton onClick={onClickQuickCreateFolder}>
+            <HiPencilAlt />
+          </IconButton>
+        </Flex>
       </Box>
       <Flex direction="column" gap={2} mt={3}>
         {folderList.map((folder) => (

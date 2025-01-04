@@ -49,7 +49,7 @@ type CreateFolder = InvokeBase<
   {
     name: string;
   },
-  null
+  number
 >;
 
 export const deleteFolderMutation = (queryClient: QueryClient) => {

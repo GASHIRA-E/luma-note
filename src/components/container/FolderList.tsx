@@ -58,8 +58,9 @@ export const FolderList = () => {
   const handleCreateFolder = () => {
     if (!newFolderName) return;
     createFolderMutateAsync({ name: newFolderName })
-      .then(() => {
+      .then((res) => {
         setNewFolderName("");
+        setSelectedFolderId(res);
       })
       .finally(() => {
         setIsPopoverOpen(false);
@@ -140,6 +141,17 @@ export const FolderList = () => {
     ];
   };
 
+  const handleClickQuickCreateFolder = () => {
+    createFolderMutateAsync({ name: "Quick Folder" })
+      .then((res) => {
+        setNewFolderName("");
+        setSelectedFolderId(res);
+      })
+      .finally(() => {
+        setIsPopoverOpen(false);
+      });
+  };
+
   const folderList = useMemo(createFolderList, [
     foldersData,
     hasSearched,
@@ -174,6 +186,7 @@ export const FolderList = () => {
         },
         onDelete: handleConfirmDelete,
       }}
+      onClickQuickCreateFolder={handleClickQuickCreateFolder}
     />
   );
 };
