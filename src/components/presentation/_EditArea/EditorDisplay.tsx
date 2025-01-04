@@ -10,16 +10,21 @@ import { useScrollSync } from "@/utils/hooks/useScrollSync";
 import "highlight.js/styles/github-dark.min.css";
 import "github-markdown-css";
 
-const marked = new Marked(
-  markedHighlight({
+const marked = new Marked({
+  ...markedHighlight({
     emptyLangClass: "hljs",
     langPrefix: "hljs language-",
     highlight: (code, lang) => {
       const language = hljs.getLanguage(lang) ? lang : "plaintext";
       return hljs.highlight(code, { language: language }).value;
     },
-  })
-);
+  }),
+  renderer: {
+    link: ({ href, text }) => {
+      return `<a href="${href}" target="_blank" rel="noopener noreferrer">${text}</a>`;
+    },
+  },
+});
 
 export type EditorDisplayProps = {
   mdText: string;
