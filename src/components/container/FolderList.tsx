@@ -55,6 +55,7 @@ export const FolderList = () => {
   const [removeRelationMemo, setRemoveRelationMemo] = useState(false);
 
   const handleClickFolder = (folderId: number | null) => {
+    // 選択中のフォルダーをクリックした場合は何もしない
     if (folderId === selectedFolderId) return;
     setSelectedFolderId(folderId);
     setSelectedMemoId(null);
@@ -66,6 +67,7 @@ export const FolderList = () => {
       .then((res) => {
         setNewFolderName("");
         setSelectedFolderId(res);
+        setSelectedMemoId(null);
       })
       .finally(() => {
         setIsPopoverOpen(false);
@@ -86,12 +88,18 @@ export const FolderList = () => {
         removeRelationMemo: removeRelationMemo,
       }).then(() => {
         setFolderBeingDeleted(null);
-        setSelectedFolderId(null);
+        setRemoveRelationMemo(false);
+        // 選択中のフォルダーが削除された場合は選択を解除
+        if (selectedFolderId === folderBeingDeleted.id) {
+          setSelectedFolderId(null);
+          setSelectedMemoId(null);
+        }
       });
     }
   };
 
   const handleRenameFolder = (folderId: number | null) => {
+    // 未分類をリネームしようとした場合は何もしない
     if (folderId === null) return;
     const folder = folderList.find((f) => f.folderId === folderId);
     if (folder && folder.folderId !== null) {
@@ -150,8 +158,8 @@ export const FolderList = () => {
   const handleClickQuickCreateFolder = () => {
     createFolderMutateAsync({ name: "Quick Folder" })
       .then((res) => {
-        setNewFolderName("");
         setSelectedFolderId(res);
+        setSelectedMemoId(null);
       })
       .finally(() => {
         setIsPopoverOpen(false);
