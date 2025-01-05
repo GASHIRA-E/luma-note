@@ -152,7 +152,7 @@ export const MemoListContainer = () => {
     createMemoMutateAsync({
       memo: {
         title: "Quick Memo",
-        folder_id: selectedFolderId,
+        folder_id: generateNullableId(selectedFolderId),
         content: "",
       },
     }).then((res) => {
