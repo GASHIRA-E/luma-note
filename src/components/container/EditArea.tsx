@@ -6,6 +6,7 @@ import { getDetailMemoQuery, updateMemoMutation } from "@/utils/invoke/Memo";
 import { getTagsQuery, createTagMutation } from "@/utils/invoke/Tags";
 import { useEditorStore } from "@/utils/stores/editor";
 import { useDebounce } from "@/utils/hooks/useDebounce";
+import { useAppSettingContext } from "@/components/context/AppSettingContext";
 
 export const EditArea = () => {
   const editorDisplayMode = useEditorStore((state) => state.displayMode);
@@ -20,6 +21,8 @@ export const EditArea = () => {
 
   const [tags, setTags] = useState<string[]>([]);
   const [mdText, setMdText] = useState("");
+
+  const { theme } = useAppSettingContext();
 
   const updateMdTextDebounce = useDebounce(
     (mdText: string) => {
@@ -123,6 +126,7 @@ export const EditArea = () => {
       }}
       editorDisplay={{
         mdText: mdText,
+        theme: theme,
         updateMdText: handleUpdateMdText,
         displayMode: editorDisplayMode,
       }}
