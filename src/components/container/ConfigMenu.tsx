@@ -5,7 +5,9 @@ import { useColorMode } from "@/components/ui/color-mode";
 
 import { ConfigMenu } from "@/components/presentation/ConfigMenu";
 
+import { useEditorStore } from "@/utils/stores/editor";
 import { getTagsQuery, deleteTagMutation } from "@/utils/invoke/Tags";
+import { getDetailMemoQuery } from "@/utils/invoke/Memo";
 import { useAppSettingContext } from "@/components/context/AppSettingContext";
 
 export const ConfigMenuContainer = () => {
@@ -20,6 +22,9 @@ export const ConfigMenuContainer = () => {
   const queryClient = useQueryClient();
   const { data } = getTagsQuery();
   const { mutateAsync: deleteTagMutateAsync } = deleteTagMutation(queryClient);
+  const selectedMemoId = useEditorStore((state) => state.selectedMemoId);
+  const { refetch } = getDetailMemoQuery({ memoId: selectedMemoId });
+
   const allTags = useMemo<string[]>(() => {
     if (!data) {
       return [];
@@ -49,6 +54,7 @@ export const ConfigMenuContainer = () => {
         tagId: selectedTagId,
       })
         .then(() => {
+          refetch();
           setRemoveSelectedTag(null);
         })
         .finally(() => {
