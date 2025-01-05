@@ -1,5 +1,10 @@
 import { useQuery, useMutation, QueryClient } from "@tanstack/react-query";
 import { InvokeBase, customInvoke } from "./_base";
+import {
+  CreateMemoIn,
+  UpdateMemoIn,
+  MemoListInfo,
+} from "@/types/invokeGenerate";
 
 export const MEMO_KEYS = {
   GET_DETAIL_MEMO: "get_detail_memo",
@@ -55,12 +60,7 @@ type CreateMemo = InvokeBase<
   MemoKeys,
   typeof MEMO_KEYS.CREATE_MEMO,
   {
-    memo: {
-      title: string;
-      folder_id: number | null;
-      content: string;
-      tags?: number[] | null;
-    };
+    memo: CreateMemoIn;
   },
   null
 >;
@@ -81,13 +81,7 @@ type UpdateMemo = InvokeBase<
   MemoKeys,
   typeof MEMO_KEYS.UPDATE_MEMO,
   {
-    memo: {
-      id: number;
-      title?: string;
-      folder_id?: number | null;
-      content?: string;
-      tags?: number[];
-    };
+    memo: UpdateMemoIn;
   },
   null
 >;
@@ -132,11 +126,7 @@ type GetMemoList = InvokeBase<
   {
     folderId: number | null;
   },
-  {
-    id: number;
-    title: string;
-    updated_at: string;
-  }[]
+  MemoListInfo[]
 >;
 
 export const getMemoListQuery = (props: GetMemoList["props"]) => {

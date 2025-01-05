@@ -15,6 +15,8 @@ import { useFolderStore } from "@/utils/stores/folder";
 import { useEditorStore } from "@/utils/stores/editor";
 import { useSearchStore } from "@/utils/stores/search";
 
+import { generateNullableId } from "@/utils/helpers/generateNullableId";
+
 type MemoItem = React.ComponentProps<typeof MemoList>["memos"][number];
 
 export const MemoListContainer = () => {
@@ -67,7 +69,7 @@ export const MemoListContainer = () => {
     createMemoMutateAsync({
       memo: {
         title: inputValue,
-        folder_id: selectedFolderId,
+        folder_id: generateNullableId(selectedFolderId),
         content: "",
       },
     })
@@ -95,7 +97,7 @@ export const MemoListContainer = () => {
       updateMemoMutateAsync({
         memo: {
           id: memoBeingMoved.id,
-          folder_id: moveFolderId,
+          folder_id: generateNullableId(moveFolderId),
         },
       }).then(() => {
         refetchGetMemoList();
