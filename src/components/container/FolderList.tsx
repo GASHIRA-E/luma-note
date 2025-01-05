@@ -11,6 +11,7 @@ import {
 } from "@/utils/invoke/Folder";
 import { useFolderStore } from "@/utils/stores/folder";
 import { useSearchStore } from "@/utils/stores/search";
+import { useEditorStore } from "@/utils/stores/editor";
 
 type FolderListItem = React.ComponentProps<
   typeof FolderListPresentational
@@ -34,6 +35,8 @@ export const FolderList = () => {
   const { mutateAsync: deleteFolderMutateAsync } =
     deleteFolderMutation(queryClient);
 
+  const setSelectedMemoId = useEditorStore((state) => state.setSelectedMemoId);
+
   // フォルダー作成ポップオーバー関連のstate
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
@@ -52,14 +55,19 @@ export const FolderList = () => {
   const [removeRelationMemo, setRemoveRelationMemo] = useState(false);
 
   const handleClickFolder = (folderId: number | null) => {
+    // 選択中のフォルダーをクリックした場合は何もしない
+    if (folderId === selectedFolderId) return;
     setSelectedFolderId(folderId);
+    setSelectedMemoId(null);
   };
 
   const handleCreateFolder = () => {
     if (!newFolderName) return;
     createFolderMutateAsync({ name: newFolderName })
-      .then(() => {
+      .then((res) => {
         setNewFolderName("");
+        setSelectedFolderId(res);
+        setSelectedMemoId(null);
       })
       .finally(() => {
         setIsPopoverOpen(false);
@@ -80,11 +88,18 @@ export const FolderList = () => {
         removeRelationMemo: removeRelationMemo,
       }).then(() => {
         setFolderBeingDeleted(null);
+        setRemoveRelationMemo(false);
+        // 選択中のフォルダーが削除された場合は選択を解除
+        if (selectedFolderId === folderBeingDeleted.id) {
+          setSelectedFolderId(null);
+          setSelectedMemoId(null);
+        }
       });
     }
   };
 
   const handleRenameFolder = (folderId: number | null) => {
+    // 未分類をリネームしようとした場合は何もしない
     if (folderId === null) return;
     const folder = folderList.find((f) => f.folderId === folderId);
     if (folder && folder.folderId !== null) {
@@ -140,6 +155,17 @@ export const FolderList = () => {
     ];
   };
 
+  const handleClickQuickCreateFolder = () => {
+    createFolderMutateAsync({ name: "Quick Folder" })
+      .then((res) => {
+        setSelectedFolderId(res);
+        setSelectedMemoId(null);
+      })
+      .finally(() => {
+        setIsPopoverOpen(false);
+      });
+  };
+
   const folderList = useMemo(createFolderList, [
     foldersData,
     hasSearched,
@@ -154,7 +180,7 @@ export const FolderList = () => {
       setIsPopoverOpen={setIsPopoverOpen}
       newFolderName={newFolderName}
       setNewFolderName={setNewFolderName}
-      onClickCreateFolder={handleCreateFolder}
+      onCreateFolder={handleCreateFolder}
       itemUpdateDialogProps={{
         isOpen: !!folderBeingRenamed,
         onClose: () => setFolderBeingRenamed(null),
@@ -174,6 +200,7 @@ export const FolderList = () => {
         },
         onDelete: handleConfirmDelete,
       }}
+      onClickQuickCreateFolder={handleClickQuickCreateFolder}
     />
   );
 };

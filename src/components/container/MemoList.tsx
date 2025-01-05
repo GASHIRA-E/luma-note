@@ -73,8 +73,9 @@ export const MemoListContainer = () => {
         content: "",
       },
     })
-      .then(() => {
+      .then((res) => {
         setInputValue("");
+        setSelectedMemoId(res);
       })
       .finally(() => {
         setIsPopoverOpen(false);
@@ -147,6 +148,19 @@ export const MemoListContainer = () => {
     }
   };
 
+  const handleClickQuickCreateMemo = () => {
+    createMemoMutateAsync({
+      memo: {
+        title: "Quick Memo",
+        folder_id: selectedFolderId,
+        content: "",
+      },
+    }).then((res) => {
+      refetchGetMemoList();
+      setSelectedMemoId(res);
+    });
+  };
+
   const memos = useMemo(() => {
     if (!data) {
       return [];
@@ -202,6 +216,7 @@ export const MemoListContainer = () => {
         onClose: () => setMemoBeingDeleted(null),
         onDelete: handleConfirmDelete,
       }}
+      onClickQuickCreateMemo={handleClickQuickCreateMemo}
     />
   );
 };
