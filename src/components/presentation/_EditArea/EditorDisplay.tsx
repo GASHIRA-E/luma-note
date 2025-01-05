@@ -3,6 +3,7 @@ import { Marked } from "marked";
 import { Box, Flex, Textarea } from "@chakra-ui/react";
 import { markedHighlight } from "marked-highlight";
 import hljs from "highlight.js";
+import mermaid from "mermaid";
 
 import { DisplayModes, type DisplayMode } from "@/utils/constants";
 import { useScrollSync } from "@/utils/hooks/useScrollSync";
@@ -19,6 +20,9 @@ const marked = new Marked({
     emptyLangClass: "hljs",
     langPrefix: "hljs language-",
     highlight: (code, lang) => {
+      if (lang === "mermaid") {
+        return `<div class="mermaid">${code}</div>`;
+      }
       const language = hljs.getLanguage(lang) ? lang : "plaintext";
       return hljs.highlight(code, { language: language }).value;
     },
@@ -46,6 +50,14 @@ export const EditorDisplay = ({
   const { ref1, ref2 } = useScrollSync<HTMLTextAreaElement>();
 
   useEffect(() => {
+    mermaid.initialize({
+      securityLevel: "loose",
+      theme: "dark",
+      darkMode: true,
+    });
+  }, []);
+
+  useEffect(() => {
     // 既存のCSSを削除
     document.head.querySelectorAll("#app-theme-css").forEach((el) => {
       el.remove();
@@ -69,11 +81,19 @@ export const EditorDisplay = ({
         break;
     }
     document.head.appendChild(cssLink);
+
+    mermaid.initialize({
+      darkMode: theme === "dark",
+    });
   }, [theme]);
 
   const markdownHtml = useMemo(() => {
     return marked.parse(mdText);
   }, [mdText]);
+
+  useEffect(() => {
+    mermaid.run();
+  }, [markdownHtml]);
 
   return (
     <Flex flexGrow={1} overflow="hidden">
@@ -89,6 +109,13 @@ export const EditorDisplay = ({
           overflowY: "auto",
           borderRadius: "0",
         }}
+        focusRing="none"
+        css={{
+          "&:focus": {
+            borderColor: "transparent",
+          },
+        }}
+        variant="subtle"
         onChange={(e) => updateMdText(e.target.value)}
         // デザイン確認用に適当なmarkdownの初期値
         value={mdText}
