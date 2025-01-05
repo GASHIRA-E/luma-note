@@ -2,6 +2,16 @@ use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use typeshare::typeshare;
 
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[serde(tag = "type", content = "content")]
+#[typeshare]
+pub enum NullableId<T> {
+    /// NULL_ID
+    Null,
+    /// IDが整数型
+    Value(T),
+}
+
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 #[typeshare]
 pub struct DetailMemoInfo {
@@ -43,7 +53,7 @@ pub struct CreateMemoIn {
     /// メモタイトル
     pub title: String,
     /// メモフォルダID
-    pub folder_id: Option<i32>,
+    pub folder_id: Option<NullableId<i32>>,
     /// メモ内容
     pub content: String,
     /// メモタグ
@@ -58,7 +68,7 @@ pub struct UpdateMemoIn {
     /// メモタイトル
     pub title: Option<String>,
     /// メモフォルダID
-    pub folder_id: Option<i32>,
+    pub folder_id: Option<NullableId<i32>>,
     /// メモ内容
     pub content: Option<String>,
     /// メモタグ

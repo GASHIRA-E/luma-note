@@ -1,8 +1,8 @@
+use crate::types::NullableId;
 use crate::types::{
     CreateMemoIn, DetailMemoInfo, MemoListInfo, RawDetailMemo, RawMemoList, TagInfo, UpdateMemoIn,
 };
 use sqlx::{Pool, Sqlite};
-
 #[tauri::command]
 pub async fn get_memo_list(
     state: tauri::State<'_, Pool<Sqlite>>,
@@ -129,7 +129,10 @@ pub async fn create_memo_in_db(sqlite_pool: Pool<Sqlite>, memo: CreateMemoIn) ->
     const MEMO_SQL: &str = "INSERT INTO Memos (title, folder_id, content) VALUES (?, ?, ?)";
     let result = sqlx::query(MEMO_SQL)
         .bind(&memo.title)
-        .bind(memo.folder_id)
+        .bind(memo.folder_id.and_then(|id| match id {
+            NullableId::Null => None,
+            NullableId::Value(v) => Some(v),
+        }))
         .bind(&memo.content)
         .execute(&mut *tx)
         .await
@@ -213,9 +216,16 @@ async fn update_memo_in_db(sqlite_pool: Pool<Sqlite>, memo: UpdateMemoIn) -> Res
         bindings.push(content.clone());
     }
 
-    if let Some(folder_id) = memo.folder_id {
+    if let Some(NullableId::Value(folder_id)) = memo.folder_id {
         update_parts.push("folder_id = ?");
         bindings.push(folder_id.to_string());
+    } else if memo.folder_id == Some(NullableId::Null)
+        && memo.title.is_none()
+        && memo.content.is_none()
+        && memo.tags.is_none()
+    {
+        // フォルダ移動：folder_idがNoneで、かつ他のフィールドの更新がない場合のみNULLに設定
+        update_parts.push("folder_id = NULL");
     }
 
     // メモのフィールド更新がある場合のみSQLを実行
@@ -284,7 +294,7 @@ mod tests {
 
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: Some(1),
+            folder_id: Some(NullableId::Value(1)),
             content: "test".to_string(),
             tags: Some(vec![1, 2]),
         };
@@ -321,7 +331,7 @@ mod tests {
 
         let memo1 = CreateMemoIn {
             title: "test1".to_string(),
-            folder_id: Some(folder_id),
+            folder_id: Some(NullableId::Value(folder_id)),
             content: "test_content1".to_string(),
             tags: Some(vec![1]),
         };
@@ -329,7 +339,7 @@ mod tests {
 
         let memo2 = CreateMemoIn {
             title: "test2".to_string(),
-            folder_id: Some(folder_id),
+            folder_id: Some(NullableId::Value(folder_id)),
             content: "test_content2".to_string(),
             tags: Some(vec![1]),
         };
@@ -373,7 +383,7 @@ mod tests {
 
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: Some(folder_id),
+            folder_id: Some(NullableId::Value(folder_id)),
             content: "test".to_string(),
             tags: Some(vec![1]),
         };
@@ -382,7 +392,7 @@ mod tests {
         let update_memo = UpdateMemoIn {
             id: created_memo_id,
             title: Some("test2".to_string()),
-            folder_id: Some(folder_id),
+            folder_id: Some(NullableId::Value(folder_id)),
             content: Some("test2".to_string()),
             tags: Some(vec![tag_id]),
         };
@@ -422,7 +432,7 @@ mod tests {
 
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: Some(folder_id),
+            folder_id: Some(NullableId::Value(folder_id)),
             content: "test".to_string(),
             tags: Some(vec![tag_id]),
         };
@@ -431,7 +441,7 @@ mod tests {
         let update_memo = UpdateMemoIn {
             id: created_memo_id,
             title: None,
-            folder_id: Some(folder2_id),
+            folder_id: Some(NullableId::Value(folder2_id)),
             content: None,
             tags: None,
         };
@@ -456,6 +466,41 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn test_メモを未分類フォルダに移動できること() {
+        let sqlite_pool = setup_test_db().await;
+        let folder_id = create_folder_in_db(sqlite_pool.clone(), "test".to_string())
+            .await
+            .unwrap();
+
+        let memo = CreateMemoIn {
+            title: "test".to_string(),
+            folder_id: Some(NullableId::Value(folder_id)),
+            content: "test".to_string(),
+            tags: None,
+        };
+        let created_memo_id = create_memo_in_db(sqlite_pool.clone(), memo).await.unwrap();
+
+        let update_memo = UpdateMemoIn {
+            id: created_memo_id,
+            title: None,
+            folder_id: Some(NullableId::Null),
+            content: None,
+            tags: None,
+        };
+        update_memo_in_db(sqlite_pool.clone(), update_memo)
+            .await
+            .unwrap();
+
+        let memo = get_detail_memo_in_db(sqlite_pool.clone(), created_memo_id)
+            .await
+            .unwrap();
+        assert_eq!(memo.folder_id, 0);
+        // フォルダ以外変更されていないこと
+        assert_eq!(memo.title, "test".to_string());
+        assert_eq!(memo.content, "test".to_string());
+    }
+
+    #[tokio::test]
     async fn test_メモのタイトルだけを更新できること() {
         let sqlite_pool = setup_test_db().await;
 
@@ -469,7 +514,7 @@ mod tests {
 
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: Some(folder_id),
+            folder_id: Some(NullableId::Value(folder_id)),
             content: "test".to_string(),
             tags: Some(vec![tag_id]),
         };
@@ -518,7 +563,7 @@ mod tests {
 
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: Some(folder_id),
+            folder_id: Some(NullableId::Value(folder_id)),
             content: "test".to_string(),
             tags: Some(vec![tag_id]),
         };
@@ -571,7 +616,7 @@ mod tests {
 
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: Some(folder_id),
+            folder_id: Some(NullableId::Value(folder_id)),
             content: "test".to_string(),
             tags: Some(vec![tag_id]),
         };
@@ -628,7 +673,7 @@ mod tests {
         // 更新前のメモ
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: Some(folder_id),
+            folder_id: Some(NullableId::Value(folder_id)),
             content: "test".to_string(),
             tags: Some(vec![tag1_id]),
         };
@@ -642,7 +687,7 @@ mod tests {
         let update_memo = UpdateMemoIn {
             id: created_memo_id,
             title: Some("test".to_string()),
-            folder_id: Some(folder_id),
+            folder_id: Some(NullableId::Value(folder_id)),
             content: Some("test".to_string()),
             tags: Some(vec![tag2_id]),
         };
@@ -678,7 +723,7 @@ mod tests {
 
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: Some(folder_id),
+            folder_id: Some(NullableId::Value(folder_id)),
             content: "test".to_string(),
             tags: Some(vec![tag_id]),
         };
@@ -707,14 +752,14 @@ mod tests {
 
         let memo = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: None,
+            folder_id: Some(NullableId::Null),
             content: "test".to_string(),
             tags: Some(vec![]),
         };
         create_memo_in_db(sqlite_pool.clone(), memo).await.unwrap();
         let memo2 = CreateMemoIn {
             title: "test".to_string(),
-            folder_id: None,
+            folder_id: Some(NullableId::Null),
             content: "test".to_string(),
             tags: Some(vec![]),
         };
