@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Marked } from "marked";
 import { Box, Flex, Textarea } from "@chakra-ui/react";
 import { markedHighlight } from "marked-highlight";
@@ -87,8 +87,16 @@ export const EditorDisplay = ({
     });
   }, [theme]);
 
+  const [mdHtml, setMdHtml] = useState("");
   const markdownHtml = useMemo(() => {
-    return marked.parse(mdText);
+    const str = marked.parse(mdText);
+    if (typeof str === "string") {
+      setMdHtml(str);
+    } else {
+      str.then((res) => {
+        setMdHtml(res);
+      });
+    }
   }, [mdText]);
 
   useEffect(() => {
@@ -132,7 +140,7 @@ export const EditorDisplay = ({
           padding: "16px",
           overflowY: "auto",
         }}
-        dangerouslySetInnerHTML={{ __html: markdownHtml }}
+        dangerouslySetInnerHTML={{ __html: mdHtml }}
       />
     </Flex>
   );
