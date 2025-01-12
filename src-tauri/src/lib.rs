@@ -8,20 +8,24 @@ use commands::tag::{create_tag, delete_tag, get_tags};
 use sqlx::{Pool, Sqlite};
 use tauri::Manager;
 
-pub fn db_init() -> Result<Pool<Sqlite>, Box<dyn std::error::Error>> {
+pub fn db_init(app: &mut tauri::App) -> Result<Pool<Sqlite>, Box<dyn std::error::Error>> {
     use tauri::async_runtime::block_on;
+    println!("データベース接続・マイグレーション開始");
 
-    // プロジェクトのルートディレクトリを取得（src-tauriの親ディレクトリ）
-    let current_dir = std::env::current_dir()?
-        .parent()
-        .ok_or("Cannot get parent directory")?
-        .to_path_buf();
+    let current_dir: std::path::PathBuf = app.path().app_local_data_dir()?.to_path_buf();
+
+    println!("プロジェクトディレクトリ: {}", current_dir.display());
 
     let database_path = current_dir.join("md-memo-light-db").join("db.sqlite");
 
     // データベースディレクトリが存在しない場合は作成
     if let Some(parent) = database_path.parent() {
-        std::fs::create_dir_all(parent)?;
+        match std::fs::create_dir_all(parent) {
+            Ok(_) => {}
+            Err(e) => {
+                println!("データベースディレクトリ作成失敗: {}", e);
+            }
+        }
     }
 
     // パスを文字列に変換（Windows対応）
@@ -41,8 +45,9 @@ pub fn db_init() -> Result<Pool<Sqlite>, Box<dyn std::error::Error>> {
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
-pub fn run(sqlite_pool: Pool<Sqlite>) -> Result<(), Box<dyn std::error::Error>> {
+pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     tauri::Builder::default()
+        .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
@@ -62,6 +67,7 @@ pub fn run(sqlite_pool: Pool<Sqlite>) -> Result<(), Box<dyn std::error::Error>> 
         ])
         // ハンドラからコネクションプールにアクセスできるよう、登録する
         .setup(|app| {
+            let sqlite_pool = db_init(app)?;
             app.manage(sqlite_pool);
             Ok(())
         })
