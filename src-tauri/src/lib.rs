@@ -9,7 +9,6 @@ use sqlx::{Pool, Sqlite};
 use tauri::Manager;
 
 pub fn db_init(app: &mut tauri::App) -> Result<Pool<Sqlite>, Box<dyn std::error::Error>> {
-    println!("db_init");
     use tauri::async_runtime::block_on;
     println!("データベース接続・マイグレーション開始");
 
