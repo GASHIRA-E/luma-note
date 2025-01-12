@@ -1,6 +1,6 @@
 [package]
 name = "md-memo-light"
-version = "0.1.0"
+version = "0.0.1"
 description = "A Tauri App"
 authors = ["you"]
 edition = "2021"
@@ -30,3 +30,4 @@ dunce = "1.0.5"
 tokio-test = "0.4.0"
 typeshare = "1.0.4"
 tauri-plugin-store = "2"
+tauri-plugin-fs = "2"
