@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Marked } from "marked";
 import { Box, Flex, Textarea } from "@chakra-ui/react";
 import { markedHighlight } from "marked-highlight";
@@ -51,8 +51,8 @@ export const EditorDisplay = ({
 
   useEffect(() => {
     mermaid.initialize({
-      securityLevel: "loose",
-      theme: "dark",
+      // securityLevel: "loose",
+      // theme: "dark",
       darkMode: true,
     });
   }, []);
@@ -81,14 +81,10 @@ export const EditorDisplay = ({
         break;
     }
     document.head.appendChild(cssLink);
-
-    mermaid.initialize({
-      darkMode: theme === "dark",
-    });
   }, [theme]);
 
   const [mdHtml, setMdHtml] = useState("");
-  const markdownHtml = useMemo(() => {
+  useEffect(() => {
     const str = marked.parse(mdText);
     if (typeof str === "string") {
       setMdHtml(str);
@@ -101,7 +97,7 @@ export const EditorDisplay = ({
 
   useEffect(() => {
     mermaid.run();
-  }, [markdownHtml]);
+  }, [mdHtml]);
 
   return (
     <Flex flexGrow={1} overflow="hidden">
