@@ -51,8 +51,8 @@ export const EditorDisplay = ({
 
   useEffect(() => {
     mermaid.initialize({
-      // securityLevel: "loose",
-      // theme: "dark",
+      securityLevel: "loose",
+      theme: "dark",
       darkMode: true,
     });
   }, []);
@@ -81,6 +81,10 @@ export const EditorDisplay = ({
         break;
     }
     document.head.appendChild(cssLink);
+
+    mermaid.initialize({
+      theme: theme === "dark" ? "dark" : "default",
+    });
   }, [theme]);
 
   const [mdHtml, setMdHtml] = useState("");
