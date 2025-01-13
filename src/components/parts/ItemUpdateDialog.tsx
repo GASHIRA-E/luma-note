@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Input, Portal } from "@chakra-ui/react";
+import { Portal } from "@chakra-ui/react";
 import { Button } from "@/components/ui/button";
 
 import {
@@ -8,6 +8,7 @@ import {
   DialogFooter,
   DialogRoot,
 } from "@/components/ui/dialog";
+import { CustomInput } from "@/components/parts/CustomInput";
 
 type ItemUpdateDialogProps = {
   isOpen: boolean;
@@ -50,7 +51,7 @@ export const ItemUpdateDialog = ({
       <Portal>
         <DialogContent>
           <DialogBody>
-            <Input mb={4} value={inputValue} onChange={handleOnChange} />
+            <CustomInput mb={4} value={inputValue} onChange={handleOnChange} />
           </DialogBody>
           <DialogFooter>
             <Button onClick={onClose}>Cancel</Button>

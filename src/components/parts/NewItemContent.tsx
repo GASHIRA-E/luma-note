@@ -1,11 +1,12 @@
-import { Box, Button, Input } from "@chakra-ui/react";
+import type { ReactNode } from "react";
+import { Box, Button } from "@chakra-ui/react";
 import {
   PopoverBody,
   PopoverContent,
   PopoverRoot,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { ReactNode } from "react";
+import { CustomInput } from "@/components/parts/CustomInput";
 
 type NewItemPopoverProps = {
   isPopoverOpen: boolean;
@@ -38,7 +39,7 @@ export const NewItemPopover = ({
       <PopoverContent>
         <PopoverBody>
           <Box>
-            <Input
+            <CustomInput
               mb={2}
               width="full"
               value={inputValue}
