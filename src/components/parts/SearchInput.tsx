@@ -107,8 +107,12 @@ export const SearchInput = ({
             ))}
           </HStack>
           <HStack>
-            <Button onClick={onClickFilterButton}>絞り込む</Button>
-            <Button onClick={onClickClear}>絞り込みクリア</Button>
+            <Button colorPalette="teal" onClick={onClickFilterButton}>
+              絞り込む
+            </Button>
+            <Button variant="subtle" onClick={onClickClear}>
+              絞り込みクリア
+            </Button>
           </HStack>
         </PopoverBody>
       </PopoverContent>

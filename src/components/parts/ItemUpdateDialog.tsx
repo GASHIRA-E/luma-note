@@ -54,8 +54,12 @@ export const ItemUpdateDialog = ({
             <CustomInput mb={4} value={inputValue} onChange={handleOnChange} />
           </DialogBody>
           <DialogFooter>
-            <Button onClick={onClose}>Cancel</Button>
-            <Button onClick={onSave}>Save</Button>
+            <Button variant="subtle" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button colorPalette="teal" onClick={onSave}>
+              Save
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Portal>

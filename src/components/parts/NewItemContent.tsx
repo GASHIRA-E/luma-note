@@ -50,7 +50,7 @@ export const NewItemPopover = ({
                 }
               }}
             />
-            <Button mt={4} onClick={onClickCreate}>
+            <Button colorPalette="teal" mt={4} onClick={onClickCreate}>
               Create
             </Button>
           </Box>
