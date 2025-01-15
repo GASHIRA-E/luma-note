@@ -2,6 +2,8 @@ import { useState, useMemo, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { EditArea as EditorPresentation } from "@/components/presentation/EditArea";
+import { NotSelectedMemo } from "@/components/parts/NotSelectedMemo";
+
 import { getDetailMemoQuery, updateMemoMutation } from "@/utils/invoke/Memo";
 import { getTagsQuery, createTagMutation } from "@/utils/invoke/Tags";
 import { useEditorStore } from "@/utils/stores/editor";
@@ -112,7 +114,7 @@ export const EditArea = () => {
   }, [tags, tagsData]);
 
   if (!memoData || selectedMemoId === null) {
-    return <p>メモが選択されていません</p>;
+    return <NotSelectedMemo />;
   }
 
   return (
