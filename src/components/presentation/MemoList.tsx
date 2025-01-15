@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Heading, Flex, IconButton } from "@chakra-ui/react";
+import { Box, Flex, IconButton } from "@chakra-ui/react";
 import { HiPencilAlt } from "react-icons/hi";
 
 import { Button } from "@/components/ui/button";
@@ -50,9 +50,6 @@ export const MemoList: React.FC<MemoListProps> = ({
       borderRightColor="border"
     >
       <Box position="sticky" top={0} zIndex={1} bg="bg" pt={3}>
-        <Heading size="lg" mb={2}>
-          Memo List
-        </Heading>
         <Flex gap={1}>
           <NewItemPopover
             isPopoverOpen={isPopoverOpen}
@@ -63,7 +60,7 @@ export const MemoList: React.FC<MemoListProps> = ({
             onKeyPressEnter={onClickNewMemo}
           >
             <Button flex={1} mb={2}>
-              + 新規メモ
+              + New Memo
             </Button>
           </NewItemPopover>
           <IconButton onClick={onClickQuickCreateMemo}>
