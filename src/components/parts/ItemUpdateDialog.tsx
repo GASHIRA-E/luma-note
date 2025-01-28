@@ -51,7 +51,16 @@ export const ItemUpdateDialog = ({
       <Portal>
         <DialogContent>
           <DialogBody>
-            <CustomInput mb={4} value={inputValue} onChange={handleOnChange} />
+            <CustomInput
+              mb={4}
+              value={inputValue}
+              onChange={handleOnChange}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  onSave();
+                }
+              }}
+            />
           </DialogBody>
           <DialogFooter>
             <Button variant="subtle" onClick={onClose}>
