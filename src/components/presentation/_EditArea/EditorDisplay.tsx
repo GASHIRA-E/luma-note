@@ -1,54 +1,28 @@
-import { useEffect, useState } from "react";
-import { Marked } from "marked";
-import { Box, Flex, Textarea } from "@chakra-ui/react";
-import { markedHighlight } from "marked-highlight";
-import hljs from "highlight.js";
+import React, { useEffect, useMemo } from "react";
+// import { Marked } from "marked";
+import { Flex } from "@chakra-ui/react";
+// import { markedHighlight } from "marked-highlight";
+// import hljs from "highlight.js";
 import mermaid from "mermaid";
 
 import { DisplayModes, type DisplayMode } from "@/utils/constants";
-import { useScrollSync } from "@/utils/hooks/useScrollSync";
-import { type AppTheme } from "@/utils/constants";
+import { AppThemes, type AppTheme } from "@/utils/constants";
 
-import "highlight.js/styles/github-dark.min.css";
-
-import "github-markdown-css/github-markdown.css";
-import "github-markdown-css/github-markdown-dark.css";
-import "github-markdown-css/github-markdown-light.css";
-
-const marked = new Marked({
-  ...markedHighlight({
-    emptyLangClass: "hljs",
-    langPrefix: "hljs language-",
-    highlight: (code, lang) => {
-      if (lang === "mermaid") {
-        return `<div class="mermaid">${code}</div>`;
-      }
-      const language = hljs.getLanguage(lang) ? lang : "plaintext";
-      return hljs.highlight(code, { language: language }).value;
-    },
-  }),
-  renderer: {
-    link: ({ href, text }) => {
-      return `<a href="${href}" target="_blank" rel="noopener noreferrer">${text}</a>`;
-    },
-  },
-});
+import MDEditor, { commands } from "@uiw/react-md-editor";
 
 export type EditorDisplayProps = {
-  mdText: string;
+  mdText: string | undefined;
   theme: AppTheme;
   displayMode: DisplayMode;
-  updateMdText: (mdText: string) => void;
+  setMdText: React.Dispatch<React.SetStateAction<string | undefined>>;
 };
 
 export const EditorDisplay = ({
   mdText,
   theme,
   displayMode,
-  updateMdText,
+  setMdText,
 }: EditorDisplayProps) => {
-  const { ref1, ref2 } = useScrollSync<HTMLTextAreaElement>();
-
   useEffect(() => {
     mermaid.initialize({
       securityLevel: "loose",
@@ -57,90 +31,63 @@ export const EditorDisplay = ({
     });
   }, []);
 
+  // テーマ切り替え時にエディターのテーマを変更
   useEffect(() => {
-    // 既存のCSSを削除
-    document.head.querySelectorAll("#app-theme-css").forEach((el) => {
-      el.remove();
-    });
-    const cssLink = document.createElement("link");
-    cssLink.rel = "stylesheet";
-    cssLink.id = "app-theme-css";
-    cssLink.type = "text/css";
-
-    switch (theme) {
-      case "light":
-        cssLink.href =
-          "node_modules/github-markdown-css/github-markdown-light.css";
-        break;
-      case "dark":
-        cssLink.href =
-          "node_modules/github-markdown-css/github-markdown-dark.css";
-        break;
-      default:
-        cssLink.href = "node_modules/github-markdown-css/github-markdown.css";
-        break;
+    if (theme === AppThemes.DARK) {
+      document.documentElement.setAttribute("data-color-mode", "dark");
     }
-    document.head.appendChild(cssLink);
-
-    mermaid.initialize({
-      theme: theme === "dark" ? "dark" : "default",
-    });
+    if (theme === AppThemes.LIGHT) {
+      document.documentElement.setAttribute("data-color-mode", "light");
+    }
+    if (theme === AppThemes.SYSTEM) {
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        document.documentElement.setAttribute("data-color-mode", "dark");
+      } else {
+        document.documentElement.setAttribute("data-color-mode", "light");
+      }
+    }
   }, [theme]);
 
-  const [mdHtml, setMdHtml] = useState("");
-  useEffect(() => {
-    const str = marked.parse(mdText);
-    if (typeof str === "string") {
-      setMdHtml(str);
-    } else {
-      str.then((res) => {
-        setMdHtml(res);
-      });
+  const previewMode = useMemo<"live" | "edit" | "preview">(() => {
+    switch (displayMode) {
+      case DisplayModes.EDIT:
+        return "edit";
+      case DisplayModes.SPLIT:
+        return "live";
+      case DisplayModes.VIEW:
+        return "preview";
+      default:
+        return "edit";
     }
-  }, [mdText]);
+  }, [displayMode]);
 
-  useEffect(() => {
-    mermaid.run();
-  }, [mdHtml]);
+  const customCommands: commands.ICommand[] = [
+    commands.bold,
+    commands.italic,
+    commands.strikethrough,
+    commands.hr,
+    commands.title,
+    commands.divider,
+    commands.link,
+    commands.quote,
+    commands.image,
+    commands.table,
+    commands.divider,
+    commands.unorderedListCommand,
+    commands.orderedListCommand,
+  ];
 
   return (
     <Flex flexGrow={1} overflow="hidden">
-      <Textarea
-        ref={ref1}
-        display={displayMode === DisplayModes.VIEW ? "none" : "block"}
-        width={displayMode === DisplayModes.EDIT ? "100%" : "50%"}
-        style={{
-          height: "100%",
-          padding: "16px",
-          fontSize: "16px",
-          fontFamily: "monospace",
-          overflowY: "auto",
-          borderRadius: "0",
-        }}
-        focusRing="none"
-        css={{
-          "&:focus": {
-            borderColor: "transparent",
-          },
-        }}
-        variant="subtle"
-        onChange={(e) => updateMdText(e.target.value)}
-        // デザイン確認用に適当なmarkdownの初期値
+      <MDEditor
         value={mdText}
-      ></Textarea>
-      <Box
-        ref={ref2}
-        borderTop="1px solid"
-        borderColor="border.emphasized"
-        className="markdown-body"
-        display={displayMode === DisplayModes.EDIT ? "none" : "block"}
-        width={displayMode === DisplayModes.VIEW ? "100%" : "50%"}
+        onChange={setMdText}
+        height={"100%"}
         style={{
-          height: "100%",
-          padding: "16px",
-          overflowY: "auto",
+          width: "100%",
         }}
-        dangerouslySetInnerHTML={{ __html: mdHtml }}
+        preview={previewMode}
+        commands={customCommands}
       />
     </Flex>
   );

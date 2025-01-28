@@ -22,7 +22,7 @@ export const EditArea = () => {
   const { mutateAsync: createTagMutateAsync } = createTagMutation(queryClient);
 
   const [tags, setTags] = useState<string[]>([]);
-  const [mdText, setMdText] = useState("");
+  const [mdText, setMdText] = useState<string | undefined>(undefined);
 
   const { theme } = useAppSettingContext();
 
@@ -42,10 +42,9 @@ export const EditArea = () => {
     }
   );
 
-  const handleUpdateMdText = (mdText: string) => {
-    setMdText(mdText);
-    updateMdTextDebounce(mdText);
-  };
+  useEffect(() => {
+    updateMdTextDebounce(mdText || "");
+  }, [mdText]);
 
   useEffect(() => {
     if (memoData) {
@@ -129,7 +128,8 @@ export const EditArea = () => {
       editorDisplay={{
         mdText: mdText,
         theme: theme,
-        updateMdText: handleUpdateMdText,
+        // updateMdText: handleUpdateMdText,
+        setMdText: setMdText,
         displayMode: editorDisplayMode,
       }}
     />
