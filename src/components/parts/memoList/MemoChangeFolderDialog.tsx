@@ -81,8 +81,10 @@ export const MemoChangeFolderDialog = ({
             </NativeSelectRoot>
           </DialogBody>
           <DialogFooter>
-            <Button onClick={onClose}>Cancel</Button>
-            <Button onClick={onClickSave} color="fg.primary">
+            <Button variant="subtle" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button colorPalette="teal" onClick={onClickSave}>
               Change
             </Button>
           </DialogFooter>

@@ -1,4 +1,4 @@
-import { Input, HStack, Button, IconButton } from "@chakra-ui/react";
+import { HStack, Button, IconButton } from "@chakra-ui/react";
 import { HiCheck, HiXCircle } from "react-icons/hi";
 
 import {
@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/popover";
 import { Tag } from "@/components/ui/tag";
 import { InputGroup } from "@/components/ui/input-group";
+import { CustomInput } from "@/components/parts/CustomInput";
 
 type SearchInputProps = {
   /** 検索が行われたかどうかを示すステート(クリアボタンの活性化) */
@@ -77,7 +78,7 @@ export const SearchInput = ({
             </IconButton>
           }
         >
-          <Input
+          <CustomInput
             placeholder="メモタイトル"
             w={300}
             value={inputValue}
@@ -106,8 +107,12 @@ export const SearchInput = ({
             ))}
           </HStack>
           <HStack>
-            <Button onClick={onClickFilterButton}>絞り込む</Button>
-            <Button onClick={onClickClear}>絞り込みクリア</Button>
+            <Button colorPalette="teal" onClick={onClickFilterButton}>
+              絞り込む
+            </Button>
+            <Button variant="subtle" onClick={onClickClear}>
+              絞り込みクリア
+            </Button>
           </HStack>
         </PopoverBody>
       </PopoverContent>

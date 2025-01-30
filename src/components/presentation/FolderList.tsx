@@ -1,4 +1,4 @@
-import { Box, Flex, Heading, IconButton } from "@chakra-ui/react";
+import { Box, Flex, IconButton } from "@chakra-ui/react";
 import { Button } from "@/components/ui/button";
 import { HiPencilAlt } from "react-icons/hi";
 
@@ -34,20 +34,16 @@ export const FolderList = ({
 }: FolderListProps) => {
   return (
     <Box
-      w={240}
+      w={220}
       maxH="100vh"
       overflowY="auto"
-      px={3}
       pb={3}
       bg="bg"
       borderRightWidth={1}
       borderRightColor="border"
     >
       <Box position="sticky" top={0} zIndex={1} bg="bg" pt={3}>
-        <Heading size="lg" mb={2}>
-          Folder List
-        </Heading>
-        <Flex gap={1}>
+        <Flex gap={1} px={2}>
           <NewItemPopover
             isPopoverOpen={isPopoverOpen}
             setIsPopoverOpen={setIsPopoverOpen}
@@ -57,7 +53,7 @@ export const FolderList = ({
             onKeyPressEnter={onCreateFolder}
           >
             <Button flex={1} mb={2}>
-              + 新規フォルダー
+              + New Folder
             </Button>
           </NewItemPopover>
           <IconButton onClick={onClickQuickCreateFolder}>
@@ -65,7 +61,7 @@ export const FolderList = ({
           </IconButton>
         </Flex>
       </Box>
-      <Flex direction="column" gap={2} mt={3}>
+      <Flex direction="column" mt={3} gap={1}>
         {folderList.map((folder) => (
           <FolderItem key={`folder-list-${folder.folderId}`} {...folder} />
         ))}
