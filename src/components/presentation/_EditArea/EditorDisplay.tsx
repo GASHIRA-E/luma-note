@@ -1,54 +1,108 @@
-import { useEffect, useMemo, useState } from "react";
-import { Marked } from "marked";
-import { Box, Flex, Textarea } from "@chakra-ui/react";
-import { markedHighlight } from "marked-highlight";
-import hljs from "highlight.js";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  Fragment,
+  useRef,
+  useContext,
+  createContext,
+} from "react";
+import { Flex } from "@chakra-ui/react";
+import { getCodeString } from "rehype-rewrite";
 import mermaid from "mermaid";
 
 import { DisplayModes, type DisplayMode } from "@/utils/constants";
-import { useScrollSync } from "@/utils/hooks/useScrollSync";
-import { type AppTheme } from "@/utils/constants";
+import { AppThemes, type AppTheme } from "@/utils/constants";
 
-import "highlight.js/styles/github-dark.min.css";
+import MDEditor, { commands } from "@uiw/react-md-editor";
 
-import "github-markdown-css/github-markdown.css";
-import "github-markdown-css/github-markdown-dark.css";
-import "github-markdown-css/github-markdown-light.css";
-
-const marked = new Marked({
-  ...markedHighlight({
-    emptyLangClass: "hljs",
-    langPrefix: "hljs language-",
-    highlight: (code, lang) => {
-      if (lang === "mermaid") {
-        return `<div class="mermaid">${code}</div>`;
-      }
-      const language = hljs.getLanguage(lang) ? lang : "plaintext";
-      return hljs.highlight(code, { language: language }).value;
-    },
-  }),
-  renderer: {
-    link: ({ href, text }) => {
-      return `<a href="${href}" target="_blank" rel="noopener noreferrer">${text}</a>`;
-    },
-  },
+// themeを保持するコンテキスト
+const AppSettingContext = createContext<{
+  theme: AppTheme;
+}>({
+  theme: AppThemes.SYSTEM,
 });
 
 export type EditorDisplayProps = {
-  mdText: string;
+  mdText: string | undefined;
   theme: AppTheme;
   displayMode: DisplayMode;
-  updateMdText: (mdText: string) => void;
+  setMdText: React.Dispatch<React.SetStateAction<string | undefined>>;
+};
+
+const randomid = () => parseInt(String(Math.random() * 1e15), 10).toString(36);
+const Code = ({
+  inline,
+  children = [],
+  className,
+  ...props
+}: {
+  inline?: boolean;
+  children?: string[];
+  className?: string;
+  node?: {
+    children: any[];
+  };
+}) => {
+  const { theme } = useContext(AppSettingContext);
+  const demoid = useRef(`dome${randomid()}`);
+  const [container, setContainer] = useState<HTMLElement | null>(null);
+  const isMermaid =
+    className && /^language-mermaid/.test(className.toLocaleLowerCase());
+  const code: string =
+    props.node && props.node.children
+      ? getCodeString(props.node.children)
+      : children[0] || "";
+
+  const reRender = async () => {
+    if (container && isMermaid) {
+      try {
+        const str = await mermaid.render(demoid.current, code);
+        container.innerHTML = str.svg;
+      } catch (error) {
+        container.innerHTML = String(error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    reRender();
+  }, [container, isMermaid, code, demoid, theme]);
+
+  const refElement = useCallback((node: HTMLElement | null) => {
+    if (node !== null) {
+      setContainer(node);
+    }
+  }, []);
+
+  if (isMermaid) {
+    return (
+      <Fragment>
+        <code id={demoid.current} style={{ display: "none" }} />
+        <code ref={refElement} data-name="mermaid" />
+      </Fragment>
+    );
+  }
+  return <code className={className}>{children}</code>;
+};
+
+// 引用: https://qiita.com/wataru775/items/61db1371655897aea517 (感謝)
+const AnchorTag = ({ node, children, ...props }: any) => {
+  try {
+    new URL(props.href ?? "");
+    props.target = "_blank";
+    props.rel = "noopener noreferrer";
+  } catch (e) {}
+  return <a {...props}>{children}</a>;
 };
 
 export const EditorDisplay = ({
   mdText,
   theme,
   displayMode,
-  updateMdText,
+  setMdText,
 }: EditorDisplayProps) => {
-  const { ref1, ref2 } = useScrollSync<HTMLTextAreaElement>();
-
   useEffect(() => {
     mermaid.initialize({
       securityLevel: "loose",
@@ -57,91 +111,98 @@ export const EditorDisplay = ({
     });
   }, []);
 
+  // テーマ切り替え時にエディターのテーマを変更
   useEffect(() => {
-    // 既存のCSSを削除
-    document.head.querySelectorAll("#app-theme-css").forEach((el) => {
-      el.remove();
-    });
-    const cssLink = document.createElement("link");
-    cssLink.rel = "stylesheet";
-    cssLink.id = "app-theme-css";
-    cssLink.type = "text/css";
-
-    switch (theme) {
-      case "light":
-        cssLink.href =
-          "node_modules/github-markdown-css/github-markdown-light.css";
-        break;
-      case "dark":
-        cssLink.href =
-          "node_modules/github-markdown-css/github-markdown-dark.css";
-        break;
-      default:
-        cssLink.href = "node_modules/github-markdown-css/github-markdown.css";
-        break;
-    }
-    document.head.appendChild(cssLink);
-
-    mermaid.initialize({
-      darkMode: theme === "dark",
-    });
-  }, [theme]);
-
-  const [mdHtml, setMdHtml] = useState("");
-  const markdownHtml = useMemo(() => {
-    const str = marked.parse(mdText);
-    if (typeof str === "string") {
-      setMdHtml(str);
-    } else {
-      str.then((res) => {
-        setMdHtml(res);
+    if (theme === AppThemes.DARK) {
+      document.documentElement.setAttribute("data-color-mode", "dark");
+      mermaid.initialize({
+        theme: "dark",
+        darkMode: true,
       });
     }
-  }, [mdText]);
+    if (theme === AppThemes.LIGHT) {
+      document.documentElement.setAttribute("data-color-mode", "light");
+      mermaid.initialize({
+        theme: "default",
+        darkMode: false,
+      });
+    }
+    if (theme === AppThemes.SYSTEM) {
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        document.documentElement.setAttribute("data-color-mode", "dark");
+        mermaid.initialize({
+          theme: "dark",
+          darkMode: true,
+        });
+      } else {
+        document.documentElement.setAttribute("data-color-mode", "light");
+        mermaid.initialize({
+          theme: "default",
+          darkMode: false,
+        });
+      }
+    }
+  }, [theme]);
 
-  useEffect(() => {
-    mermaid.run();
-  }, [markdownHtml]);
+  const previewMode = useMemo<"live" | "edit" | "preview">(() => {
+    switch (displayMode) {
+      case DisplayModes.EDIT:
+        return "edit";
+      case DisplayModes.SPLIT:
+        return "live";
+      case DisplayModes.VIEW:
+        return "preview";
+      default:
+        return "edit";
+    }
+  }, [displayMode]);
+
+  const customCommands: commands.ICommand[] = [
+    commands.bold,
+    commands.italic,
+    commands.strikethrough,
+    commands.hr,
+    commands.divider,
+    commands.title1,
+    commands.title2,
+    commands.title3,
+    commands.title4,
+    commands.title5,
+    commands.title6,
+    commands.divider,
+    commands.link,
+    commands.quote,
+    commands.image,
+    commands.table,
+    commands.divider,
+    commands.unorderedListCommand,
+    commands.orderedListCommand,
+  ];
 
   return (
-    <Flex flexGrow={1} overflow="hidden">
-      <Textarea
-        ref={ref1}
-        display={displayMode === DisplayModes.VIEW ? "none" : "block"}
-        width={displayMode === DisplayModes.EDIT ? "100%" : "50%"}
-        style={{
-          height: "100%",
-          padding: "16px",
-          fontSize: "16px",
-          fontFamily: "monospace",
-          overflowY: "auto",
-          borderRadius: "0",
-        }}
-        focusRing="none"
-        css={{
-          "&:focus": {
-            borderColor: "transparent",
-          },
-        }}
-        variant="subtle"
-        onChange={(e) => updateMdText(e.target.value)}
-        // デザイン確認用に適当なmarkdownの初期値
-        value={mdText}
-      ></Textarea>
-      <Box
-        ref={ref2}
-        borderTop="1px solid"
-        borderColor="border.emphasized"
-        className="markdown-body"
-        display={displayMode === DisplayModes.EDIT ? "none" : "block"}
-        width={displayMode === DisplayModes.VIEW ? "100%" : "50%"}
-        style={{
-          height: "100%",
-          padding: "16px",
-          overflowY: "auto",
-        }}
-        dangerouslySetInnerHTML={{ __html: mdHtml }}
-      />
-    </Flex>
+    <AppSettingContext.Provider
+      value={{
+        theme,
+      }}
+    >
+      <Flex flexGrow={1} overflow="hidden">
+        <MDEditor
+          value={mdText}
+          onChange={setMdText}
+          height={"100%"}
+          style={{
+            width: "100%",
+          }}
+          preview={previewMode}
+          commands={customCommands}
+          previewOptions={{
+            components: {
+              a: AnchorTag,
+              code: Code as any,
+            },
+          }}
+        />
+      </Flex>
+    </AppSettingContext.Provider>
   );
 };

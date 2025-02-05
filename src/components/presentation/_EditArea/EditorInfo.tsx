@@ -1,5 +1,6 @@
-import { Box, Flex, Text, Input } from "@chakra-ui/react";
+import { Box, Flex, Text } from "@chakra-ui/react";
 import { Tag } from "@/components/ui/tag";
+import { CustomInput } from "@/components/parts/CustomInput";
 
 export type EditorInfoProps = {
   memoTitle: string;
@@ -34,7 +35,7 @@ export const EditorInfo = ({
             {tag}
           </Tag>
         ))}
-        <Input
+        <CustomInput
           placeholder="タグを追加"
           maxLength={12}
           width="60"

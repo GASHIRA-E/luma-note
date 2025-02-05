@@ -64,8 +64,10 @@ export const DeleteItemConfirmDialog = ({
             )}
           </DialogBody>
           <DialogFooter>
-            <Button onClick={onClose}>Cancel</Button>
-            <Button onClick={onDelete} color="fg.error">
+            <Button variant="subtle" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button onClick={onDelete} colorPalette="red">
               Delete
             </Button>
           </DialogFooter>

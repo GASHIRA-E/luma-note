@@ -1,5 +1,10 @@
 import { Box, Text, Float, Circle, HStack, IconButton } from "@chakra-ui/react";
-import { HiDotsHorizontal, HiTrash, HiPencil } from "react-icons/hi";
+import {
+  HiDotsHorizontal,
+  HiTrash,
+  HiPencil,
+  HiOutlineFolder,
+} from "react-icons/hi";
 import {
   MenuContent,
   MenuItem,
@@ -44,10 +49,9 @@ export const FolderItem = ({
     <Box
       position="relative"
       borderWidth={1}
-      borderColor="border"
+      borderColor="bg.subtle"
       bg={selected ? "bg.emphasized" : "bg.subtle"}
       p={2}
-      borderRadius={2}
       cursor="pointer"
       _hover={{
         borderColor: "border.inverted",
@@ -55,14 +59,21 @@ export const FolderItem = ({
       onClick={selected ? undefined : handleClick}
     >
       {memoCounts !== undefined ? (
-        <Float placement="top-end">
+        <Float placement="top-end" offsetX={3}>
           <Circle size={5} bg="teal.emphasized">
             {memoCounts}
           </Circle>
         </Float>
       ) : null}
       <HStack justifyContent="space-between" alignItems="center">
-        <Text textStyle="md">{name}</Text>
+        <HStack spaceX={1}>
+          <Box>
+            <HiOutlineFolder />
+          </Box>
+          <Text wordBreak="break-all" textStyle="sm">
+            {name}
+          </Text>
+        </HStack>
         {folderId !== null && (
           <MenuRoot onSelect={handleSelectMenu}>
             <MenuTrigger asChild>
