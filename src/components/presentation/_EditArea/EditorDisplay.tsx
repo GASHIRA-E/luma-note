@@ -87,6 +87,16 @@ const Code = ({
   return <code className={className}>{children}</code>;
 };
 
+// 引用: https://qiita.com/wataru775/items/61db1371655897aea517 (感謝)
+const AnchorTag = ({ node, children, ...props }: any) => {
+  try {
+    new URL(props.href ?? "");
+    props.target = "_blank";
+    props.rel = "noopener noreferrer";
+  } catch (e) {}
+  return <a {...props}>{children}</a>;
+};
+
 export const EditorDisplay = ({
   mdText,
   theme,
@@ -181,6 +191,7 @@ export const EditorDisplay = ({
           commands={customCommands}
           previewOptions={{
             components: {
+              a: AnchorTag,
               code: Code as any,
             },
           }}
