@@ -12,12 +12,7 @@
 - [tanstack query](https://tanstack.com/query/latest)
 - [scaffdog](https://scaff.dog/)
 
-#### エディタ周りのライブラリ
-
-- [marked](https://marked.js.org/)
-  - markdown テキストから html テキストへ変換を行うため
-- [highlight.js](https://highlightjs.org/)
-  - コード関連のハイライトを行うため
+- [react-md-editor](https://github.com/uiwjs/react-md-editor)
 
 ## Recommended IDE Setup
 
@@ -31,8 +26,6 @@ Template created! To get started run:
 
 ```bash
   npm install
-  # npm run tauri android init
-  # npm run tauri ios init
 ```
 
 ## build commands
@@ -41,18 +34,6 @@ For Desktop development, run:
 
 ```bash
   npm run tauri dev
-```
-
-For Android development, run:
-
-```bash
-  npm run tauri android dev
-```
-
-For iOS development, run:
-
-```bash
-  npm run tauri ios dev
 ```
 
 ## フロントエンド Tips
