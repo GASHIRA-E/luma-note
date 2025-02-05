@@ -1,8 +1,15 @@
-import React, { useEffect, useMemo } from "react";
-// import { Marked } from "marked";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  Fragment,
+  useRef,
+  useContext,
+  createContext,
+} from "react";
 import { Flex } from "@chakra-ui/react";
-// import { markedHighlight } from "marked-highlight";
-// import hljs from "highlight.js";
+import { getCodeString } from "rehype-rewrite";
 import mermaid from "mermaid";
 
 import { DisplayModes, type DisplayMode } from "@/utils/constants";
@@ -10,11 +17,74 @@ import { AppThemes, type AppTheme } from "@/utils/constants";
 
 import MDEditor, { commands } from "@uiw/react-md-editor";
 
+// themeを保持するコンテキスト
+const AppSettingContext = createContext<{
+  theme: AppTheme;
+}>({
+  theme: AppThemes.SYSTEM,
+});
+
 export type EditorDisplayProps = {
   mdText: string | undefined;
   theme: AppTheme;
   displayMode: DisplayMode;
   setMdText: React.Dispatch<React.SetStateAction<string | undefined>>;
+};
+
+const randomid = () => parseInt(String(Math.random() * 1e15), 10).toString(36);
+const Code = ({
+  inline,
+  children = [],
+  className,
+  ...props
+}: {
+  inline?: boolean;
+  children?: string[];
+  className?: string;
+  node?: {
+    children: any[];
+  };
+}) => {
+  const { theme } = useContext(AppSettingContext);
+  const demoid = useRef(`dome${randomid()}`);
+  const [container, setContainer] = useState<HTMLElement | null>(null);
+  const isMermaid =
+    className && /^language-mermaid/.test(className.toLocaleLowerCase());
+  const code: string =
+    props.node && props.node.children
+      ? getCodeString(props.node.children)
+      : children[0] || "";
+
+  const reRender = async () => {
+    if (container && isMermaid) {
+      try {
+        const str = await mermaid.render(demoid.current, code);
+        container.innerHTML = str.svg;
+      } catch (error) {
+        container.innerHTML = String(error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    reRender();
+  }, [container, isMermaid, code, demoid, theme]);
+
+  const refElement = useCallback((node: HTMLElement | null) => {
+    if (node !== null) {
+      setContainer(node);
+    }
+  }, []);
+
+  if (isMermaid) {
+    return (
+      <Fragment>
+        <code id={demoid.current} style={{ display: "none" }} />
+        <code ref={refElement} data-name="mermaid" />
+      </Fragment>
+    );
+  }
+  return <code className={className}>{children}</code>;
 };
 
 export const EditorDisplay = ({
@@ -35,15 +105,31 @@ export const EditorDisplay = ({
   useEffect(() => {
     if (theme === AppThemes.DARK) {
       document.documentElement.setAttribute("data-color-mode", "dark");
+      mermaid.initialize({
+        theme: "dark",
+        darkMode: true,
+      });
     }
     if (theme === AppThemes.LIGHT) {
       document.documentElement.setAttribute("data-color-mode", "light");
+      mermaid.initialize({
+        theme: "default",
+        darkMode: false,
+      });
     }
     if (theme === AppThemes.SYSTEM) {
       if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
         document.documentElement.setAttribute("data-color-mode", "dark");
+        mermaid.initialize({
+          theme: "dark",
+          darkMode: true,
+        });
       } else {
         document.documentElement.setAttribute("data-color-mode", "light");
+        mermaid.initialize({
+          theme: "default",
+          darkMode: false,
+        });
       }
     }
   }, [theme]);
@@ -78,17 +164,28 @@ export const EditorDisplay = ({
   ];
 
   return (
-    <Flex flexGrow={1} overflow="hidden">
-      <MDEditor
-        value={mdText}
-        onChange={setMdText}
-        height={"100%"}
-        style={{
-          width: "100%",
-        }}
-        preview={previewMode}
-        commands={customCommands}
-      />
-    </Flex>
+    <AppSettingContext.Provider
+      value={{
+        theme,
+      }}
+    >
+      <Flex flexGrow={1} overflow="hidden">
+        <MDEditor
+          value={mdText}
+          onChange={setMdText}
+          height={"100%"}
+          style={{
+            width: "100%",
+          }}
+          preview={previewMode}
+          commands={customCommands}
+          previewOptions={{
+            components: {
+              code: Code as any,
+            },
+          }}
+        />
+      </Flex>
+    </AppSettingContext.Provider>
   );
 };
