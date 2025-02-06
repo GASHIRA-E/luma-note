@@ -1,53 +1,68 @@
+use crate::error::{AppError, AppResult, ErrorResponse};
 use crate::types::TagInfo;
+use anyhow::Context;
 use sqlx::{Pool, Sqlite};
 
 #[tauri::command]
-pub async fn create_tag(state: tauri::State<'_, Pool<Sqlite>>, name: String) -> Result<i32, ()> {
-    let tag_id = create_tag_in_db(state.inner().clone(), name).await?;
-    Ok(tag_id)
+pub async fn create_tag(
+    state: tauri::State<'_, Pool<Sqlite>>,
+    name: String,
+) -> Result<i32, ErrorResponse> {
+    create_tag_in_db(state.inner().clone(), name)
+        .await
+        .map_err(Into::into)
 }
 
-pub async fn create_tag_in_db(sqlite_pool: Pool<Sqlite>, name: String) -> Result<i32, ()> {
+pub async fn create_tag_in_db(sqlite_pool: Pool<Sqlite>, name: String) -> AppResult<i32> {
     let tag = sqlx::query("INSERT INTO Tags (name) VALUES (?)")
         .bind(name)
         .execute(&sqlite_pool)
         .await
-        .unwrap();
+        .context("タグの作成に失敗しました")?;
     Ok(tag.last_insert_rowid() as i32)
 }
 
 #[tauri::command]
-pub async fn get_tags(state: tauri::State<'_, Pool<Sqlite>>) -> Result<Vec<TagInfo>, ()> {
-    let tags = get_tags_from_db(state.inner().clone()).await?;
-    Ok(tags)
+pub async fn get_tags(
+    state: tauri::State<'_, Pool<Sqlite>>,
+) -> Result<Vec<TagInfo>, ErrorResponse> {
+    get_tags_from_db(state.inner().clone())
+        .await
+        .map_err(Into::into)
 }
 
-async fn get_tags_from_db(sqlite_pool: Pool<Sqlite>) -> Result<Vec<TagInfo>, ()> {
+async fn get_tags_from_db(sqlite_pool: Pool<Sqlite>) -> AppResult<Vec<TagInfo>> {
     const SQL: &str = "SELECT id, name FROM Tags";
     let tags = sqlx::query_as::<_, TagInfo>(SQL)
         .fetch_all(&sqlite_pool)
         .await
-        .map_err(|_| ())?;
+        .context("タグの取得に失敗しました")?;
     Ok(tags)
 }
 
 #[tauri::command]
-pub async fn delete_tag(state: tauri::State<'_, Pool<Sqlite>>, tag_id: i32) -> Result<(), ()> {
-    delete_tag_in_db(state.inner().clone(), tag_id).await?;
-    Ok(())
+pub async fn delete_tag(
+    state: tauri::State<'_, Pool<Sqlite>>,
+    tag_id: i32,
+) -> Result<(), ErrorResponse> {
+    delete_tag_in_db(state.inner().clone(), tag_id)
+        .await
+        .map_err(Into::into)
 }
 
-async fn delete_tag_in_db(sqlite_pool: Pool<Sqlite>, tag_id: i32) -> Result<(), ()> {
+async fn delete_tag_in_db(sqlite_pool: Pool<Sqlite>, tag_id: i32) -> AppResult<()> {
     const SQL: &str = "DELETE FROM Tags WHERE id = ?";
     let result = sqlx::query(SQL)
         .bind(tag_id)
         .execute(&sqlite_pool)
         .await
-        .map_err(|_| ())?;
+        .context("タグの削除に失敗しました")?;
 
     // 削除された行が0の場合（該当するIDが存在しない場合）はエラーを返す
     if result.rows_affected() == 0 {
-        return Err(());
+        return Err(anyhow::Error::from(AppError::NotFound(
+            "タグが見つかりませんでした".to_string(),
+        )));
     }
     Ok(())
 }

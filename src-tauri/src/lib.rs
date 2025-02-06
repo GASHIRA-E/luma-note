@@ -1,5 +1,6 @@
 mod commands;
 mod database;
+mod error;
 mod types;
 use commands::folder::{create_folder, delete_folder, get_folders, update_folder};
 use commands::memo::{create_memo, delete_memo, get_detail_memo, get_memo_list, update_memo};

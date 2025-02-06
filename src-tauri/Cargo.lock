@@ -76,9 +76,9 @@ dependencies = [
 
 [[package]]
 name = "anyhow"
-version = "1.0.94"
+version = "1.0.95"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c1fd03a028ef38ba2276dce7e33fcd6369c158a1bca17946c4b1b701891c1ff7"
+checksum = "34ac096ce696dc2fcabef30516bb13c0a68a11d30131d3df6f04711467681b04"
 
 [[package]]
 name = "async-stream"
@@ -2053,6 +2053,7 @@ dependencies = [
 name = "md-memo-light"
 version = "0.0.1"
 dependencies = [
+ "anyhow",
  "directories",
  "dunce",
  "futures",
@@ -2064,6 +2065,7 @@ dependencies = [
  "tauri-plugin-fs",
  "tauri-plugin-shell",
  "tauri-plugin-store",
+ "thiserror 2.0.11",
  "tokio",
  "tokio-test",
  "typeshare",
@@ -3998,7 +4000,7 @@ dependencies = [
  "tauri-runtime",
  "tauri-runtime-wry",
  "tauri-utils",
- "thiserror 2.0.4",
+ "thiserror 2.0.11",
  "tokio",
  "tray-icon",
  "url",
@@ -4051,7 +4053,7 @@ dependencies = [
  "sha2",
  "syn 2.0.90",
  "tauri-utils",
- "thiserror 2.0.4",
+ "thiserror 2.0.11",
  "time",
  "url",
  "uuid",
@@ -4106,7 +4108,7 @@ dependencies = [
  "tauri",
  "tauri-plugin",
  "tauri-utils",
- "thiserror 2.0.4",
+ "thiserror 2.0.11",
  "toml 0.8.2",
  "url",
  "uuid",
@@ -4144,7 +4146,7 @@ dependencies = [
  "serde_json",
  "tauri",
  "tauri-plugin",
- "thiserror 2.0.4",
+ "thiserror 2.0.11",
  "tokio",
  "tracing",
 ]
@@ -4163,7 +4165,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tauri-utils",
- "thiserror 2.0.4",
+ "thiserror 2.0.11",
  "url",
  "windows",
 ]
@@ -4223,7 +4225,7 @@ dependencies = [
  "serde_json",
  "serde_with",
  "swift-rs",
- "thiserror 2.0.4",
+ "thiserror 2.0.11",
  "toml 0.8.2",
  "url",
  "urlpattern",
@@ -4282,11 +4284,11 @@ dependencies = [
 
 [[package]]
 name = "thiserror"
-version = "2.0.4"
+version = "2.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2f49a1853cf82743e3b7950f77e0f4d622ca36cf4317cba00c767838bac8d490"
+checksum = "d452f284b73e6d76dd36758a0c8684b1d5be31f92b89d07fd5822175732206fc"
 dependencies = [
- "thiserror-impl 2.0.4",
+ "thiserror-impl 2.0.11",
 ]
 
 [[package]]
@@ -4302,9 +4304,9 @@ dependencies = [
 
 [[package]]
 name = "thiserror-impl"
-version = "2.0.4"
+version = "2.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8381894bb3efe0c4acac3ded651301ceee58a15d47c2e34885ed1908ad667061"
+checksum = "26afc1baea8a989337eeb52b6e72a039780ce45c3edfcc9c5b9d112feeb173c2"
 dependencies = [
  "proc-macro2",
  "quote",
