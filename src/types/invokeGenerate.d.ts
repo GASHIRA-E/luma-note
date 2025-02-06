@@ -41,6 +41,24 @@ export interface DetailMemoInfo {
 	tags?: TagInfo[];
 }
 
+export enum ErrorCode {
+	DatabaseError = "DatabaseError",
+	NotFound = "NotFound",
+	ValidationError = "ValidationError",
+	SystemError = "SystemError",
+	Unauthorized = "Unauthorized",
+	UnknownError = "UnknownError",
+}
+
+export interface ErrorResponse {
+	/** エラーコード */
+	code: ErrorCode;
+	/** エラーメッセージ */
+	message: string;
+	/** 詳細情報（開発環境でのみ使用） */
+	details?: string;
+}
+
 export interface FolderInfo {
 	/** フォルダID */
 	id: number;
