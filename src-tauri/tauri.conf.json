@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "md-memo-light",
+  "productName": "luma-note",
   "version": "0.0.1",
-  "identifier": "gashira-e.com",
+  "identifier": "com.gashira-e.luma-note",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "md-memo-light",
+        "title": "luma-note",
         "width": 1200,
         "height": 800
       }
