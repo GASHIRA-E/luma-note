@@ -14,8 +14,9 @@ import mermaid from "mermaid";
 
 import { DisplayModes, type DisplayMode } from "@/utils/constants";
 import { AppThemes, type AppTheme } from "@/utils/constants";
+import { useDebounce } from "@/utils/hooks/useDebounce";
 
-import MDEditor, { commands } from "@uiw/react-md-editor";
+import MDEditor, { commands, type MDEditorProps } from "@uiw/react-md-editor";
 
 // themeを保持するコンテキスト
 const AppSettingContext = createContext<{
@@ -28,7 +29,7 @@ export type EditorDisplayProps = {
   mdText: string | undefined;
   theme: AppTheme;
   displayMode: DisplayMode;
-  setMdText: React.Dispatch<React.SetStateAction<string | undefined>>;
+  saveMdText: (mdText: string) => void;
 };
 
 const randomid = () => parseInt(String(Math.random() * 1e15), 10).toString(36);
@@ -101,8 +102,23 @@ export const EditorDisplay = ({
   mdText,
   theme,
   displayMode,
-  setMdText,
+  saveMdText,
 }: EditorDisplayProps) => {
+  const [mdLocalText, setMdLocalText] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    setMdLocalText(mdText);
+  }, [mdText]);
+
+  const saveMdTextDebounce = useDebounce(
+    (mdText: string) => {
+      saveMdText(mdText);
+    },
+    {
+      delay: 500,
+    }
+  );
+
   useEffect(() => {
     mermaid.initialize({
       securityLevel: "loose",
@@ -179,6 +195,14 @@ export const EditorDisplay = ({
     commands.orderedListCommand,
   ];
 
+  const handleChange: MDEditorProps["onChange"] = (value) => {
+    // Add this condition
+    setMdLocalText(value);
+    if (value !== undefined) {
+      saveMdTextDebounce(value);
+    }
+  };
+
   return (
     <AppSettingContext.Provider
       value={{
@@ -187,8 +211,8 @@ export const EditorDisplay = ({
     >
       <Flex flexGrow={1} overflow="hidden">
         <MDEditor
-          value={mdText}
-          onChange={setMdText}
+          value={mdLocalText}
+          onChange={handleChange}
           height={"100%"}
           style={{
             width: "100%",

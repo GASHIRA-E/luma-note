@@ -7,7 +7,6 @@ import { NotSelectedMemo } from "@/components/parts/NotSelectedMemo";
 import { getDetailMemoQuery, updateMemoMutation } from "@/utils/invoke/Memo";
 import { getTagsQuery, createTagMutation } from "@/utils/invoke/Tags";
 import { useEditorStore } from "@/utils/stores/editor";
-import { useDebounce } from "@/utils/hooks/useDebounce";
 import { useAppSettingContext } from "@/components/context/AppSettingContext";
 
 export const EditArea = () => {
@@ -26,25 +25,15 @@ export const EditArea = () => {
 
   const { theme } = useAppSettingContext();
 
-  const updateMdTextDebounce = useDebounce(
-    (mdText: string) => {
-      if (!selectedMemoId) return;
-      setMdText(mdText);
-      updateMemoMutate({
-        memo: {
-          id: selectedMemoId,
-          content: mdText,
-        },
-      });
-    },
-    {
-      delay: 500,
-    }
-  );
-
-  useEffect(() => {
-    updateMdTextDebounce(mdText || "");
-  }, [mdText]);
+  const handleSaveMdText = (mdText: string) => {
+    if (!selectedMemoId) return;
+    updateMemoMutate({
+      memo: {
+        id: selectedMemoId,
+        content: mdText,
+      },
+    });
+  };
 
   useEffect(() => {
     if (memoData) {
@@ -128,8 +117,7 @@ export const EditArea = () => {
       editorDisplay={{
         mdText: mdText,
         theme: theme,
-        // updateMdText: handleUpdateMdText,
-        setMdText: setMdText,
+        saveMdText: handleSaveMdText,
         displayMode: editorDisplayMode,
       }}
     />
