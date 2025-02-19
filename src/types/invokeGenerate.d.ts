@@ -48,6 +48,8 @@ export interface FolderInfo {
 	name: string;
 	/** フォルダ更新日時 */
 	updated_at: string;
+	/** フォルダにあるメモの件数 */
+	memo_count: number;
 }
 
 export interface MemoListInfo {
