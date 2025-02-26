@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, createContext, useRef } from "react";
+import { useState, useEffect, useMemo, createContext } from "react";
 import { Flex } from "@chakra-ui/react";
 import mermaid from "mermaid";
 
