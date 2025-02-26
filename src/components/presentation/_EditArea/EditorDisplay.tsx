@@ -1,24 +1,18 @@
-import React, {
-  useState,
-  useEffect,
-  useMemo,
-  useCallback,
-  Fragment,
-  useRef,
-  useContext,
-  createContext,
-} from "react";
+import { useState, useEffect, useMemo, createContext } from "react";
 import { Flex } from "@chakra-ui/react";
-import { getCodeString } from "rehype-rewrite";
 import mermaid from "mermaid";
 
 import { DisplayModes, type DisplayMode } from "@/utils/constants";
 import { AppThemes, type AppTheme } from "@/utils/constants";
+import { useDebounce } from "@/utils/hooks/useDebounce";
 
-import MDEditor, { commands } from "@uiw/react-md-editor";
+import MDEditor, { commands, type MDEditorProps } from "@uiw/react-md-editor";
+
+import { Code } from "@/components/parts/editor/editorDisplay/Code";
+import { AnchorTag } from "@/components/parts/editor/editorDisplay/AnchorTag";
 
 // themeを保持するコンテキスト
-const AppSettingContext = createContext<{
+export const AppSettingContext = createContext<{
   theme: AppTheme;
 }>({
   theme: AppThemes.SYSTEM,
@@ -28,81 +22,30 @@ export type EditorDisplayProps = {
   mdText: string | undefined;
   theme: AppTheme;
   displayMode: DisplayMode;
-  setMdText: React.Dispatch<React.SetStateAction<string | undefined>>;
-};
-
-const randomid = () => parseInt(String(Math.random() * 1e15), 10).toString(36);
-const Code = ({
-  inline,
-  children = [],
-  className,
-  ...props
-}: {
-  inline?: boolean;
-  children?: string[];
-  className?: string;
-  node?: {
-    children: any[];
-  };
-}) => {
-  const { theme } = useContext(AppSettingContext);
-  const demoid = useRef(`dome${randomid()}`);
-  const [container, setContainer] = useState<HTMLElement | null>(null);
-  const isMermaid =
-    className && /^language-mermaid/.test(className.toLocaleLowerCase());
-  const code: string =
-    props.node && props.node.children
-      ? getCodeString(props.node.children)
-      : children[0] || "";
-
-  const reRender = async () => {
-    if (container && isMermaid) {
-      try {
-        const str = await mermaid.render(demoid.current, code);
-        container.innerHTML = str.svg;
-      } catch (error) {
-        container.innerHTML = String(error);
-      }
-    }
-  };
-
-  useEffect(() => {
-    reRender();
-  }, [container, isMermaid, code, demoid, theme]);
-
-  const refElement = useCallback((node: HTMLElement | null) => {
-    if (node !== null) {
-      setContainer(node);
-    }
-  }, []);
-
-  if (isMermaid) {
-    return (
-      <Fragment>
-        <code id={demoid.current} style={{ display: "none" }} />
-        <code ref={refElement} data-name="mermaid" />
-      </Fragment>
-    );
-  }
-  return <code className={className}>{children}</code>;
-};
-
-// 引用: https://qiita.com/wataru775/items/61db1371655897aea517 (感謝)
-const AnchorTag = ({ node, children, ...props }: any) => {
-  try {
-    new URL(props.href ?? "");
-    props.target = "_blank";
-    props.rel = "noopener noreferrer";
-  } catch (e) {}
-  return <a {...props}>{children}</a>;
+  saveMdText: (mdText: string) => void;
 };
 
 export const EditorDisplay = ({
   mdText,
   theme,
   displayMode,
-  setMdText,
+  saveMdText,
 }: EditorDisplayProps) => {
+  const [mdLocalText, setMdLocalText] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    setMdLocalText(mdText);
+  }, [mdText]);
+
+  const saveMdTextDebounce = useDebounce(
+    (mdText: string) => {
+      saveMdText(mdText);
+    },
+    {
+      delay: 500,
+    }
+  );
+
   useEffect(() => {
     mermaid.initialize({
       securityLevel: "loose",
@@ -179,6 +122,14 @@ export const EditorDisplay = ({
     commands.orderedListCommand,
   ];
 
+  const handleChange: MDEditorProps["onChange"] = (value) => {
+    // Add this condition
+    setMdLocalText(value);
+    if (value !== undefined) {
+      saveMdTextDebounce(value);
+    }
+  };
+
   return (
     <AppSettingContext.Provider
       value={{
@@ -187,9 +138,9 @@ export const EditorDisplay = ({
     >
       <Flex flexGrow={1} overflow="hidden">
         <MDEditor
-          value={mdText}
-          onChange={setMdText}
-          height={"100%"}
+          value={mdLocalText}
+          onChange={handleChange}
+          height="100%"
           style={{
             width: "100%",
           }}

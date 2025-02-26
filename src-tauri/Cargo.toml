@@ -1,6 +1,6 @@
 [package]
-name = "md-memo-light"
-version = "0.0.1"
+name = "luma-note"
+version = "0.0.2"
 description = "A Tauri App"
 authors = ["you"]
 edition = "2021"

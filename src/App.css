@@ -16,3 +16,7 @@ body {
   flex: 1 1 auto;
   overflow: hidden;
 }
+
+.w-md-editor-text {
+  min-height: 100% !important;
+}

@@ -7,8 +7,16 @@ pub async fn get_folders(state: tauri::State<'_, Pool<Sqlite>>) -> Result<Vec<Fo
 }
 
 async fn get_folders_from_db(sqlite_pool: Pool<Sqlite>) -> Result<Vec<FolderInfo>, ()> {
-    // TODO 各フォルダにあるメモの件数も返す
-    const SQL: &str = "SELECT id, name, updated_at FROM Folders";
+    const SQL: &str = "
+        SELECT 
+            f.id,
+            f.name,
+            f.updated_at,
+            COUNT(m.id) as memo_count
+        FROM Folders f
+        LEFT JOIN Memos m ON f.id = m.folder_id 
+        GROUP BY f.id, f.name, f.updated_at
+    ";
     let folders = sqlx::query_as::<_, FolderInfo>(SQL)
         .fetch_all(&sqlite_pool)
         .await
@@ -121,21 +129,35 @@ mod tests {
         assert!(result.is_ok());
 
         // 作成されたデータを確認
-        let folder = sqlx::query_as::<_, FolderInfo>("SELECT * FROM Folders WHERE name = ?")
-            .bind("test")
-            .fetch_one(&sqlite_pool)
-            .await
-            .unwrap();
+        let folder = sqlx::query_as::<_, FolderInfo>(
+            "
+            SELECT 
+                f.id,
+                f.name,
+                f.updated_at,
+                COUNT(m.id) as memo_count
+            FROM Folders f
+            LEFT JOIN Memos m ON f.id = m.folder_id 
+            WHERE f.name = ?
+            GROUP BY f.id, f.name, f.updated_at
+        ",
+        )
+        .bind("test")
+        .fetch_one(&sqlite_pool)
+        .await
+        .unwrap();
 
         assert_eq!(result.unwrap(), 1);
         assert_eq!(folder.name, "test");
+        assert_eq!(folder.memo_count, 0);
     }
 
     #[tokio::test]
     async fn test_フォルダ取得できること() {
         let sqlite_pool = setup_test_db().await;
 
-        create_folder_in_db(sqlite_pool.clone(), "test".to_string())
+        // フォルダを2つ作成
+        create_folder_in_db(sqlite_pool.clone(), "test1".to_string())
             .await
             .unwrap();
         create_folder_in_db(sqlite_pool.clone(), "test2".to_string())
@@ -143,8 +165,65 @@ mod tests {
             .unwrap();
 
         let result = get_folders_from_db(sqlite_pool).await;
+        let folders = result.unwrap();
 
-        assert_eq!(result.unwrap().len(), 2);
+        assert_eq!(folders.len(), 2);
+        assert_eq!(folders[0].name, "test1");
+        assert_eq!(folders[0].memo_count, 0);
+        assert_eq!(folders[1].name, "test2");
+        assert_eq!(folders[1].memo_count, 0);
+    }
+
+    #[tokio::test]
+    async fn test_フォルダ内のメモ件数が正しく取得できること() {
+        let sqlite_pool = setup_test_db().await;
+
+        // フォルダを2つ作成
+        let folder1_id = create_folder_in_db(sqlite_pool.clone(), "test1".to_string())
+            .await
+            .unwrap();
+        let folder2_id = create_folder_in_db(sqlite_pool.clone(), "test2".to_string())
+            .await
+            .unwrap();
+
+        // folder1に2つのメモを作成
+        let create_memo_in1 = CreateMemoIn {
+            title: "memo1".to_string(),
+            content: "content1".to_string(),
+            folder_id: Some(NullableId::Value(folder1_id)),
+            tags: None,
+        };
+        create_memo_in_db(sqlite_pool.clone(), create_memo_in1.clone())
+            .await
+            .unwrap();
+        create_memo_in_db(sqlite_pool.clone(), create_memo_in1.clone())
+            .await
+            .unwrap();
+
+        // folder2に1つのメモを作成
+        let create_memo_in2 = CreateMemoIn {
+            title: "memo2".to_string(),
+            content: "content2".to_string(),
+            folder_id: Some(NullableId::Value(folder2_id)),
+            tags: None,
+        };
+        create_memo_in_db(sqlite_pool.clone(), create_memo_in2)
+            .await
+            .unwrap();
+
+        let result = get_folders_from_db(sqlite_pool).await;
+        let folders = result.unwrap();
+
+        assert_eq!(folders.len(), 2);
+        // folder1の確認
+        let folder1 = folders.iter().find(|f| f.id == folder1_id).unwrap();
+        assert_eq!(folder1.name, "test1");
+        assert_eq!(folder1.memo_count, 2);
+
+        // folder2の確認
+        let folder2 = folders.iter().find(|f| f.id == folder2_id).unwrap();
+        assert_eq!(folder2.name, "test2");
+        assert_eq!(folder2.memo_count, 1);
     }
 
     #[tokio::test]

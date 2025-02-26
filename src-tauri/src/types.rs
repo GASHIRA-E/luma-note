@@ -120,4 +120,6 @@ pub struct FolderInfo {
     pub name: String,
     /// フォルダ更新日時
     pub updated_at: String,
+    /// フォルダにあるメモの件数
+    pub memo_count: i32,
 }
