@@ -4,20 +4,31 @@ import { useQueryClient } from "@tanstack/react-query";
 import { EditArea as EditorPresentation } from "@/components/presentation/EditArea";
 import { NotSelectedMemo } from "@/components/parts/NotSelectedMemo";
 
-import { getDetailMemoQuery, updateMemoMutation } from "@/utils/invoke/Memo";
+import {
+  getDetailMemoQuery,
+  updateMemoMutation,
+  getMemoListQuery,
+} from "@/utils/invoke/Memo";
 import { getTagsQuery, createTagMutation } from "@/utils/invoke/Tags";
+
+import { useFolderStore } from "@/utils/stores/folder";
 import { useEditorStore } from "@/utils/stores/editor";
 import { useAppSettingContext } from "@/components/context/AppSettingContext";
 
 export const EditArea = () => {
   const editorDisplayMode = useEditorStore((state) => state.displayMode);
   const selectedMemoId = useEditorStore((state) => state.selectedMemoId);
+  const selectedFolderId = useFolderStore((state) => state.selectedFolderId);
 
   const { data: memoData } = getDetailMemoQuery({ memoId: selectedMemoId });
   const { data: tagsData } = getTagsQuery();
+  const { refetch: refetchGetMemoList } = getMemoListQuery({
+    folderId: selectedFolderId,
+  });
 
   const queryClient = useQueryClient();
-  const { mutate: updateMemoMutate } = updateMemoMutation(queryClient);
+  const { mutate: updateMemoMutate, mutateAsync: updateMemoMutateAsync } =
+    updateMemoMutation(queryClient);
   const { mutateAsync: createTagMutateAsync } = createTagMutation(queryClient);
 
   const [tags, setTags] = useState<string[]>([]);
@@ -101,6 +112,18 @@ export const EditArea = () => {
     });
   }, [tags, tagsData]);
 
+  const handleTitleChange = (newTitle: string) => {
+    if (!selectedMemoId) return;
+    updateMemoMutateAsync({
+      memo: {
+        id: selectedMemoId,
+        title: newTitle,
+      },
+    }).then(() => {
+      refetchGetMemoList();
+    });
+  };
+
   if (!memoData || selectedMemoId === null) {
     return <NotSelectedMemo />;
   }
@@ -113,6 +136,7 @@ export const EditArea = () => {
         availableTags: availableTags,
         addTag: handleAddTag,
         removeTag: handleRemoveTag,
+        onTitleChange: handleTitleChange,
       }}
       editorDisplay={{
         mdText: mdText,
