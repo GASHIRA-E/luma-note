@@ -38,10 +38,12 @@ For Desktop development, run:
 
 ### npm scripts
 
-| command             | 目的                              |
-| ------------------- | --------------------------------- |
-| `npm run web`       | Mock を使用してフロントを起動する |
-| `npm run tauri dev` | tauri アプリを起動する            |
+| command                | 目的                                    |
+|-----------------------|----------------------------------------|
+| `npm run web`         | Mock を使用してフロントを起動する           |
+| `npm run tauri dev`   | 開発用DBで tauri アプリを起動する          |
+| `npm run tauri:prod dev` | 本番用DBで tauri アプリを起動する（動作確認用） |
+| `npm run tauri build` | 本番用アプリケーションをビルドする（本番DB使用） |
 
 ### ディレクトリ構成
 
@@ -227,3 +229,43 @@ cargo run --example [example対象]
 - `sample_simple`
   - `cargo run --example sample_simple`
   - シンプルなデータを追加する
+
+## 環境分けについて
+
+アプリケーションは開発環境と本番環境で異なるデータベースを使用します：
+
+### データベースの環境分け
+
+- 開発環境
+  - 保存場所: `{app_local_data_dir}/md-memo-light-db-dev/db.sqlite`
+  - 使用コマンド: `npm run tauri dev`
+  - 開発やテスト用のデータを保存
+
+- 本番環境
+  - 保存場所: `{app_local_data_dir}/md-memo-light-db/db.sqlite`
+  - 使用コマンド: `npm run tauri:prod dev`（動作確認用）
+  - ビルド版でも使用
+  - 実際の利用データを保存
+
+※ `{app_local_data_dir}` は OS によって異なります：
+- Windows: `C:\Users\{ユーザー名}\AppData\Local\{アプリ名}`
+- macOS: `~/Library/Application Support/{アプリ名}`
+- Linux: `~/.local/share/{アプリ名}`
+
+### ビルド生成物
+
+`npm run tauri build` を実行すると、本番用アプリケーションがビルドされます（`md-memo-light-db/db.sqlite`を使用）。
+ビルド生成物は以下の場所に作成されます：
+
+```
+src-tauri/target/release/bundle/
+```
+
+各OS向けのインストーラー：
+- Windows: `src-tauri/target/release/bundle/msi/` (.msi)
+- macOS: `src-tauri/target/release/bundle/dmg/` (.dmg)
+- Linux: `src-tauri/target/release/bundle/deb/` (.deb)
+
+実行可能ファイル：
+- Windows: `src-tauri/target/release/luma-note.exe`
+- macOS/Linux: `src-tauri/target/release/luma-note`
