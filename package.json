@@ -4,11 +4,12 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "cross-env VITE_ENV=development vite",
     "web": "vite --mode mock",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "cross-env VITE_ENV=development tauri",
+    "tauri:prod": "cross-env VITE_ENV=production tauri"
   },
   "dependencies": {
     "@chakra-ui/react": "^3.2.3",
@@ -33,6 +34,7 @@
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "@vitejs/plugin-react": "^4.2.1",
+    "cross-env": "^7.0.3",
     "scaffdog": "^4.1.0",
     "typescript": "^5.2.2",
     "vite": "^5.3.1"

@@ -13,10 +13,13 @@ pub fn db_init(app: &mut tauri::App) -> Result<Pool<Sqlite>, Box<dyn std::error:
     println!("データベース接続・マイグレーション開始");
 
     let current_dir: std::path::PathBuf = app.path().app_local_data_dir()?.to_path_buf();
-
     println!("プロジェクトディレクトリ: {}", current_dir.display());
 
-    let database_path = current_dir.join("md-memo-light-db").join("db.sqlite");
+    // 環境変数から現在の環境を取得
+    let env = std::env::var("VITE_ENV").unwrap_or_else(|_| "production".to_string());
+
+    // データベースパスを環境に応じて生成
+    let database_path = database::get_database_path(&current_dir, &env);
 
     // データベースディレクトリが存在しない場合は作成
     if let Some(parent) = database_path.parent() {

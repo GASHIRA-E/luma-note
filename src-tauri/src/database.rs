@@ -47,3 +47,12 @@ async fn create_tables(pool: &Pool<Sqlite>) {
     let sql = include_str!("../../migrations/0001_init_tables.up.sql");
     sqlx::query(sql).execute(pool).await.unwrap();
 }
+
+/// DBのパスを環境に応じて生成する
+pub(crate) fn get_database_path(app_dir: &std::path::Path, env: &str) -> std::path::PathBuf {
+    let db_name = match env {
+        "development" => "md-memo-light-db-dev",
+        _ => "md-memo-light-db",
+    };
+    app_dir.join(db_name).join("db.sqlite")
+}
