@@ -4,12 +4,11 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "cross-env VITE_ENV=development vite",
+    "dev": "vite",
     "web": "vite --mode mock",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "tauri": "cross-env VITE_ENV=development tauri",
-    "tauri:prod": "cross-env VITE_ENV=production tauri"
+    "tauri": "tauri"
   },
   "dependencies": {
     "@chakra-ui/react": "^3.2.3",

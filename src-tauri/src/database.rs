@@ -49,10 +49,17 @@ async fn create_tables(pool: &Pool<Sqlite>) {
 }
 
 /// DBのパスを環境に応じて生成する
-pub(crate) fn get_database_path(app_dir: &std::path::Path, env: &str) -> std::path::PathBuf {
-    let db_name = match env {
-        "development" => "md-memo-light-db-dev",
-        _ => "md-memo-light-db",
+pub(crate) fn get_database_path(app_dir: &std::path::Path) -> std::path::PathBuf {
+    // TAURI_ENV_DEBUGが"true"の場合は開発環境
+    let is_debug = std::env::var("TAURI_ENV_DEBUG")
+        .map(|v| v == "true")
+        .unwrap_or(false);
+
+    let db_name = if is_debug {
+        "md-memo-light-db-dev"
+    } else {
+        "md-memo-light-db"
     };
+
     app_dir.join(db_name).join("db.sqlite")
 }
