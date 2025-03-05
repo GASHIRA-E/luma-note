@@ -33,7 +33,6 @@
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "@vitejs/plugin-react": "^4.2.1",
-    "cross-env": "^7.0.3",
     "scaffdog": "^4.1.0",
     "typescript": "^5.2.2",
     "vite": "^5.3.1"
