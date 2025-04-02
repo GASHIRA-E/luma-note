@@ -236,12 +236,12 @@ cargo run --example [example対象]
 
 ### データベースの環境分け
 
-- 開発環境（`TAURI_ENV_DEBUG=true`）
+- 開発環境（debug_assertions有効）
   - 保存場所: `{app_local_data_dir}/md-memo-light-db-dev/db.sqlite`
   - 使用コマンド: `npm run tauri dev`
   - 開発やテスト用のデータを保存
 
-- 本番環境（`TAURI_ENV_DEBUG=false`）
+- 本番環境（debug_assertions無効）
   - 保存場所: `{app_local_data_dir}/md-memo-light-db/db.sqlite`
   - 使用コマンド: `npm run tauri build`でビルドされたアプリケーション
   - 実際の利用データを保存

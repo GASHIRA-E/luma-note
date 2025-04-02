@@ -50,10 +50,17 @@ async fn create_tables(pool: &Pool<Sqlite>) {
 
 /// DBのパスを環境に応じて生成する
 pub(crate) fn get_database_path(app_dir: &std::path::Path) -> std::path::PathBuf {
-    // TAURI_ENV_DEBUGが"true"の場合は開発環境
-    let is_debug = std::env::var("TAURI_ENV_DEBUG")
-        .map(|v| v == "true")
-        .unwrap_or(false);
+    // Cargoのプロファイルから開発環境かどうかを判断
+    let is_debug = cfg!(debug_assertions);
+
+    println!(
+        "実行環境: {}",
+        if is_debug {
+            "開発環境"
+        } else {
+            "本番環境"
+        }
+    );
 
     let db_name = if is_debug {
         "md-memo-light-db-dev"
