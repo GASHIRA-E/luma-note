@@ -110,6 +110,7 @@ export const EditorDisplay = ({
           style={{
             width: previewMode === "live" ? "50%" : "100%",
             overflowY: "scroll",
+            minHeight: "100%",
           }}
         >
           <MarkdownPreview markdownText={mdText || ""} />
