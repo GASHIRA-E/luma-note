@@ -134,7 +134,9 @@ export const EditorDisplay = ({
 
       {previewMode === "preview" && (
         <Flex flexGrow={1} overflow="hidden">
-          <MarkdownPreview markdownText={mdText || ""} />
+          <div style={{ overflowY: "scroll", width: "100%" }}>
+            <MarkdownPreview markdownText={mdText || ""} />
+          </div>
         </Flex>
       )}
     </AppSettingContext.Provider>
