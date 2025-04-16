@@ -1,4 +1,4 @@
-import { useEffect, useMemo, createContext } from "react";
+import { useEffect, useMemo } from "react";
 import { Flex } from "@chakra-ui/react";
 import mermaid from "mermaid";
 
@@ -8,13 +8,6 @@ import { useDebounce } from "@/utils/hooks/useDebounce";
 
 import { Editor } from "@/components/parts/editor/Editor";
 import { MarkdownPreview } from "@/components/parts/MarkdownPreview";
-
-// themeを保持するコンテキスト
-export const AppSettingContext = createContext<{
-  theme: AppTheme;
-}>({
-  theme: AppThemes.SYSTEM,
-});
 
 export type EditorDisplayProps = {
   mdText: string | undefined;
@@ -102,43 +95,26 @@ export const EditorDisplay = ({
   };
 
   return (
-    <AppSettingContext.Provider
-      value={{
-        theme,
-      }}
-    >
-      {previewMode === "edit" && (
-        <Flex flexGrow={1} overflow="hidden">
+    <Flex flexGrow={1} overflow="hidden">
+      {previewMode !== "preview" && (
+        <div style={{ width: previewMode === "live" ? "50%" : "100%" }}>
           <Editor
             value={mdText || ""}
             onChange={handleChange}
             selectedMemoId={selectedMemoId}
           />
-        </Flex>
+        </div>
       )}
-
-      {previewMode === "live" && (
-        <Flex flexGrow={1} overflow="hidden">
-          <div style={{ width: "50%", height: "100%" }}>
-            <Editor
-              value={mdText || ""}
-              onChange={handleChange}
-              selectedMemoId={selectedMemoId}
-            />
-          </div>
-          <div style={{ width: "50%", height: "100%", overflowY: "scroll" }}>
-            <MarkdownPreview markdownText={mdText || ""} />
-          </div>
-        </Flex>
+      {previewMode !== "edit" && (
+        <div
+          style={{
+            width: previewMode === "live" ? "50%" : "100%",
+            overflowY: "scroll",
+          }}
+        >
+          <MarkdownPreview markdownText={mdText || ""} />
+        </div>
       )}
-
-      {previewMode === "preview" && (
-        <Flex flexGrow={1} overflow="hidden">
-          <div style={{ overflowY: "scroll", width: "100%" }}>
-            <MarkdownPreview markdownText={mdText || ""} />
-          </div>
-        </Flex>
-      )}
-    </AppSettingContext.Provider>
+    </Flex>
   );
 };
