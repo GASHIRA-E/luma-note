@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, createContext } from "react";
+import { useEffect, useMemo, createContext } from "react";
 import { Flex } from "@chakra-ui/react";
 import mermaid from "mermaid";
 
@@ -6,10 +6,8 @@ import { DisplayModes, type DisplayMode } from "@/utils/constants";
 import { AppThemes, type AppTheme } from "@/utils/constants";
 import { useDebounce } from "@/utils/hooks/useDebounce";
 
-import MDEditor, { commands, type MDEditorProps } from "@uiw/react-md-editor";
-
-import { Code } from "@/components/parts/editor/editorDisplay/Code";
-import { AnchorTag } from "@/components/parts/editor/editorDisplay/AnchorTag";
+import { Editor } from "@/components/parts/editor/Editor";
+import { MarkdownPreview } from "@/components/parts/MarkdownPreview";
 
 // themeを保持するコンテキスト
 export const AppSettingContext = createContext<{
@@ -22,6 +20,7 @@ export type EditorDisplayProps = {
   mdText: string | undefined;
   theme: AppTheme;
   displayMode: DisplayMode;
+  selectedMemoId?: number;
   saveMdText: (mdText: string) => void;
 };
 
@@ -29,14 +28,9 @@ export const EditorDisplay = ({
   mdText,
   theme,
   displayMode,
+  selectedMemoId,
   saveMdText,
 }: EditorDisplayProps) => {
-  const [mdLocalText, setMdLocalText] = useState<string | undefined>(undefined);
-
-  useEffect(() => {
-    setMdLocalText(mdText);
-  }, [mdText]);
-
   const saveMdTextDebounce = useDebounce(
     (mdText: string) => {
       saveMdText(mdText);
@@ -100,31 +94,8 @@ export const EditorDisplay = ({
     }
   }, [displayMode]);
 
-  const customCommands: commands.ICommand[] = [
-    commands.bold,
-    commands.italic,
-    commands.strikethrough,
-    commands.hr,
-    commands.divider,
-    commands.title1,
-    commands.title2,
-    commands.title3,
-    commands.title4,
-    commands.title5,
-    commands.title6,
-    commands.divider,
-    commands.link,
-    commands.quote,
-    commands.image,
-    commands.table,
-    commands.divider,
-    commands.unorderedListCommand,
-    commands.orderedListCommand,
-  ];
-
-  const handleChange: MDEditorProps["onChange"] = (value) => {
+  const handleChange: (value: string) => void = (value) => {
     // Add this condition
-    setMdLocalText(value);
     if (value !== undefined) {
       saveMdTextDebounce(value);
     }
@@ -136,24 +107,36 @@ export const EditorDisplay = ({
         theme,
       }}
     >
-      <Flex flexGrow={1} overflow="hidden">
-        <MDEditor
-          value={mdLocalText}
-          onChange={handleChange}
-          height="100%"
-          style={{
-            width: "100%",
-          }}
-          preview={previewMode}
-          commands={customCommands}
-          previewOptions={{
-            components: {
-              a: AnchorTag,
-              code: Code as any,
-            },
-          }}
-        />
-      </Flex>
+      {previewMode === "edit" && (
+        <Flex flexGrow={1} overflow="hidden">
+          <Editor
+            value={mdText || ""}
+            onChange={handleChange}
+            selectedMemoId={selectedMemoId}
+          />
+        </Flex>
+      )}
+
+      {previewMode === "live" && (
+        <Flex flexGrow={1} overflow="hidden">
+          <div style={{ width: "50%", height: "100%" }}>
+            <Editor
+              value={mdText || ""}
+              onChange={handleChange}
+              selectedMemoId={selectedMemoId}
+            />
+          </div>
+          <div style={{ width: "50%", height: "100%", overflowY: "scroll" }}>
+            <MarkdownPreview markdownText={mdText || ""} />
+          </div>
+        </Flex>
+      )}
+
+      {previewMode === "preview" && (
+        <Flex flexGrow={1} overflow="hidden">
+          <MarkdownPreview markdownText={mdText || ""} />
+        </Flex>
+      )}
     </AppSettingContext.Provider>
   );
 };
