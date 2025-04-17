@@ -1,39 +1,45 @@
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import mermaid from "mermaid";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { prism } from "react-syntax-highlighter/dist/esm/styles/prism";
 import "github-markdown-css/github-markdown-light.css";
-import SyntaxHighlighter from "react-syntax-highlighter/dist/esm/default-highlight";
-
-import type { ClassAttributes, HTMLAttributes } from "react";
-import type { ExtraProps } from "react-markdown";
 
 type MarkdownPreviewProps = {
   markdownText: string;
 };
 
-const Pre = ({
-  children,
-  ...props
-}: ClassAttributes<HTMLPreElement> &
-  HTMLAttributes<HTMLPreElement> &
-  ExtraProps) => {
-  if (!children || typeof children !== "object") {
-    return <code {...props}>{children}</code>;
-  }
-  const childType = "type" in children ? children.type : "";
-  if (childType !== "code") {
-    return <code {...props}>{children}</code>;
-  }
+type MermaidProps = {
+  code: string;
+};
 
-  const childProps = "props" in children ? children.props : {};
-  const { className, children: code } = childProps;
-  const language = className?.replace("language-", "");
+export const Mermaid: React.FC<MermaidProps> = (props) => {
+  const { code } = props;
+  const outputRef = React.useRef<HTMLDivElement>(null);
 
-  return (
-    <SyntaxHighlighter language={language}>
-      {String(code).replace(/\n$/, "")}
-    </SyntaxHighlighter>
-  );
+  const render = React.useCallback(async () => {
+    if (outputRef.current && code) {
+      try {
+        // ① 一意な ID を指定する必要あり
+        const { svg } = await mermaid.render(`m${crypto.randomUUID()}`, code);
+        outputRef.current.innerHTML = svg;
+      } catch (error) {
+        console.error(error);
+        outputRef.current.innerHTML = "Invalid syntax";
+      }
+    }
+  }, [code]);
+
+  React.useEffect(() => {
+    render();
+  }, [render]);
+
+  return code ? (
+    <div style={{ backgroundColor: "#fff" }}>
+      <div ref={outputRef} />
+    </div>
+  ) : null;
 };
 
 export const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({
@@ -51,7 +57,30 @@ export const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
-          pre: Pre,
+          code({ node, className, children, ref, ...props }) {
+            if (
+              className === "language-mermaid" &&
+              node?.children[0].type === "text"
+            ) {
+              return <Mermaid code={node?.children[0].value} />;
+            } else {
+              const match = /language-(\w+)/.exec(className || "");
+
+              return match ? (
+                <SyntaxHighlighter
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  style={prism as any}
+                  language={match[1]}
+                  PreTag="div"
+                  {...props}
+                >
+                  {String(children).replace(/\n$/, "")}
+                </SyntaxHighlighter>
+              ) : (
+                <code className={className}>{children}</code>
+              );
+            }
+          },
         }}
       >
         {markdownText}
