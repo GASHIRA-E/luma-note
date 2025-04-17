@@ -50,7 +50,6 @@ export const EditArea = () => {
   const handleSaveMdText = useCallback(
     (mdText: string) => {
       if (!selectedMemoId) return;
-      console.log("selectedMemoId", selectedMemoId);
       updateMemoMutate({
         memo: {
           id: selectedMemoId,
