@@ -5,6 +5,7 @@ import mermaid from "mermaid";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { prism } from "react-syntax-highlighter/dist/esm/styles/prism";
 import "github-markdown-css/github-markdown-light.css";
+import "./markdownPreview.css";
 
 type MarkdownPreviewProps = {
   markdownText: string;
