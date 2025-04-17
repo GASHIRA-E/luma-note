@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { Flex } from "@chakra-ui/react";
 import mermaid from "mermaid";
 
@@ -41,7 +41,6 @@ export const EditorDisplay = ({
     });
   }, []);
 
-  // テーマ切り替え時にエディターのテーマを変更
   useEffect(() => {
     if (theme === AppThemes.DARK) {
       document.documentElement.setAttribute("data-color-mode", "dark");
@@ -49,15 +48,13 @@ export const EditorDisplay = ({
         theme: "dark",
         darkMode: true,
       });
-    }
-    if (theme === AppThemes.LIGHT) {
+    } else if (theme === AppThemes.LIGHT) {
       document.documentElement.setAttribute("data-color-mode", "light");
       mermaid.initialize({
         theme: "default",
         darkMode: false,
       });
-    }
-    if (theme === AppThemes.SYSTEM) {
+    } else if (theme === AppThemes.SYSTEM) {
       if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
         document.documentElement.setAttribute("data-color-mode", "dark");
         mermaid.initialize({
@@ -74,21 +71,7 @@ export const EditorDisplay = ({
     }
   }, [theme]);
 
-  const previewMode = useMemo<"live" | "edit" | "preview">(() => {
-    switch (displayMode) {
-      case DisplayModes.EDIT:
-        return "edit";
-      case DisplayModes.SPLIT:
-        return "live";
-      case DisplayModes.VIEW:
-        return "preview";
-      default:
-        return "edit";
-    }
-  }, [displayMode]);
-
   const handleChange: (value: string) => void = (value) => {
-    // Add this condition
     if (value !== undefined) {
       saveMdTextDebounce(value);
     }
@@ -96,8 +79,13 @@ export const EditorDisplay = ({
 
   return (
     <Flex flexGrow={1} overflow="hidden">
-      {previewMode !== "preview" && (
-        <div style={{ width: previewMode === "live" ? "50%" : "100%" }}>
+      {(displayMode === DisplayModes.EDIT ||
+        displayMode === DisplayModes.SPLIT) && (
+        <div
+          style={{
+            width: displayMode === DisplayModes.SPLIT ? "50%" : "100%",
+          }}
+        >
           <Editor
             value={mdText || ""}
             onChange={handleChange}
@@ -105,10 +93,11 @@ export const EditorDisplay = ({
           />
         </div>
       )}
-      {previewMode !== "edit" && (
+      {(displayMode === DisplayModes.VIEW ||
+        displayMode === DisplayModes.SPLIT) && (
         <div
           style={{
-            width: previewMode === "live" ? "50%" : "100%",
+            width: displayMode === DisplayModes.SPLIT ? "50%" : "100%",
             overflowY: "scroll",
             minHeight: "100%",
           }}
