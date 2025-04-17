@@ -32,20 +32,8 @@ export const EditArea = () => {
   const { mutateAsync: createTagMutateAsync } = createTagMutation(queryClient);
 
   const [tags, setTags] = useState<string[]>([]);
-  // const [mdText, setMdText] = useState<string | undefined>(undefined);
 
   const { theme } = useAppSettingContext();
-
-  // const handleSaveMdText = (mdText: string) => {
-  //   if (!selectedMemoId) return;
-  //   console.log("selectedMemoId", selectedMemoId);
-  //   updateMemoMutate({
-  //     memo: {
-  //       id: selectedMemoId,
-  //       content: mdText,
-  //     },
-  //   });
-  // };
 
   const handleSaveMdText = useCallback(
     (mdText: string) => {
@@ -62,10 +50,8 @@ export const EditArea = () => {
 
   useEffect(() => {
     if (memoData) {
-      // setMdText(memoData.content);
       setTags(memoData.tags?.map((tag) => tag.name) || []);
     } else {
-      // setMdText("");
       setTags([]);
     }
   }, [memoData]);
