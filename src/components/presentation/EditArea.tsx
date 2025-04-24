@@ -11,7 +11,13 @@ export type EditAreaProps = {
 
 export const EditArea = ({ editorInfo, editorDisplay }: EditAreaProps) => {
   return (
-    <Flex flex={1} height="100%" direction="column">
+    <Flex
+      flex={1}
+      height="100%"
+      direction="column"
+      flexShrink={1}
+      overflowX="hidden"
+    >
       {/* ファイル名とタグ */}
       <EditorInfo {...editorInfo} />
 

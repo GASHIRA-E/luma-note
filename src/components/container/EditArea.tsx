@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { EditArea as EditorPresentation } from "@/components/presentation/EditArea";
@@ -32,26 +32,26 @@ export const EditArea = () => {
   const { mutateAsync: createTagMutateAsync } = createTagMutation(queryClient);
 
   const [tags, setTags] = useState<string[]>([]);
-  const [mdText, setMdText] = useState<string | undefined>(undefined);
 
   const { theme } = useAppSettingContext();
 
-  const handleSaveMdText = (mdText: string) => {
-    if (!selectedMemoId) return;
-    updateMemoMutate({
-      memo: {
-        id: selectedMemoId,
-        content: mdText,
-      },
-    });
-  };
+  const handleSaveMdText = useCallback(
+    (mdText: string) => {
+      if (!selectedMemoId) return;
+      updateMemoMutate({
+        memo: {
+          id: selectedMemoId,
+          content: mdText,
+        },
+      });
+    },
+    [selectedMemoId, updateMemoMutate]
+  );
 
   useEffect(() => {
     if (memoData) {
-      setMdText(memoData.content);
       setTags(memoData.tags?.map((tag) => tag.name) || []);
     } else {
-      setMdText("");
       setTags([]);
     }
   }, [memoData]);
@@ -139,10 +139,11 @@ export const EditArea = () => {
         onTitleChange: handleTitleChange,
       }}
       editorDisplay={{
-        mdText: mdText,
+        mdText: memoData.content,
         theme: theme,
         saveMdText: handleSaveMdText,
         displayMode: editorDisplayMode,
+        selectedMemoId: selectedMemoId,
       }}
     />
   );
