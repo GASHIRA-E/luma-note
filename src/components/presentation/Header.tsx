@@ -1,5 +1,5 @@
 import type React from "react";
-import { Flex, HStack } from "@chakra-ui/react";
+import { Flex, HStack, Button } from "@chakra-ui/react";
 
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { SearchInput } from "@/components/parts/SearchInput";
@@ -12,6 +12,8 @@ type HeaderProps = {
   setEditorDisplayMode: (mode: DisplayMode) => void;
   ConfigMenuButton: () => React.ReactElement;
   searchInput: React.ComponentProps<typeof SearchInput>;
+  toggleFolderListVisibility: (value: boolean) => void;
+  toggleMemoListVisibility: (value: boolean) => void;
 };
 
 const SegmentItems = getObjectKeys(DisplayModes).map((k) => DisplayModes[k]);
@@ -25,6 +27,8 @@ export const Header = ({
   setEditorDisplayMode,
   ConfigMenuButton,
   searchInput,
+  toggleFolderListVisibility,
+  toggleMemoListVisibility,
 }: HeaderProps) => {
   const handleValueChange: React.ComponentProps<
     typeof SegmentedControl
@@ -46,6 +50,8 @@ export const Header = ({
       <SearchInput {...searchInput} />
 
       <HStack>
+        <Button onClick={() => toggleFolderListVisibility(!editorDisplayModeValue)}>Toggle Folder List</Button>
+        <Button onClick={() => toggleMemoListVisibility(!editorDisplayModeValue)}>Toggle Memo List</Button>
         <SegmentedControl
           value={editorDisplayModeValue}
           onValueChange={handleValueChange}

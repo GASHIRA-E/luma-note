@@ -8,9 +8,15 @@ import { useSearchStore } from "@/utils/stores/search";
 
 type HeaderContainerProps = {
   ConfigMenuButton: () => React.ReactElement;
+  toggleFolderListVisibility: (value: boolean) => void;
+  toggleMemoListVisibility: (value: boolean) => void;
 };
 
-export const HeaderContainer = ({ ConfigMenuButton }: HeaderContainerProps) => {
+export const HeaderContainer = ({ 
+  ConfigMenuButton, 
+  toggleFolderListVisibility, 
+  toggleMemoListVisibility 
+}: HeaderContainerProps) => {
   const editorDisplayMode = useEditorStore((state) => state.displayMode);
   const setDisplayMode = useEditorStore((state) => state.setDisplayMode);
 
@@ -85,6 +91,8 @@ export const HeaderContainer = ({ ConfigMenuButton }: HeaderContainerProps) => {
         onClickFilterButton: handleClickFilterButton,
         onClickClear: handleClickClear,
       }}
+      toggleFolderListVisibility={toggleFolderListVisibility}
+      toggleMemoListVisibility={toggleMemoListVisibility}
     />
   );
 };
