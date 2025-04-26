@@ -1,4 +1,5 @@
 import ReactMonacoEditor from "@monaco-editor/react";
+import { MonacoMarkdownExtension } from "monaco-markdown";
 
 type EditorProps = {
   value: string;
@@ -17,6 +18,11 @@ export const Editor = (props: EditorProps) => {
         if (value !== undefined) {
           props.onChange(value);
         }
+      }}
+      onMount={(editor) => {
+        const mmd = new MonacoMarkdownExtension();
+        // @ts-ignore monaco-markdownの使用しているmonaco-editorのバージョンが古く型定義があってないと思われる
+        mmd.activate(editor);
       }}
       options={{
         minimap: {

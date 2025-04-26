@@ -26,7 +26,7 @@ export const Mermaid: React.FC<MermaidProps> = (props) => {
         const { svg } = await mermaid.render(`m${crypto.randomUUID()}`, code);
         outputRef.current.innerHTML = svg;
       } catch (error) {
-        console.error(error);
+        console.warn(error);
         outputRef.current.innerHTML = "Invalid syntax";
       }
     }
