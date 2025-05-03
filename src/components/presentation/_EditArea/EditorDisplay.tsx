@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, createContext } from "react";
+import { useEffect } from "react";
 import { Flex } from "@chakra-ui/react";
 import mermaid from "mermaid";
 
@@ -6,22 +6,14 @@ import { DisplayModes, type DisplayMode } from "@/utils/constants";
 import { AppThemes, type AppTheme } from "@/utils/constants";
 import { useDebounce } from "@/utils/hooks/useDebounce";
 
-import MDEditor, { commands, type MDEditorProps } from "@uiw/react-md-editor";
-
-import { Code } from "@/components/parts/editor/editorDisplay/Code";
-import { AnchorTag } from "@/components/parts/editor/editorDisplay/AnchorTag";
-
-// themeを保持するコンテキスト
-export const AppSettingContext = createContext<{
-  theme: AppTheme;
-}>({
-  theme: AppThemes.SYSTEM,
-});
+import { Editor } from "@/components/parts/editor/Editor";
+import { MarkdownPreview } from "@/components/parts/MarkdownPreview";
 
 export type EditorDisplayProps = {
   mdText: string | undefined;
   theme: AppTheme;
   displayMode: DisplayMode;
+  selectedMemoId?: number;
   saveMdText: (mdText: string) => void;
 };
 
@@ -29,14 +21,9 @@ export const EditorDisplay = ({
   mdText,
   theme,
   displayMode,
+  selectedMemoId,
   saveMdText,
 }: EditorDisplayProps) => {
-  const [mdLocalText, setMdLocalText] = useState<string | undefined>(undefined);
-
-  useEffect(() => {
-    setMdLocalText(mdText);
-  }, [mdText]);
-
   const saveMdTextDebounce = useDebounce(
     (mdText: string) => {
       saveMdText(mdText);
@@ -54,7 +41,6 @@ export const EditorDisplay = ({
     });
   }, []);
 
-  // テーマ切り替え時にエディターのテーマを変更
   useEffect(() => {
     if (theme === AppThemes.DARK) {
       document.documentElement.setAttribute("data-color-mode", "dark");
@@ -62,15 +48,13 @@ export const EditorDisplay = ({
         theme: "dark",
         darkMode: true,
       });
-    }
-    if (theme === AppThemes.LIGHT) {
+    } else if (theme === AppThemes.LIGHT) {
       document.documentElement.setAttribute("data-color-mode", "light");
       mermaid.initialize({
         theme: "default",
         darkMode: false,
       });
-    }
-    if (theme === AppThemes.SYSTEM) {
+    } else if (theme === AppThemes.SYSTEM) {
       if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
         document.documentElement.setAttribute("data-color-mode", "dark");
         mermaid.initialize({
@@ -87,73 +71,40 @@ export const EditorDisplay = ({
     }
   }, [theme]);
 
-  const previewMode = useMemo<"live" | "edit" | "preview">(() => {
-    switch (displayMode) {
-      case DisplayModes.EDIT:
-        return "edit";
-      case DisplayModes.SPLIT:
-        return "live";
-      case DisplayModes.VIEW:
-        return "preview";
-      default:
-        return "edit";
-    }
-  }, [displayMode]);
-
-  const customCommands: commands.ICommand[] = [
-    commands.bold,
-    commands.italic,
-    commands.strikethrough,
-    commands.hr,
-    commands.divider,
-    commands.title1,
-    commands.title2,
-    commands.title3,
-    commands.title4,
-    commands.title5,
-    commands.title6,
-    commands.divider,
-    commands.link,
-    commands.quote,
-    commands.image,
-    commands.table,
-    commands.divider,
-    commands.unorderedListCommand,
-    commands.orderedListCommand,
-  ];
-
-  const handleChange: MDEditorProps["onChange"] = (value) => {
-    // Add this condition
-    setMdLocalText(value);
+  const handleChange: (value: string) => void = (value) => {
     if (value !== undefined) {
       saveMdTextDebounce(value);
     }
   };
 
   return (
-    <AppSettingContext.Provider
-      value={{
-        theme,
-      }}
-    >
-      <Flex flexGrow={1} overflow="hidden">
-        <MDEditor
-          value={mdLocalText}
-          onChange={handleChange}
-          height="100%"
+    <Flex flexGrow={1} overflow="hidden">
+      {(displayMode === DisplayModes.EDIT ||
+        displayMode === DisplayModes.SPLIT) && (
+        <div
           style={{
-            width: "100%",
+            width: displayMode === DisplayModes.SPLIT ? "50%" : "100%",
           }}
-          preview={previewMode}
-          commands={customCommands}
-          previewOptions={{
-            components: {
-              a: AnchorTag,
-              code: Code as any,
-            },
+        >
+          <Editor
+            value={mdText || ""}
+            onChange={handleChange}
+            selectedMemoId={selectedMemoId}
+          />
+        </div>
+      )}
+      {(displayMode === DisplayModes.VIEW ||
+        displayMode === DisplayModes.SPLIT) && (
+        <div
+          style={{
+            width: displayMode === DisplayModes.SPLIT ? "50%" : "100%",
+            overflowY: "scroll",
+            minHeight: "100%",
           }}
-        />
-      </Flex>
-    </AppSettingContext.Provider>
+        >
+          <MarkdownPreview markdownText={mdText || ""} />
+        </div>
+      )}
+    </Flex>
   );
 };

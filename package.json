@@ -1,7 +1,7 @@
 {
   "name": "luma-note",
   "private": true,
-  "version": "0.0.3",
+  "version": "0.0.4",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -14,6 +14,7 @@
   "dependencies": {
     "@chakra-ui/react": "^3.2.3",
     "@emotion/react": "^11.14.0",
+    "@monaco-editor/react": "^4.7.0",
     "@tanstack/react-query": "^5.62.8",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-shell": "^2",
@@ -22,10 +23,12 @@
     "@uiw/react-md-editor": "^4.0.5",
     "github-markdown-css": "^5.8.1",
     "mermaid": "^11.4.1",
+    "monaco-markdown": "^0.0.12",
     "next-themes": "^0.4.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.4.0",
+    "react-syntax-highlighter": "^15.6.1",
     "rehype-rewrite": "^3.0.6",
     "zustand": "^5.0.2"
   },
@@ -33,6 +36,7 @@
     "@tauri-apps/cli": "^2",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
+    "@types/react-syntax-highlighter": "^15.5.13",
     "@vitejs/plugin-react": "^4.2.1",
     "husky": "^9.1.7",
     "scaffdog": "^4.1.0",

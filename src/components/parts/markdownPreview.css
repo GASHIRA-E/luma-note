@@ -1,0 +1,27 @@
+/* markdownの上書き用CSS */
+/* 
+  リセットCSSで消されてしまった
+ */
+.markdown-body ul {
+  list-style: disc;
+}
+/* 第二階層 */
+.markdown-body ul ul {
+  list-style: circle;
+}
+/* 第三階層 */
+.markdown-body ul ul ul {
+  list-style: square;
+}
+
+.markdown-body ol {
+  list-style: decimal;
+  counter-reset: list;
+  counter-increment: list;
+}
+.markdown-body pre {
+  padding: 0;
+}
+.markdown-body pre > div {
+  margin: 0 !important;
+}
