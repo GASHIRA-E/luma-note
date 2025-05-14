@@ -50,26 +50,21 @@ function App() {
     const setupShortcuts = async () => {
       try {
         // フォルダリストの表示/非表示を切り替えるショートカット
-        await register("CommandOrControl+Shift+F", () => {
+        await register("CommandOrControl+Shift+9", () => {
           toggleFolderListVisibility();
         });
         
         // メモリストの表示/非表示を切り替えるショートカット
-        await register("CommandOrControl+Shift+M", () => {
+        await register("CommandOrControl+Shift+0", () => {
           toggleMemoListVisibility();
         });
-        
-        console.log("ショートカットが登録されました");
       } catch (error) {
         console.error("ショートカットの登録に失敗しました:", error);
       }
     };
     
     setupShortcuts();
-    
-    // コンポーネントのアンマウント時にクリーンアップする必要はありません
-    // Tauriアプリが終了するとショートカットは自動的に登録解除されます
-  }, []);
+      }, []);
 
   return (
     <AppSettingProvider>

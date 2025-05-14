@@ -46,6 +46,37 @@ pub fn db_init(app: &mut tauri::App) -> Result<Pool<Sqlite>, Box<dyn std::error:
     Ok(sqlite_pool)
 }
 
+fn register_shortcuts(app: &tauri::App) -> Result<(), Box<dyn std::error::Error>> {
+    app.global_shortcut().register("CommandOrControl+Shift+9")?;
+    app.global_shortcut().register("CommandOrControl+Shift+0")?;
+    Ok(())
+}
+
+fn handle_shortcut(
+    app: &tauri::AppHandle,
+    shortcut: &tauri_plugin_global_shortcut::Shortcut,
+    event: &tauri_plugin_global_shortcut::ShortcutEvent,
+) {
+    // フォルダリスト切り替えショートカット
+    if shortcut.key == Code::Digit9 && shortcut.mods.contains(Modifiers::SHIFT) {
+        match event.state() {
+            ShortcutState::Pressed => {
+                app.emit("toggle-folder-list", ()).unwrap();
+            }
+            ShortcutState::Released => {}
+        }
+    }
+    // メモリスト切り替えショートカット
+    else if shortcut.key == Code::Digit0 && shortcut.mods.contains(Modifiers::SHIFT) {
+        match event.state() {
+            ShortcutState::Pressed => {
+                app.emit("toggle-memo-list", ()).unwrap();
+            }
+            ShortcutState::Released => {}
+        }
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     tauri::Builder::default()
@@ -55,34 +86,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         .plugin(
             tauri_plugin_global_shortcut::Builder::new()
                 .with_handler(move |app, shortcut, event| {
-                    println!("ショートカットキーが押されました: {:?}", shortcut);
-                    // フォルダリスト切り替えショートカット
-                    if shortcut.key == Code::KeyF && shortcut.mods.contains(Modifiers::SHIFT) {
-                        match event.state() {
-                            ShortcutState::Pressed => {
-                                println!("CommandOrControl+Shift+F が押されました！");
-                                // フロントエンドにイベントを送信
-                                app.emit("toggle-folder-list", ()).unwrap();
-                            }
-                            ShortcutState::Released => {
-                                println!("CommandOrControl+Shift+F が離されました！");
-                            }
-                        }
-                    }
-                    // メモリスト切り替えショートカット
-                    else if shortcut.key == Code::KeyM && shortcut.mods.contains(Modifiers::SHIFT)
-                    {
-                        match event.state() {
-                            ShortcutState::Pressed => {
-                                println!("CommandOrControl+Shift+M が押されました！");
-                                // フロントエンドにイベントを送信
-                                app.emit("toggle-memo-list", ()).unwrap();
-                            }
-                            ShortcutState::Released => {
-                                println!("CommandOrControl+Shift+M が離されました！");
-                            }
-                        }
-                    }
+                    handle_shortcut(app, &shortcut, &event);
                 })
                 .build(),
         )
@@ -101,14 +105,12 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
             get_tags,
             find_memo,
         ])
-        // ハンドラからコネクションプールにアクセスできるよう、登録する
         .setup(|app| {
             let sqlite_pool = db_init(app)?;
             app.manage(sqlite_pool);
 
             // グローバルショートカットの登録
-            app.global_shortcut().register("CommandOrControl+Shift+F")?;
-            app.global_shortcut().register("CommandOrControl+Shift+M")?;
+            register_shortcuts(app)?;
 
             Ok(())
         })
