@@ -58,11 +58,12 @@ export const MemoItem = ({
     >
       <Box
         position="relative"
-        boxShadow="xs"
-        boxShadowColor="border"
+        boxShadow="sm"
         bg={selected ? "bg.subtle" : "bg"}
         p={1}
         cursor="pointer"
+        as="button"
+        textAlign="left"
         _hover={{
           bg: "bg.emphasized",
         }}
