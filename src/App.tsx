@@ -1,4 +1,7 @@
 import "./App.css";
+import { useState, useEffect } from "react";
+import { register } from "@tauri-apps/plugin-global-shortcut";
+import { listen } from "@tauri-apps/api/event";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
@@ -14,6 +17,55 @@ import { ConfigMenuContainer } from "@/components/container/ConfigMenu";
 const queryClient = new QueryClient();
 
 function App() {
+  const [isFolderListVisible, setIsFolderListVisible] = useState(true);
+  const [isMemoListVisible, setIsMemoListVisible] = useState(true);
+
+  const toggleFolderListVisibility = () => {
+    setIsFolderListVisible((prev) => !prev);
+  };
+
+  const toggleMemoListVisibility = () => {
+    setIsMemoListVisible((prev) => !prev);
+  };
+
+  // バックエンドからのイベントをリッスン
+  useEffect(() => {
+    const unlistenFolderList = listen("toggle-folder-list", () => {
+      toggleFolderListVisibility();
+    });
+
+    const unlistenMemoList = listen("toggle-memo-list", () => {
+      toggleMemoListVisibility();
+    });
+
+    // クリーンアップ関数
+    return () => {
+      unlistenFolderList.then((unlisten) => unlisten());
+      unlistenMemoList.then((unlisten) => unlisten());
+    };
+  }, []);
+
+  // グローバルショートカットの登録
+  useEffect(() => {
+    const setupShortcuts = async () => {
+      try {
+        // フォルダリストの表示/非表示を切り替えるショートカット
+        await register("CommandOrControl+Shift+9", () => {
+          toggleFolderListVisibility();
+        });
+        
+        // メモリストの表示/非表示を切り替えるショートカット
+        await register("CommandOrControl+Shift+0", () => {
+          toggleMemoListVisibility();
+        });
+      } catch (error) {
+        console.error("ショートカットの登録に失敗しました:", error);
+      }
+    };
+    
+    setupShortcuts();
+      }, []);
+
   return (
     <AppSettingProvider>
       {(isCompleteInit) =>
@@ -25,11 +77,15 @@ function App() {
               <ColorModeProvider>
                 <main className="container">
                   {/* メニューエリア */}
-                  <HeaderContainer ConfigMenuButton={ConfigMenuContainer} />
+                  <HeaderContainer
+                    ConfigMenuButton={ConfigMenuContainer}
+                    toggleFolderListVisibility={toggleFolderListVisibility}
+                    toggleMemoListVisibility={toggleMemoListVisibility}
+                  />
                   {/* エディターエリア */}
                   <section className="editor-container">
-                    <FolderList />
-                    <MemoListContainer />
+                    {isFolderListVisible && <FolderList />}
+                    {isMemoListVisible && <MemoListContainer />}
                     <EditArea />
                   </section>
                 </main>
