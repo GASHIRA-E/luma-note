@@ -11,6 +11,7 @@ import {
   MenuRoot,
   MenuTrigger,
 } from "@/components/ui/menu";
+import { Tooltip } from "@/components/ui/tooltip";
 
 export type MemoItemProps = {
   id: number;
@@ -48,70 +49,79 @@ export const MemoItem = ({
   };
 
   return (
-    <Box
-      position="relative"
-      borderWidth={1}
-      borderColor="border"
-      bg={selected ? "bg.emphasized" : "bg.subtle"}
-      p={2}
-      borderRadius={2}
-      cursor="pointer"
-      _hover={{
-        borderColor: "border.inverted",
-      }}
-      onClick={() => onClickMemo(id)}
+    <Tooltip
+      content={
+        <Text color="fg.subtle" textStyle="sm">
+          last updated: {updatedAt}
+        </Text>
+      }
     >
-      {resultIcon ? (
-        <Float placement="top-end">
-          <Circle size={3} bg="teal.emphasized"></Circle>
-        </Float>
-      ) : null}
-      <HStack justifyContent="space-between" alignItems="flex-start">
-        <Text textStyle="md">{name}</Text>
-        <MenuRoot onSelect={handleSelectMenu}>
-          <MenuTrigger asChild>
-            <IconButton
-              size="xs"
-              aria-label="More options"
-              variant="outline"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <HiDotsHorizontal />
-            </IconButton>
-          </MenuTrigger>
-          <MenuContent>
-            <MenuItem
-              value="move-folder"
-              cursor="pointer"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <HiFolderOpen />
-              <Box flex="1">フォルダ移動</Box>
-            </MenuItem>
-            <MenuItem
-              value="rename-memo"
-              cursor="pointer"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <HiPencil />
-              <Box flex="1">名前変更</Box>
-            </MenuItem>
-            <MenuItem
-              value="delete-memo"
-              cursor="pointer"
-              color="fg.error"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <HiTrash />
-              <Box flex="1">削除</Box>
-            </MenuItem>
-          </MenuContent>
-        </MenuRoot>
-      </HStack>
-
-      <Text color="fg.subtle" textStyle="sm">
-        {updatedAt}
-      </Text>
-    </Box>
+      <Box
+        position="relative"
+        boxShadow="sm"
+        bg={selected ? "bg.subtle" : "bg"}
+        p={1}
+        cursor="pointer"
+        as="button"
+        textAlign="left"
+        _hover={{
+          bg: "bg.emphasized",
+        }}
+        onClick={() => onClickMemo(id)}
+      >
+        {resultIcon ? (
+          <Float placement="top-end">
+            <Circle size={3} bg="teal.emphasized"></Circle>
+          </Float>
+        ) : null}
+        <HStack justifyContent="space-between" alignItems="center">
+          <Box w="100%">
+            <Text textStyle="sm">{name}</Text>
+            <Text color="fg.subtle" textStyle="xs">
+              {updatedAt}
+            </Text>
+          </Box>
+          <MenuRoot onSelect={handleSelectMenu}>
+            <MenuTrigger asChild>
+              <IconButton
+                size="xs"
+                aria-label="More options"
+                variant="outline"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <HiDotsHorizontal />
+              </IconButton>
+            </MenuTrigger>
+            <MenuContent>
+              <MenuItem
+                value="move-folder"
+                cursor="pointer"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <HiFolderOpen />
+                <Box flex="1">フォルダ移動</Box>
+              </MenuItem>
+              <MenuItem
+                value="rename-memo"
+                cursor="pointer"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <HiPencil />
+                <Box flex="1">名前変更</Box>
+              </MenuItem>
+              <MenuItem
+                value="delete-memo"
+                cursor="pointer"
+                color="fg.error"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <HiTrash />
+                <Box flex="1">削除</Box>
+              </MenuItem>
+            </MenuContent>
+          </MenuRoot>
+        </HStack>
+      </Box>
+    </Tooltip>
   );
 };
