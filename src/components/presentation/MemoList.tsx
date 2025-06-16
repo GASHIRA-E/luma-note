@@ -43,7 +43,6 @@ export const MemoList: React.FC<MemoListProps> = ({
       w={240}
       maxH="100vh"
       overflowY="auto"
-      px={3}
       pb={3}
       bg="bg"
       borderRightWidth={1}
@@ -69,7 +68,7 @@ export const MemoList: React.FC<MemoListProps> = ({
         </Flex>
       </Box>
 
-      <Flex direction="column" gap={2} mt={3}>
+      <Flex direction="column" mt={2} gap={0.5}>
         {memos.map((memo) => (
           <MemoItem key={memo.id} {...memo} />
         ))}
