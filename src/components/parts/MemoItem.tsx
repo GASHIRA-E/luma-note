@@ -11,7 +11,6 @@ import {
   MenuRoot,
   MenuTrigger,
 } from "@/components/ui/menu";
-import { Tooltip } from "@/components/ui/tooltip";
 
 export type MemoItemProps = {
   id: number;
@@ -49,13 +48,6 @@ export const MemoItem = ({
   };
 
   return (
-    <Tooltip
-      content={
-        <Text color="fg.subtle" textStyle="sm">
-          last updated: {updatedAt}
-        </Text>
-      }
-    >
       <Box
         position="relative"
         boxShadow="sm"
@@ -122,6 +114,5 @@ export const MemoItem = ({
           </MenuRoot>
         </HStack>
       </Box>
-    </Tooltip>
   );
 };
