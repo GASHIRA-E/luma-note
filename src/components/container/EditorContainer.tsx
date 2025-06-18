@@ -2,7 +2,8 @@ import { useState } from "react";
 import {
   DndContext,
   DragOverlay,
-  DragStartEvent
+  DragStartEvent,
+  DragEndEvent,
 } from "@dnd-kit/core";
 import { Box } from "@chakra-ui/react";
 
@@ -11,12 +12,21 @@ import { MemoListContainer } from "@/components/container/MemoList";
 import { EditArea } from "@/components/container/EditArea";
 import { MemoItem } from "@/components/parts/MemoItem";
 
-import { getMemoListQuery } from "@/utils/invoke/Memo";
+import { getMemoListQuery, updateMemoMutation } from "@/utils/invoke/Memo";
 import { useFolderStore } from "@/utils/stores/folder";
+import { useQueryClient } from "@tanstack/react-query";
+import { generateNullableId } from "@/utils/helpers/generateNullableId";
 
 export const EditorContainer = () => {
+  const queryClient = useQueryClient();
+  const [customDropAnimation, setCustomDropAnimation] = useState<
+    null | undefined
+  >(undefined);
+  const { mutateAsync: updateMemoMutateAsync } =
+    updateMemoMutation(queryClient);
+
   const selectedFolderId = useFolderStore((state) => state.selectedFolderId);
-  const { data } = getMemoListQuery({
+  const { data, refetch: refetchGetMemoList } = getMemoListQuery({
     folderId: selectedFolderId,
   });
 
@@ -40,8 +50,28 @@ export const EditorContainer = () => {
     });
   };
 
-  const handleDragEnd = () => {
-    setDraggingItem(null);
+  const handleDragEnd = (event: DragEndEvent) => {
+    // メモをdropして、フォルダが存在する場合は所属フォルダを移動する
+    const memoId = Number(event.active.id);
+    if (isNaN(memoId)) return;
+    const folderId = Number(event.over?.id);
+    if (isNaN(folderId)) return;
+
+    setCustomDropAnimation(null);
+
+    updateMemoMutateAsync({
+      memo: {
+        id: memoId,
+        folder_id: generateNullableId(folderId),
+      },
+    })
+      .then(() => {
+        refetchGetMemoList();
+      })
+      .finally(() => {
+        setDraggingItem(null);
+        setCustomDropAnimation(undefined);
+      });
   };
 
   return (
@@ -49,7 +79,7 @@ export const EditorContainer = () => {
       <section className="editor-container">
         <FolderList />
         <MemoListContainer />
-        <DragOverlay>
+        <DragOverlay dropAnimation={customDropAnimation}>
           {draggingItem && (
             <Box w={240}>
               <MemoItem
