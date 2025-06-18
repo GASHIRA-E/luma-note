@@ -7,6 +7,7 @@ import {
   HiFolderOpen,
   HiTrash,
   HiPencil,
+  HiOutlineViewList,
 } from "react-icons/hi";
 import {
   MenuContent,
@@ -72,8 +73,6 @@ export const MemoItem = ({
         transform: CSS.Transform.toString(transform),
       }}
       ref={setNodeRef}
-      {...attributes}
-      {...listeners}
     >
       {resultIcon ? (
         <Float placement="top-end">
@@ -81,6 +80,18 @@ export const MemoItem = ({
         </Float>
       ) : null}
       <HStack justifyContent="space-between" alignItems="center">
+        <IconButton
+          size="xs"
+          aria-label="move"
+          variant="ghost"
+          style={{
+            cursor: "move",
+          }}
+          {...attributes}
+          {...listeners}
+        >
+          <HiOutlineViewList />
+        </IconButton>
         <Box w="100%">
           <Text textStyle="sm">{name}</Text>
           <Text color="fg.subtle" textStyle="xs">
