@@ -11,6 +11,11 @@ import { EditorContainer } from "@/components/container/EditorContainer";
 
 const queryClient = new QueryClient();
 
+/**
+ * The root component that initializes application settings and provides global context providers.
+ *
+ * Renders a loading message until initialization is complete, then sets up React Query, Chakra UI, and color mode providers, and displays the main application layout.
+ */
 function App() {
   return (
     <AppSettingProvider>
