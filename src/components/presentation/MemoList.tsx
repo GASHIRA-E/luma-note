@@ -43,6 +43,7 @@ export const MemoList: React.FC<MemoListProps> = ({
       w={240}
       maxH="100vh"
       overflowY="auto"
+      overscrollBehavior="none"
       pb={3}
       bg="bg"
       borderRightWidth={1}
