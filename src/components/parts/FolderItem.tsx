@@ -33,7 +33,7 @@ export const FolderItem = ({
   onClickRename,
 }: FolderProps) => {
   const { setNodeRef, isOver } = useDroppable({
-    id: folderId?.toString() ?? "",
+    id: `folder-${folderId?.toString() ?? "null"}`,
   });
 
   const handleClick = () => {

@@ -39,7 +39,7 @@ export const MemoItem = ({
   onClickRenameMemo,
   onClickDeleteMemo,
 }: MemoItemProps) => {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: id,
   });
 
@@ -68,10 +68,14 @@ export const MemoItem = ({
       _hover={{
         bg: "bg.emphasized",
       }}
-      onClick={() => onClickMemo(id)}
+      onClick={() => {
+        if (isDragging) return;
+        onClickMemo(id);
+      }}
       style={{
         transform: CSS.Transform.toString(transform),
       }}
+      {...attributes}
       ref={setNodeRef}
     >
       {resultIcon ? (
@@ -87,7 +91,6 @@ export const MemoItem = ({
           style={{
             cursor: "move",
           }}
-          {...attributes}
           {...listeners}
         >
           <HiOutlineViewList />

@@ -54,8 +54,11 @@ export const EditorContainer = () => {
     // メモをdropして、フォルダが存在する場合は所属フォルダを移動する
     const memoId = Number(event.active.id);
     if (isNaN(memoId)) return;
-    const folderId = Number(event.over?.id);
-    if (isNaN(folderId)) return;
+    // ドロップ先のフォルダのIDを取得
+    const folderIdStr = event.over?.id.toString().split("-");
+    if (!folderIdStr || folderIdStr[0] !== "folder") return;
+    // 未分類の場合はnull
+    const folderId = folderIdStr[1] !== "null" ? Number(folderIdStr[1]) : null;
 
     setCustomDropAnimation(null);
 
@@ -67,6 +70,9 @@ export const EditorContainer = () => {
     })
       .then(() => {
         refetchGetMemoList();
+      })
+      .catch((error) => {
+        console.error(error);
       })
       .finally(() => {
         setDraggingItem(null);
