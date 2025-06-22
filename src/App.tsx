@@ -5,11 +5,9 @@ import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
 import { ColorModeProvider } from "@/components/ui/color-mode";
 import { AppSettingProvider } from "@/components/context/AppSettingContext";
 
-import { FolderList } from "@/components/container/FolderList";
-import { MemoListContainer } from "@/components/container/MemoList";
-import { EditArea } from "@/components/container/EditArea";
 import { HeaderContainer } from "@/components/container/Header";
 import { ConfigMenuContainer } from "@/components/container/ConfigMenu";
+import { EditorContainer } from "@/components/container/EditorContainer";
 
 const queryClient = new QueryClient();
 
@@ -27,11 +25,7 @@ function App() {
                   {/* メニューエリア */}
                   <HeaderContainer ConfigMenuButton={ConfigMenuContainer} />
                   {/* エディターエリア */}
-                  <section className="editor-container">
-                    <FolderList />
-                    <MemoListContainer />
-                    <EditArea />
-                  </section>
+                  <EditorContainer />
                 </main>
               </ColorModeProvider>
             </ChakraProvider>

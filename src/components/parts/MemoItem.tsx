@@ -1,9 +1,13 @@
+import { useDraggable } from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
+
 import { Box, Text, HStack, IconButton, Float, Circle } from "@chakra-ui/react";
 import {
   HiDotsHorizontal,
   HiFolderOpen,
   HiTrash,
   HiPencil,
+  HiOutlineViewList,
 } from "react-icons/hi";
 import {
   MenuContent,
@@ -35,6 +39,10 @@ export const MemoItem = ({
   onClickRenameMemo,
   onClickDeleteMemo,
 }: MemoItemProps) => {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: id,
+  });
+
   const handleSelectMenu: React.ComponentProps<typeof MenuRoot>["onSelect"] = (
     select
   ) => {
@@ -50,24 +58,49 @@ export const MemoItem = ({
   return (
     <Box
       position="relative"
-      borderWidth={1}
-      borderColor="border"
-      bg={selected ? "bg.emphasized" : "bg.subtle"}
-      p={2}
-      borderRadius={2}
+      w="100%"
+      boxShadow="sm"
+      bg={selected ? "bg.subtle" : "bg"}
+      p={1}
       cursor="pointer"
+      as="button"
+      textAlign="left"
       _hover={{
-        borderColor: "border.inverted",
+        bg: "bg.emphasized",
       }}
-      onClick={() => onClickMemo(id)}
+      onClick={() => {
+        if (isDragging) return;
+        onClickMemo(id);
+      }}
+      style={{
+        transform: CSS.Transform.toString(transform),
+      }}
+      {...attributes}
+      ref={setNodeRef}
     >
       {resultIcon ? (
         <Float placement="top-end">
           <Circle size={3} bg="teal.emphasized"></Circle>
         </Float>
       ) : null}
-      <HStack justifyContent="space-between" alignItems="flex-start">
-        <Text textStyle="md">{name}</Text>
+      <HStack justifyContent="space-between" alignItems="center">
+        <IconButton
+          size="xs"
+          aria-label="move"
+          variant="ghost"
+          style={{
+            cursor: "move",
+          }}
+          {...listeners}
+        >
+          <HiOutlineViewList />
+        </IconButton>
+        <Box w="100%">
+          <Text textStyle="sm">{name}</Text>
+          <Text color="fg.subtle" textStyle="xs">
+            {updatedAt}
+          </Text>
+        </Box>
         <MenuRoot onSelect={handleSelectMenu}>
           <MenuTrigger asChild>
             <IconButton
@@ -108,10 +141,6 @@ export const MemoItem = ({
           </MenuContent>
         </MenuRoot>
       </HStack>
-
-      <Text color="fg.subtle" textStyle="sm">
-        {updatedAt}
-      </Text>
     </Box>
   );
 };

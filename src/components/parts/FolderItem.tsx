@@ -11,6 +11,7 @@ import {
   MenuRoot,
   MenuTrigger,
 } from "@/components/ui/menu";
+import { useDroppable } from "@dnd-kit/core";
 
 export type FolderProps = {
   folderId: number | null;
@@ -31,6 +32,10 @@ export const FolderItem = ({
   onClickDelete,
   onClickRename,
 }: FolderProps) => {
+  const { setNodeRef, isOver } = useDroppable({
+    id: `folder-${folderId?.toString() ?? "null"}`,
+  });
+
   const handleClick = () => {
     onClick(folderId);
   };
@@ -49,7 +54,8 @@ export const FolderItem = ({
     <Box
       position="relative"
       borderWidth={1}
-      borderColor="bg.subtle"
+      borderColor={isOver ? "border.inverted" : "bg.subtle"}
+      transition="border-color 0.2s ease-in-out"
       bg={selected ? "bg.emphasized" : "bg.subtle"}
       p={2}
       cursor="pointer"
@@ -57,6 +63,7 @@ export const FolderItem = ({
         borderColor: "border.inverted",
       }}
       onClick={selected ? undefined : handleClick}
+      ref={setNodeRef}
     >
       {memoCounts !== undefined ? (
         <Float placement="top-end" offsetX={3}>
